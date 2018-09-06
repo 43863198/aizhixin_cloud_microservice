@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+
+    <!-- This is a default configuration, it is re-configured by the CacheConfiguration
+        Spring Bean, using the properties from the resources/config/*.yml files. -->
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <defaultCache timeToIdleSeconds="120" timeToLiveSeconds="120"
+                  eternal="false" overflowToDisk="false"/>
+    <cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+           maxElementsInMemory="10000" timeToIdleSeconds="300" timeToLiveSeconds="4200"
+           eternal="false" overflowToDisk="true"/>
+    <cache name="org.hibernate.cache.internal.StandardQueryCache"
+           maxElementsInMemory="10000" timeToIdleSeconds="300" timeToLiveSeconds="4200"
+           eternal="false" overflowToDisk="true"/>
+    <cache name="authorCache" maxElementsInMemory="10000"
+           timeToIdleSeconds="300" timeToLiveSeconds="4200" eternal="false"
+           overflowToDisk="true"/>
+
+    <cache name="CACHE.GETSTATUSINFO" timeToLiveSeconds="1200"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.HOMEPAGE" timeToLiveSeconds="600"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.AUTHORIZATION" timeToLiveSeconds="600"
+           maxElementsInMemory="100000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.WEEK" timeToLiveSeconds="6000"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.SEMESTER" timeToLiveSeconds="6000"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.LOGINORGAN" timeToLiveSeconds="6000"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.LEAVESCHEDULE" timeToLiveSeconds="180"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.SCHEDULEINFO" timeToLiveSeconds="60"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.WEEKINFO" timeToLiveSeconds="6000"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.VERSIONINFO" timeToLiveSeconds="600"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.TEACHINGCLASSIDS" timeToLiveSeconds="60"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+    <cache name="CACHE.TIMEINTERVALINFO" timeToLiveSeconds="600"
+           maxElementsInMemory="10000" overflowToDisk="true">
+    </cache>
+</ehcache>

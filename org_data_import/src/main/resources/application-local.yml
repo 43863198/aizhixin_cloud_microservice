@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sccj?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF8&useSSL=false
+    username: root
+    password: bly,012345
+#    river-class-name: oracle.jdbc.OracleDriver
+#    url: jdbc:oracle:thin:@172.16.23.194:1521:orcl
+#    username: system
+#    password: dinglicom
+    hikari:
+      auto-commit: false
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 10000
+      max-lifetime: 600000
+      idle-timeout: 60000
+      validation-timeout: 1000
+      leak-detection-threshold: 30000
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLInnoDBDialect
+    database: MYSQL
+#    database-platform: org.hibernate.dialect.Oracle9Dialect
+#    database: ORACLE
+    open-in-view: false
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming.strategy: org.hibernate.cfg.EJB3NamingStrategy
+    properties:
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: true
+      hibernate.generate_statistics: false
+      hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+      javax.persistence.sharedCache.mode: ENABLE_SELECTIVE
+
+logging.level.com.aizhixin.cloud: DEBUG
+#logging.level.com.zaxxer.hikari: DEBUG
+
+#zhixinshu:
+#  host: http://dledudev.aizhixin.com/zhixin_api
+#  userId: 111111
+#  orgId: 214
+
+sys:
+  version: v0.0.1.01

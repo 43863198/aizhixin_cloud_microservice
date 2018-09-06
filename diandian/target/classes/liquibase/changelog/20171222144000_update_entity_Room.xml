@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="20171222144000" author="xiagen">
+		<addColumn tableName="DD_ROOM">
+			<column name="open" type="Boolean" defaultValueBoolean="false"
+				remarks="是否开发" />
+			<column name="beds"  type="INT(4)" defaultValueNumeric="0"
+				remarks="床位数量" />
+			<column name="em_beds"  type="INT(4)" defaultValueNumeric="0"
+				remarks="空床位数" />
+		</addColumn>
+		<addColumn tableName="DD_BED">
+			<column name="live"  type="Boolean" defaultValueBoolean="false"
+				remarks="是否住人" />
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

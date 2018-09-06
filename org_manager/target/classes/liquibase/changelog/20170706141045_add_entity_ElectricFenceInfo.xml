@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 电子围栏设置表结构-->
+    <changeSet id="20170706141045" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_ELECTRIC_FENCE_INFO"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_ELECTRIC_FENCE_INFO" remarks="电子围栏设置表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORG_ID" type="BIGINT" remarks="学校ID"/>
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期ID"/>
+            <column name="SETUP_OR_CLOSE" type="INT(4)" remarks="启用停用(10启用，20关闭)"/>
+            <column name="LLTUDES" type="TEXT(2000)" remarks="学校范围"/>
+            <column name="MONITOR_DATE" type="TEXT(6000)" remarks="监控日期"/>
+            <column name="NOMONITOR_DATE" type="TEXT(6000)" remarks="非监控日期"/>
+            <column name="NOTICE_TIME_INTERVAL" type="BIGINT" remarks="申报时隔"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

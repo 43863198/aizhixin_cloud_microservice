@@ -1,0 +1,47 @@
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+#  client:
+#    service-url:
+#      defaultZone: http://172.16.40.138:8081/eureka/
+#spring:
+#  cloud:
+#    inetutils:
+#      ignored-interfaces:
+#        - eth1
+#        - em2
+#        - em3
+#        - em4
+#        - usb0
+#  aop:
+#    auto: true
+#    proxy-target-class: true
+spring:
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
+  redis:
+    host: 172.16.23.30
+    database: 0
+    pool:
+      max-active: 200
+      max-idle: 80
+      max-wait: 200
+      min-idle: 50
+  kafka:
+    bootstrap-server: 172.16.23.122:9092
+    consumer:
+      group-id: spt-g1
+      auto-offset-reset: earliest
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /dinglicom/gateway_access_log
+      pattern: '%h %l %u [%{yyyy-MM-dd HH:mm:ss.SSS}t] "%r" %s %b %D'
+      prefix: demo_rds_access_log
+      suffix: .log
+logging.level.root: INFO
+logging.level.com.aizhixin.cloud: INFO

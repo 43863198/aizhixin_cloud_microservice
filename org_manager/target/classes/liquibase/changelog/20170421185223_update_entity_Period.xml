@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <!-- 调整字段-->
+    <changeSet id="20170421185223" author="panzhen">
+		<addColumn tableName="T_PERIOD">
+           <column name="START_TIME" type="VARCHAR(10)" remarks="开始时间" />
+		</addColumn>
+        <addColumn tableName="T_PERIOD">
+            <column name="END_TIME" type="VARCHAR(10)" remarks="结束时间" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

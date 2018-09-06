@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 实体中增加code字段-->
+    <changeSet id="20170523153042" author="zhen.pan">
+        <!--
+        <addColumn tableName="T_COLLEGE">
+            <column name="CODE" type="VARCHAR(70)" remarks="编码" />
+        </addColumn>
+        <addColumn tableName="T_PROFESSIONAL">
+            <column name="CODE" type="VARCHAR(70)" remarks="编码" />
+        </addColumn>
+        -->
+        <createIndex indexName="idx_t_college_code" tableName="T_COLLEGE" unique="false">
+            <column name="CODE" type="VARCHAR(70)"/>
+        </createIndex>
+        <createIndex indexName="idx_t_professional_code" tableName="T_PROFESSIONAL" unique="false">
+            <column name="CODE" type="VARCHAR(70)"/>
+        </createIndex>
+        <addColumn tableName="T_CLASSES">
+            <column name="CODE" type="VARCHAR(70)" remarks="编码" />
+            <column name="IN_SCHOOL_DATE" type="DATE" remarks="入学日期" />
+            <column name="OUT_SCHOOL_DATE" type="DATE" remarks="毕业日期" />
+            <column name="SCHOOL_STATUS" type="INT(6)" remarks="在校、毕业" />
+        </addColumn>
+        <createIndex indexName="idx_t_classes_code" tableName="T_CLASSES" unique="false">
+            <column name="CODE" type="VARCHAR(70)"/>
+        </createIndex>
+        <createIndex indexName="idx_t_classes_school_status" tableName="T_CLASSES" unique="false">
+            <column name="SCHOOL_STATUS" type="INT(6)"/>
+        </createIndex>
+        <addColumn tableName="T_COURSE">
+            <column name="CODE" type="VARCHAR(70)" remarks="编码" />
+            <column name="CREDIT" type="DECIMAL(6,2)" remarks="学分" />
+        </addColumn>
+        <createIndex indexName="idx_t_course_code" tableName="T_COURSE" unique="false">
+            <column name="CODE" type="VARCHAR(70)"/>
+        </createIndex>
+        <addColumn tableName="T_SEMESTER">
+            <column name="CODE" type="VARCHAR(70)" remarks="编码" />
+        </addColumn>
+        <createIndex indexName="idx_t_semester_code" tableName="T_SEMESTER" unique="false">
+            <column name="CODE" type="VARCHAR(70)"/>
+        </createIndex>
+        <addColumn tableName="T_TEACHING_CLASS">
+            <column name="CODE" type="VARCHAR(70)" remarks="编码" />
+        </addColumn>
+        <createIndex indexName="idx_t_teaching_class_code" tableName="T_TEACHING_CLASS" unique="false">
+            <column name="CODE" type="VARCHAR(70)"/>
+        </createIndex>
+        <addColumn tableName="T_USER">
+            <column name="IN_SCHOOL_DATE" type="DATE" remarks="入学日期" />
+            <column name="SCHOOL_STATUS" type="INT(6)" remarks="在校、毕业(开除、休学)" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

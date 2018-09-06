@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <!-- 调整字段-->
+    <changeSet id="20170417175901" author="panzhen">
+		<addColumn tableName="T_USER_ROLE">
+           <column name="USER_ID" type="BIGINT" remarks="用户角色" />
+		</addColumn>
+        <createIndex indexName="idx_user_role_user_id" tableName="T_USER_ROLE" unique="false">
+            <column name="USER_ID" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="now" value="now()" dbms="mysql,h2" />
+	<property name="now" value="current_timestamp" dbms="postgresql" />
+	<property name="now" value="sysdate" dbms="oracle" />
+	<changeSet id="20171120154000" author="xiagen">
+		<addColumn tableName="DD_ALUMNI_CIRCLE">
+		<column name="dz_total"  type="INT(10)" defaultValueNumeric="0" remarks="点赞统计"></column>
+		<column name="assess_total"  type="INT(10)" defaultValueNumeric="0" remarks="评论统计"></column>
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 新增缴费统计-->
+    <changeSet id="20180126101946" author="zhen.pan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="T_PERSONAL_COST" columnName="PAY_NUMBER"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="T_PERSONAL_COST">
+            <column name="PAY_NUMBER" type="BIGINT"  remarks="缴费次数统计"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,31 @@
+package com.aizhixin.cloud.data.syn.dto;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+public class CollegeDTO implements BaseDTO {
+    @Getter @Setter private String key;
+    @Getter @Setter private String name;
+
+    public CollegeDTO (String key, String name) {
+        this.key = key;
+        this.name = name;
+    }
+
+    public String keyValue() {
+        return key;
+    }
+
+    public String stringValue() {
+        return name;
+    }
+
+    public boolean eq(BaseDTO dto) {
+        if (name.equals(dto.stringValue())) {
+            return true;
+        }
+        return false;
+    }
+}

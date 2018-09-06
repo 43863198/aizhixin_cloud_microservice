@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <changeSet id="201805231116" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="dd_rollcall_appeal_file"/>
+            </not>
+        </preConditions>
+        <createTable tableName="dd_rollcall_appeal_file" remarks="考勤申诉文件表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="appeal_id" type="BIGINT" remarks="申诉 id"/>
+            <column name="file_name" type="varchar(200)" remarks="文件名"/>
+            <column name="file_src" type="varchar(200)" remarks="文件地址"/>
+            <column name="type" type="varchar(200)" remarks="文件类型"/>
+            <column name="file_size" type="BIGINT" remarks="文件大小"/>
+
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+        <createIndex indexName="dd_rollcall_appeal_file_DELETE_FLAG" tableName="dd_rollcall_appeal_file">
+            <column name="DELETE_FLAG" type="INT"/>
+        </createIndex>
+        <createIndex indexName="dd_rollcall_appeal_file_appeal_id" tableName="dd_rollcall_appeal_file">
+            <column name="appeal_id" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

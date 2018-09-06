@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <changeSet id="20170510145225" author="meihua.li">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DD_ROLLCALL"/>
+            </not>
+        </preConditions>
+        <createTable tableName="DD_ROLLCALL" remarks="签到记录表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="SCHEDULE_ROLLCALL_ID" type="BIGINT" remarks="排课信息ID"/>
+            <column name="TEACHER_ID" type="BIGINT" remarks="教师ID"/>
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期ID"/>
+            <column name="STUDENT_ID" type="BIGINT" remarks="学生ID"/>
+            <column name="STUDENT_NAME" type="varchar(60)" remarks="学生姓名"/>
+            <column name="CLASS_ID" type="BIGINT" remarks="行政班级ID"/>
+            <column name="TEACHINGCLASS_ID" type="BIGINT" remarks="教学班级ID"/>
+            <column name="COURSE_ID" type="BIGINT" remarks="课程ID"/>
+            <column name="CAN_ROLL_CALL" type="Boolean"
+                    defaultValueBoolean="true" remarks="是否可以签到"/>
+            <column name="LAST_TYPE" type="varchar(10)" remarks="上一次签到状态"/>
+            <column name="TYPE" type="varchar(10)" remarks="签到状态"/>
+            <column name="HAVE_REPORT" type="Boolean" defaultValueBoolean="false"
+                    remarks="是否已经签到"/>
+            <column name="SIGN_TIME" type="DATETIME" remarks="签到时间"/>
+            <column name="GPS_LOCALTION" type="varchar(50)" remarks="gps坐标"/>
+            <column name="GPS_DETAIL" type="varchar(100)" remarks="地址"/>
+            <column name="GPS_TYPE" type="varchar(20)" remarks="联网类型"/>
+            <column name="DISTANCE" type="varchar(20)" remarks="与中值距离"/>
+            <column name="DEVICETOKEN" type="varchar(100)" remarks="设备序列号"/>
+
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+                    remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME"
+                    defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+                    remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

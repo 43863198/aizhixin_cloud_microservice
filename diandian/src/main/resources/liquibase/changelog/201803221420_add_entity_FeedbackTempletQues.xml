@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <changeSet id="201803221420" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DD_FEEDBACK_TEMPLET_QUES"/>
+            </not>
+        </preConditions>
+        <createTable tableName="DD_FEEDBACK_TEMPLET_QUES" remarks="信息反馈题模板">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="templet_id" type="BIGINT" remarks="模板id"/>
+            <column name="subject" type="varchar(200)" remarks="项目"/>
+            <column name="content" type="varchar(200)" remarks="问题内容"/>
+            <column name="score" type="INT(11)" remarks="打分题分数"/>
+            <column name="tempgroup" type="INT(11)" remarks="10:反馈评价 20:教师评价  30:学风评价"/>
+
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+                    remarks="创建时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+                    remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

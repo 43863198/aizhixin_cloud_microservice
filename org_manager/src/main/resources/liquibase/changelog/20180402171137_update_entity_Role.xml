@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 修改字段-->
+    <changeSet id="20180402171137" author="jianwei.wu">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="T_ROLE" columnName="ROLE_DESCRIBE"/>
+            </not>
+        </preConditions>
+        <renameColumn tableName="T_ROLE" oldColumnName="DESCRIBE" newColumnName="ROLE_DESCRIBE" columnDataType="VARCHAR(200)" remarks="角色描述" />
+    </changeSet>
+</databaseChangeLog>

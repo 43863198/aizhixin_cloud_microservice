@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 新增新生信息字段-->
+    <changeSet id="20171219105000" author="zhen.pan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="T_USER" columnName="ID_NUMBER"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="T_USER">
+            <column name="ID_NUMBER" type="VARCHAR(30)"  remarks="身份证号"/>
+        </addColumn>
+        <addColumn tableName="T_USER">
+            <column name="EXAM_NUMBER" type="VARCHAR(30)"  remarks="考试号"/>
+        </addColumn>
+        <addColumn tableName="T_USER">
+            <column name="ALLOW_EXAM_NUMBER" type="VARCHAR(30)"  remarks="准考证号"/>
+        </addColumn>
+        <addColumn tableName="T_USER">
+            <column name="ADMISSION_NOTICE_NUMBER" type="VARCHAR(30)"  remarks="录取通知书号"/>
+        </addColumn>
+        <createIndex indexName="idx_t_user_id_number" tableName="T_USER" unique="false">
+            <column name="ID_NUMBER" type="VARCHAR(30)"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

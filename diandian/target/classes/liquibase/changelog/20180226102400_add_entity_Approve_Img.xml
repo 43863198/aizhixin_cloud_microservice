@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="20180226102400" author="xiagen">
+		<createTable tableName="DD_APPROVE_IMG" remarks="审批图片表">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="course_approve_id" type="bigint" remarks="审批id" />
+			<column name="img_url" type="varchar(200)" remarks="图片地址" />
+			<column name="CREATED_BY" type="BIGINT" remarks="创建人ID" />
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+				remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+				defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+				remarks="删除标记(0正常,1删除)" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

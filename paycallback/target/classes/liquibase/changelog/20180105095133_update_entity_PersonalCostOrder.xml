@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 新增收款时间字段-->
+    <changeSet id="20180105095133" author="zhen.pan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="T_PERSONAL_COST_ORDER" columnName="PAY_TIME"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="T_PERSONAL_COST_ORDER">
+            <column name="PAY_TIME" type="DATETIME"  remarks="收款时间"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

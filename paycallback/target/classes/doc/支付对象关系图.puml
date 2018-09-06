@@ -1,0 +1,96 @@
+@startuml
+
+title 支付对象关系图
+scale 1.5
+
+缴费科目 o-- 人员费用
+人员费用订单 --o 人员费用
+人员费用 ..> 缴费状态
+人员费用订单 ..> 订单状态
+人员费用订单 ..> 订单类型
+缴费科目 ..> 缴费方式
+缴费科目 ..> 缴费科目发布状态
+缴费科目 ..> 分期额度频次
+class 缴费科目 {
+Integer 缴费方式
+Integer 最低收费金额
+String 每次或者首次最低收费
+Integer 发布状态
+Date 发布日期
+Date 截止日期
+}
+
+class 人员费用 {
+String 身份证号
+String 姓名
+String 联系电话
+Double 应缴金额
+Double 已缴费金额
+Double 欠费金额
+Integer 缴费状态
+String 收费明细说明
+Long 专业
+Long 学院
+Long 学校
+}
+
+class 人员费用订单 {
+String 订单号
+Integer 订单状态
+Date 订单生成时间
+Date 订单完成时间
+Double 订单金额
+String 支付宝流水号
+}
+
+class 支付宝回调日志 {
+String 通知时间
+String 通知类型
+String 通知校验ID
+String AppId
+String 支付宝交易号
+String 商户订单号
+String 交易状态
+Double 订单金额
+Double 实收金额
+Double 付款金额
+Double 退款金额
+}
+
+
+enum 缴费状态 {
+未缴费
+已欠费
+已结清
+}
+
+enum 缴费方式 {
+全款
+分期
+}
+enum 缴费科目发布状态 {
+待发布
+已发布
+}
+enum 分期额度频次 {
+首次
+每次
+}
+enum 订单类型 {
+付款
+退款
+}
+enum 订单状态 {
+初始化
+已付款
+已超时
+已完成
+}
+/'
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+'/
+
+@enduml

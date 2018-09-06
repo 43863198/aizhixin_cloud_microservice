@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: rollcall
+  cloud:
+    config:
+      profile: ${spring.profiles.active}
+      label: master
+      uri: ${configServerIp}

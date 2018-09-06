@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 电子围栏位置信息表结构-->
+    <changeSet id="20170706151932" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_ELECTRIC_FENCE_BASE"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_ELECTRIC_FENCE_BASE" remarks="电子围栏位置信息表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORG_ID" type="BIGINT" remarks="学校ID"/>
+            <column name="USER_ID" type="BIGINT" remarks="用户ID"/>
+            <column name="ADDRESS" type="VARCHAR(600)" remarks="位置"/>
+            <column name="EQUIPMENT_CODE" type="VARCHAR(100)" remarks="设备码"/>
+            <column name="LLTUDE" type="VARCHAR(600)" remarks="经纬度"/>
+            <column name="NOTICE_TIME" type="DATETIME" defaultValueDate="${now}" remarks="申报时间"/>
+            <column name="OUT_OF_RANGE" type="INT(4)" remarks="是否超出范围   1:超出范围   0:在范围内"/>
+            <column name="LEAVE_NUM" type="BIGINT" remarks="离线时长"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

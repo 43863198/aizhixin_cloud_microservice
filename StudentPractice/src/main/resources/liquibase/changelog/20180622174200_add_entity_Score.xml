@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!--实践成绩 -->
+    <changeSet id="20180622174200" author="zhengning">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+				<tableExists tableName="SP_SCORE"/>
+	        </not>
+	    </preConditions>
+        
+        <createTable tableName="SP_SCORE" remarks="实践成绩表">
+           <column name="ID" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+           	<column name="JOB_NUM" type="varchar(60)" remarks="学号"/>
+           	<column name="STUDENT_ID" type="bigint" remarks="学生id"/>
+           	<column name="STUDENT_NAME" type="VARCHAR(80)" remarks="学生名称"/>
+           	<column name="CLASS_NAME" type="varchar(120)" remarks="班级名称"/>
+           	<column name="CLASS_ID" type="bigint" remarks="班级id"/>
+           	<column name="PROFESSIONAL_NAME" type="varchar(120)" remarks="专业"/>
+           	<column name="PROFESSIONAL_ID" type="bigint" remarks="专业id"/>
+           	<column name="COLLEGE_NAME" type="varchar(120)" remarks="院系名称"/>
+           	<column name="COLLEGE_ID" type="bigint" remarks="院系id"/>
+           	<column name="ENTERPRISE_ID" type="bigint" remarks="企业id"/>
+			<column name="ENTERPRISE_NAME" type="varchar(100)" remarks="实践企业名称"/>
+			<column name="ORG_ID" type="BIGINT" remarks="机构id"/>
+			<column name="MENTOR_ID" type="bigint" remarks="导师id"/>
+			<column name="MENTOR_NAME" type="VARCHAR(80)" remarks="导师名称"/>
+			<column name="COUNSELOR_ID" type="bigint" remarks="辅导员id"/>
+			<column name="COUNSELOR_NAME" type="VARCHAR(80)" remarks="辅导员名称"/>
+			<column name="GROUP_ID" type="bigint" remarks="实践参与计划id"/>
+			<column name="GROUP_NAME" type="VARCHAR(80)" remarks="实践参与计划名称"/>
+            <column name="SIGN_SCORE" type="DOUBLE"  remarks="签到分数"/>
+            <column name="SUMMARY_SCORE" type="DOUBLE"  remarks="日志分数"/>
+            <column name="REPORT_SCORE" type="DOUBLE"  remarks="实践报告分数"/>
+            <column name="TASK_SCORE" type="DOUBLE"  remarks="实践任务分数"/>
+            <column name="TOTAL_SCORE" type="DOUBLE"  remarks="实践总分数"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

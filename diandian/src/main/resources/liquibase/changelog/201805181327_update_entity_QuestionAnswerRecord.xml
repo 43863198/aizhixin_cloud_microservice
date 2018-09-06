@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <changeSet id="201805181327" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="DD_QUESTION_ANSWER_RECORD" indexName="DD_QUESTION_ANSWER_RECORD_DELETE_FLAG"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="DD_QUESTION_ANSWER_RECORD_DELETE_FLAG" tableName="DD_QUESTION_ANSWER_RECORD">
+            <column name="DELETE_FLAG" type="INT"/>
+        </createIndex>
+        <createIndex indexName="DD_QUESTION_ANSWER_RECORD_QUESTIONNAIRE_ASSGIN_STUDENTS_ID" tableName="DD_QUESTION_ANSWER_RECORD">
+            <column name="QUESTIONNAIRE_ASSGIN_STUDENTS_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="DD_QUESTION_ANSWER_RECORD_QUESTIONS_ID" tableName="DD_QUESTION_ANSWER_RECORD">
+            <column name="QUESTIONS_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="DD_QUESTION_ANSWER_RECORD_SCORE" tableName="DD_QUESTION_ANSWER_RECORD">
+            <column name="SCORE" type="INT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

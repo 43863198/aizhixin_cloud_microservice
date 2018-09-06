@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <changeSet id="20171016141111" author="jianwei.wu">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DD_MODIFY_ATTENDANCE_LOG"/>
+            </not>
+        </preConditions>
+        <createTable tableName="DD_MODIFY_ATTENDANCE_LOG">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ROLLCALL_ID" type="bigint" remarks="签到id"/>
+            <column name="OPERATOR_ID" type="bigint" remarks="操作人Id"/>
+            <column name="OPERATOR" type="varchar(15)" remarks="操作人"/>
+            <column name="OPERATING_CONTENT" type="varchar(255)" remarks="操作内容"/>
+            <column name="OPERATING_DATE" type="DATETIME" remarks="操作时间"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

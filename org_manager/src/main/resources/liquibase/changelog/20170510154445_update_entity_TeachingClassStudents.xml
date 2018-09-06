@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <!-- 教学班学生关系表增加学期-->
+    <changeSet id="20170510154445" author="zhen.pan">
+        <addColumn tableName="T_TEACHING_CLASS_STUDENTS">
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期" />
+        </addColumn>
+        <createIndex indexName="idx_teaching_class_students_semester_id" tableName="T_TEACHING_CLASS_STUDENTS" unique="false">
+            <column name="SEMESTER_ID" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

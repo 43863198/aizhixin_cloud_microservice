@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="now" value="now()" dbms="mysql,h2" />
+	<property name="now" value="current_timestamp" dbms="postgresql" />
+	<property name="now" value="sysdate" dbms="oracle" />
+
+	<changeSet id="20171218113500" author="xiagen">
+		<createTable tableName="DD_ANNOUNCEMENT">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="from_user_id" type="bigint" remarks="发送用户id" />
+			<column name="from_user_name" type="varchar(200)" remarks="发送用户名称" />
+			<column name="group_id" type="varchar(200)" remarks="分组id"></column>
+			<column name="content" type="text" remarks="发送内容"></column>
+				<column name="send_user_total" type="INT(4)" defaultValueNumeric="0"
+				remarks="发送人总数" />
+			<column name="assess" type="Boolean" defaultValueBoolean="false"
+				remarks="是否可以评论"></column>
+				<column name="time_task" type="Boolean" defaultValueBoolean="false"
+				remarks="是否定时"></column>
+				<column name="send" type="Boolean" defaultValueBoolean="false"
+				remarks="是否发送"></column>
+			<column name="send_time" type="DATETIME" remarks="发送时间"></column>
+			<column name="assess_total" type="INT(4)" defaultValueNumeric="0"
+				remarks="评论总数"></column>
+				<column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+				remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+				defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+				remarks="删除标记(0正常,1删除)" />
+		</createTable>
+
+		<createTable tableName="DD_ANNOUNCEMENT_FILE">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="announcement_id" type="bigint" remarks="发送信息id"></column>
+			<column name="file_name" type="varchar(200)" remarks="文件名称"></column>
+			<column name="file_src" type="varchar(255)" remarks="文件地址"></column>
+			<column name="type" type="varchar(200)" remarks="doc:文档，ppt:幻灯片，video：视频，picture：图片"></column>
+			<column name="file_size" type="bigint(20)" remarks="文件大小"></column>
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+				remarks="创建时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+				remarks="删除标记(0正常,1删除)" />
+		</createTable>
+
+		<createTable tableName="DD_ANNOUNCEMENT_GROUP">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="group_id" type="varchar(200)" remarks="分组id"></column>
+			<column name="user_id" type="bigint" remarks="用户id"></column>
+			<column name="user_name" type="varchar(200)" remarks="用户名称"></column>
+			<column name="user_type" type="int" remarks="60：教师，70：学生"></column>
+			<column name="have_read" type="Boolean" defaultValueBoolean="false"
+				remarks="是否阅读"></column>
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+				remarks="创建时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+				remarks="删除标记(0正常,1删除)" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

@@ -1,0 +1,56 @@
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+#  client:
+#    service-url:
+#      defaultZone: http://172.16.23.122:1111/eureka/,http://172.16.23.123:1111/eureka/
+spring:
+  aop:
+    auto: true
+    proxy-target-class: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.16.23.65:3306/dledu_org_manager_test?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF8&useSSL=false
+    username: org_manager
+    password: dinglicom
+    hikari:
+      auto-commit: false
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 10000
+      max-lifetime: 600000
+      idle-timeout: 60000
+      validation-timeout: 1000
+      leak-detection-threshold: 30000
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLInnoDBDialect
+    database: MYSQL
+    open-in-view: false
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming.strategy: org.hibernate.cfg.EJB3NamingStrategy
+    properties:
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: true
+      hibernate.generate_statistics: false
+      hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+      javax.persistence.sharedCache.mode: ENABLE_SELECTIVE
+
+liquibase:
+  change-log: classpath:liquibase/master.xml
+  default-schema: dledu_org_manager_test
+
+logging.level.com.aizhixin.cloud: DEBUG
+
+kj:
+  host: http://em.aizhixintest.com/em_api
+
+dd.api.url: http://dd.aizhixintest.com/diandian_api
+
+sys:
+  version: v0.0.1.18

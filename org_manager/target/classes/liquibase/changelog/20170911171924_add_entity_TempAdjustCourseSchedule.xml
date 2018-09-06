@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 调停课记录信息 -->
+    <changeSet id="20170911171924" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_TEMP_ADJUST_COURSE_SCHEDULE"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" remarks="临时调课记录表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORG_ID" type="BIGINT" remarks="学校ID"/>
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期ID"/>
+            <column name="TEACHING_CLASS_ID" type="BIGINT" remarks="教学班id"/>
+            <column name="TEMP_COURSE_SCHEDULE_ID" type="BIGINT" remarks="临时课表"/>
+            <column name="ADJUST_TYPE" type="INT(4)" remarks="调课类型（10增加、20停止）"/>
+            <column name="WEEK_NO" type="INT(6)" remarks="第几周"/>
+            <column name="DAY_OF_WEEK" type="INT(4)" remarks="星期几（周日1，周六7）"/>
+            <column name="EVENT_DATE" type="VARCHAR(20)" remarks="停（加）课日期"/>
+            <column name="PERIOD_NO" type="INT(4)" defaultValueNumeric="0" remarks="第几节"/>
+            <column name="PERIOD_NUM" type="INT(4)" defaultValueNumeric="0" remarks="持续节"/>
+            <column name="CLASSROOM" type="VARCHAR(120)" remarks="教室"/>
+            <column name="VALID_STATUS" type="INT(4)" remarks="有效状态(有效10，取消20)"/>
+            <column name="APPROVAL_STATUS" type="INT(4)" remarks="审批状态(审批通过10，其他状态等待扩展"/>
+            <column name="CREATOR_NO" type="VARCHAR(50)" remarks="创建人工号"/>
+            <column name="CREATOR_NAME" type="VARCHAR(80)" remarks="创建人姓名"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+        <createIndex indexName="idx_temp_adjust_course_schedule_org" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_semester" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="SEMESTER_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_teaching_class" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="TEACHING_CLASS_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_temp_course_schedule" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="TEMP_COURSE_SCHEDULE_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_valid_status" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="VALID_STATUS" type="INT(4)"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_approval_status" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="APPROVAL_STATUS" type="INT(4)"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_creator_no" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="CREATOR_NO" type="VARCHAR(50)"/>
+        </createIndex>
+        <createIndex indexName="idx_temp_adjust_course_schedule_creator_name" tableName="T_TEMP_ADJUST_COURSE_SCHEDULE" unique="false">
+            <column name="CREATOR_NAME" type="VARCHAR(80)"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

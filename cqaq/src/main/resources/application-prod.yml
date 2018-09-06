@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:1433;DatabaseName=cqvist_jwgl1db;
+    username: cqaq2018
+    password: 123456789
+    hikari:
+      auto-commit: false
+
+logging.level.com.aizhixin.cloud: INFO
+
+sys:
+  version: v0.0.01

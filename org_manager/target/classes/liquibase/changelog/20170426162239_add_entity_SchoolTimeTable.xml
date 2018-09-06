@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 课表表结构-->
+    <changeSet id="20170426162239" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_SCHOOL_TIME_TABLE"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_SCHOOL_TIME_TABLE" remarks="课表表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORG_ID" type="BIGINT" remarks="学校"/>
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期"/>
+            <column name="TEACHING_CLASS_ID" type="BIGINT" remarks="教学班"/>
+            <column name="START_WEEK_ID" type="BIGINT" remarks="起始周"/>
+            <column name="END_WEEK_ID" type="BIGINT" remarks="结束周"/>
+            <column name="START_WEEK_NO" type="INT(6)" remarks="起始周,第几周"/>
+            <column name="END_WEEK_NO" type="INT(6)" remarks="结束周,第几周"/>
+            <column name="SINGLE_OR_DOUBLE" type="INT(6)" remarks="单双周,10不区分单双周,20单周,30双周"/>
+            <column name="DAY_OF_WEEK" type="INT(6)" remarks="星期几（周日1，周六7）"/>
+            <column name="PERIOD_ID" type="BIGINT" remarks="第几节"/>
+            <column name="PERIOD_NO" type="INT(6)" remarks="第几节"/>
+            <column name="PERIOD_NUM" type="INT(6)" remarks="本堂课持续节"/>
+            <column name="CLASS_ROOM" type="VARCHAR(150)" remarks="教室名称"/>
+            <column name="REMARK" type="VARCHAR(600)" remarks="备注"/>
+            <column name="COLOR" type="VARCHAR(30)" remarks="颜色"/>
+        </createTable>
+        <createIndex indexName="idx_school_time_table_org_id" tableName="T_SCHOOL_TIME_TABLE" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_school_time_table_semester_id" tableName="T_SCHOOL_TIME_TABLE" unique="false">
+            <column name="SEMESTER_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_school_time_table_teaching_class_id" tableName="T_SCHOOL_TIME_TABLE" unique="false">
+            <column name="TEACHING_CLASS_ID" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

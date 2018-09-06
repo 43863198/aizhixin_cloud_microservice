@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: diandian_api
+#  cloud:
+#    config:
+#     profile: ${spring.profiles.active}
+#     label: master
+#     uri: ${configServerIp}
+
+

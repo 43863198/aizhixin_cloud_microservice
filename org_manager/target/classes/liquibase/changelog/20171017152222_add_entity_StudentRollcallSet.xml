@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 学生考勤设置和取消考勤记录-->
+    <changeSet id="20171017152222" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_STUDENT_ROLLCALL_SET"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_STUDENT_ROLLCALL_SET" remarks="学生考勤排除和恢复记录表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="OPT" type="INT(4)" remarks="操作类型 10暂停考勤，20恢复考勤"/>
+            <column name="MSG" type="VARCHAR(200)" remarks="原因说明"/>
+            <column name="STUDENT_ID" type="BIGINT" remarks="对应学生的ID"/>
+            <column name="OPERATOR" type="VARCHAR(80)" remarks="操作人姓名"/>
+            <column name="STU_NAME" type="VARCHAR(80)" remarks="被操作人姓名"/>
+            <column name="STU_JOB_NUMBER" type="VARCHAR(50)" remarks="学号"/>
+            <column name="STU_CLASSES_NAME" type="VARCHAR(200)" remarks="被操作人班级名称"/>
+            <column name="STU_CLASSES_YEAR" type="VARCHAR(20)" remarks="被操作人年级"/>
+            <column name="STU_PROFESSIONAL_NAME" type="VARCHAR(150)" remarks="被操作人专业"/>
+            <column name="STU_COLLEGE_NAME" type="VARCHAR(150)" remarks="被操作人学院"/>
+            <column name="ORG_ID" type="BIGINT" remarks="被操作人学校"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+        
+        <createIndex indexName="idx_student_rollcall_set_opt" tableName="T_STUDENT_ROLLCALL_SET" unique="false">
+            <column name="OPT" type="INT(4)"/>
+        </createIndex>
+        <createIndex indexName="idx_student_rollcall_set_org_id" tableName="T_STUDENT_ROLLCALL_SET" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_student_rollcall_set_stu_job_number" tableName="T_STUDENT_ROLLCALL_SET" unique="false">
+            <column name="STU_JOB_NUMBER" type="VARCHAR(50)"/>
+        </createIndex>
+        <createIndex indexName="idx_student_rollcall_set_stu_name" tableName="T_STUDENT_ROLLCALL_SET" unique="false">
+            <column name="STU_NAME" type="VARCHAR(80)"/>
+        </createIndex>
+        <createIndex indexName="idx_student_rollcall_set_created_date" tableName="T_STUDENT_ROLLCALL_SET" unique="false">
+            <column name="CREATED_DATE" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

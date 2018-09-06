@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 因为修改没有设置默认值 固先删除再添加-->
+    <changeSet id="20170716104040" author="Duanwei">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="DD_ROLLCALLREPORT" columnName="have_report"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="DD_ROLLCALLREPORT">
+            <column name="have_report" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20170716104050" author="Duanwei">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="DD_ROLLCALLREPORT" columnName="leave_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="DD_ROLLCALLREPORT">
+            <column name="leave_status" type="boolean"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

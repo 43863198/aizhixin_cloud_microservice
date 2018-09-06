@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: service-admin
+  cloud:
+    config:
+      profile: ${spring.profiles.active}
+      label: master
+      uri: ${configServerIp}

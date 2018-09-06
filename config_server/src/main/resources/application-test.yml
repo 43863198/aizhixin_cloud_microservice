@@ -1,0 +1,36 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://172.16.23.122:1111/eureka/,http://172.16.23.123:1111/eureka/
+spring:
+  cloud:
+    inetutils:
+      ignored-interfaces: eth1
+    config:
+      server:
+        git:
+          uri: http://172.16.23.241/panzhen/cloud_config_server.git
+          search-paths: config-repo
+          username: zhen.pan@dinglicom.com
+          password: pz121206
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+    stream:
+      kafka:
+        binder:
+          zk-nodes: 172.16.23.122:2181
+          brokers: 172.16.23.122:9092
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /dinglicom/pay_access_log
+      pattern: '%h %l %u [%{yyyy-MM-dd HH:mm:ss.SSS}t] "%r" %s %b %D'
+      prefix: config_access_log
+      suffix: .log
+    basedir: /dinglicom/zhixin_API_Gateway_business/tmp/config

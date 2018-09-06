@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!--学生实践 -->
+    <changeSet id="20180517145700" author="zhengning">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="SP_REPORT"/>
+	        </not>
+	    </preConditions>
+	    
+        <createTable tableName="SP_REPORT" remarks="任务表">
+            <column name="ID" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORG_ID" type="BIGINT" remarks="机构id"/>
+            <column name="REPORT_TITLE" type="VARCHAR(100)" remarks="报告标题"/>
+            <column name="DESCRIPTION" type="LongText" remarks="报告描述"/>
+            <column name="JOB_NUM" type="varchar(60)" remarks="学生学号" />
+            <column name="COUNSELOR_ID" type="BIGINT" remarks="辅导员id" />
+            <column name="COUNSELOR_NAME" type="VARCHAR(80)" remarks="辅导员名称" />
+            <column name="STATUS" type="VARCHAR(10)" remarks="状态:未提交[uncommit],待审核[checkPending],已通过[pass],未通过[notPass],被打回[backTo]"/>
+            <column name="ADVICE" type="Text" remarks="审核建议"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="creator_name" type="VARCHAR(80)" remarks="创建人名称" />
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+        
+    </changeSet>
+</databaseChangeLog>

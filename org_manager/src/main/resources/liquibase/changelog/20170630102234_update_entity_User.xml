@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 实体中增加code字段-->
+    <changeSet id="20170630102234" author="zhen.pan">
+        <addColumn tableName="T_USER">
+            <column name="LOGIN_NAME" type="VARCHAR(120)" remarks="登录名" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

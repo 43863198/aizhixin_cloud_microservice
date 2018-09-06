@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <changeSet id="201804131643" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DD_QUESTIONNAIRE_ASSGIN_USER"/>
+            </not>
+        </preConditions>
+        <createTable tableName="DD_QUESTIONNAIRE_ASSGIN_USER" remarks="问卷分配到人">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="ques_id" type="BIGINT" remarks="问卷id"/>
+            <column name="user_id" type="BIGINT" remarks="用户id"/>
+            <column name="user_name" type="varchar(200)" remarks="用户name"/>
+            <column name="job_num" type="varchar(200)" remarks="job num"/>
+            <column name="college_id" type="BIGINT" remarks="学院id"/>
+            <column name="college_name" type="varchar(200)" remarks="学院名称"/>
+            <column name="user_type" type="INT(11)" remarks="用户类型  70：学生 60：教师"/>
+            <column name="teacher_type" type="INT(11)" remarks="用户类型  10：非授课教师 20：授课教师"/>
+            <column name="weight" type="INT(11)" remarks="权重"/>
+
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+                    remarks="创建时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+                    remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

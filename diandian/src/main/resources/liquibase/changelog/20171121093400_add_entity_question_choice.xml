@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="now" value="now()" dbms="mysql,h2" />
+	<property name="now" value="current_timestamp" dbms="postgresql" />
+	<property name="now" value="sysdate" dbms="oracle" />
+	<changeSet id="20171121093400" author="xiagen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="DD_QUESTION_CHOICE" />
+			</not>
+		</preConditions>
+		<createTable tableName="DD_QUESTION_CHOICE" remarks="答题选项">
+			<column name="ID" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="question_id" type="bigint" remarks="试题id"></column>
+			<column name="choice" type="varchar(10)" remarks="选项">
+			</column>
+			<column name="content" type="text" remarks="选项内容"></column>
+			<column name="score" type="varchar(10)" remarks="选项分值"></column>
+			<column name="created_date" type="DATETIME" defaultValueDate="${now}"
+				remarks="创建时间" />
+			<column name="delete_flag" type="INT(4)" defaultValueNumeric="0"
+				remarks="删除标记(0正常,1删除)" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

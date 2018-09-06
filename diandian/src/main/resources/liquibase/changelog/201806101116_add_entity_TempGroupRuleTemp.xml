@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <changeSet id="201806101116" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DD_TEMPGROUP_RULE_TEMP"/>
+            </not>
+        </preConditions>
+        <createTable tableName="DD_TEMPGROUP_RULE_TEMP" remarks="导员点名规则关系临时表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="rule_id" type="BIGINT" remarks="rule id"/>
+            <column name="group_id" type="BIGINT" remarks="group id"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

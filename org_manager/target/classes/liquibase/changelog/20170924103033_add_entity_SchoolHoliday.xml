@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 学校学期时间内统一休假日历记录信息 -->
+    <changeSet id="20170924103033" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_SCHOOL_HOLIDAY"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_SCHOOL_HOLIDAY" remarks="统一休假日历记录信息表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ORG_ID" type="BIGINT" remarks="学校ID"/>
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期ID"/>
+            <column name="NAME" type="VARCHAR(200)" remarks="节假日说明"/>
+            <column name="START_DATE" type="VARCHAR(20)" remarks="放假开始日期"/>
+            <column name="END_DATE" type="VARCHAR(20)" remarks="放假结束日期"/>
+            <column name="START_WEEK_NO" type="INT(6)" remarks="放假开始第几周"/>
+            <column name="START_DAY_OF_WEEK" type="INT(4)" remarks="放假开始星期几（周日1，周六7）"/>
+            <column name="END_WEEK_NO" type="INT(6)" remarks="放假结束第几周"/>
+            <column name="END_DAY_OF_WEEK" type="INT(4)" remarks="放假结束星期几（周日1，周六7）"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+        <createIndex indexName="idx_school_holiday_org" tableName="T_SCHOOL_HOLIDAY" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_school_holiday_semester" tableName="T_SCHOOL_HOLIDAY" unique="false">
+            <column name="SEMESTER_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_school_holiday_start_date" tableName="T_SCHOOL_HOLIDAY" unique="false">
+            <column name="START_DATE" type="VARCHAR(20)"/>
+        </createIndex>
+        <createIndex indexName="idx_school_holiday_end_date" tableName="T_SCHOOL_HOLIDAY" unique="false">
+            <column name="END_DATE" type="VARCHAR(20)"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

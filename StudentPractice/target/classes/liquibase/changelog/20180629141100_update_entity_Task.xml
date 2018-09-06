@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!--学生实践 -->
+    <changeSet id="20170809184400" author="zhengning">
+		<renameColumn 
+            columnDataType="bigint"
+            newColumnName="GROUP_ID"
+            oldColumnName="TEAM_ID"
+            tableName="SP_MENTOR_TASK"/>
+        <renameColumn 
+            columnDataType="varchar(100)"
+            newColumnName="GROUP_NAME"
+            oldColumnName="team_name"
+            tableName="SP_MENTOR_TASK"/>
+        <renameColumn 
+            columnDataType="varchar(100)"
+            newColumnName="GROUP_NAME"
+            oldColumnName="GROP_NAME"
+            tableName="SP_STUDENT_TASK"/>
+       <renameColumn 
+            columnDataType="bigint"
+            newColumnName="GROUP_ID"
+            oldColumnName="TEAM_ID"
+            tableName="SP_WEEK_TASK_TEAM"/>          
+    </changeSet>
+</databaseChangeLog>

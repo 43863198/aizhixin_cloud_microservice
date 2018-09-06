@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!--学生实践 -->
+    <changeSet id="20180424145600" author="xiagen">
+        <addColumn tableName="SP_MENTOR_TASK">
+        	<column name="describe_Info" type="text" remarks="详情导师描述"/>
+		</addColumn>
+        <addColumn tableName="SP_MENTOR_TASK">
+            <column name="img_list" type="text" remarks="详情导师描述图片集合"></column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

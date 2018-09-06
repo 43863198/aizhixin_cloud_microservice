@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 教学班行政班表结构-->
+    <changeSet id="20170425113223" author="zhen.pan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="T_TEACHING_CLASS_CLASSES"/>
+            </not>
+        </preConditions>
+        <createTable tableName="T_TEACHING_CLASS_CLASSES" remarks="教学班行政班关系表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="TEACHING_CLASS_ID" type="BIGINT" remarks="教学班"/>
+            <column name="CLASSES_ID" type="BIGINT" remarks="教师"/>
+            <column name="ORG_ID" type="BIGINT" remarks="学校"/>
+        </createTable>
+        <createIndex indexName="idx_teaching_class_classes_org_id" tableName="T_TEACHING_CLASS_CLASSES" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_teaching_classs_classes_teaching_class_id" tableName="T_TEACHING_CLASS_CLASSES" unique="false">
+            <column name="TEACHING_CLASS_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_teaching_classs_classes_classes_id" tableName="T_TEACHING_CLASS_CLASSES" unique="false">
+            <column name="CLASSES_ID" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

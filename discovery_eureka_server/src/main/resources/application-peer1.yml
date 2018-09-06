@@ -1,0 +1,20 @@
+eureka:
+  server:
+    renewal-percent-threshold: 0.8
+    eviction-interval-timer-in-ms: 120000
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://${peer2Ip}:${server.port}/eureka/
+
+spring:
+  cloud:
+    inetutils:
+      ignored-interfaces:
+        - eth1
+        - em1
+        - em3
+        - em4
+        - usb0

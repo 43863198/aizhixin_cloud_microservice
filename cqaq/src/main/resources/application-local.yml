@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost/sccj?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF8&useSSL=false
+    username: root
+    password: bly,012345
+    hikari:
+      auto-commit: false
+
+logging.level.com.aizhixin.cloud: DEBUG
+
+sys:
+  version: v0.0.01

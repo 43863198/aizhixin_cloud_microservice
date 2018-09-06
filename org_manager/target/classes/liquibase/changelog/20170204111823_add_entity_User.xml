@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 用户表结构-->
+    <changeSet id="20170204111823" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_USER"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_USER" remarks="用户表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ACCOUNT_ID" type="BIGINT" remarks="对应登录账号的ID"/>
+            <column name="USER_TYPE" type="INT(6)" remarks="用户类型(10学校管理员，20学院管理员，40班级管理员，60老师，70学生)"/>
+            <column name="NAME" type="VARCHAR(80)" remarks="姓名"/>
+            <column name="PHONE" type="VARCHAR(30)" remarks="电话号码"/>
+            <column name="EMAIL" type="VARCHAR(80)" remarks="邮箱"/>
+            <column name="JOB_NUMBER" type="VARCHAR(60)" remarks="学号或者工号"/>
+            <column name="SEX" type="VARCHAR(10)" remarks="性别(男性male|女性female)"/>
+            <column name="CLASSES_ID" type="BIGINT" remarks="班级"/>
+            <column name="PROFESSIONAL_ID" type="BIGINT" remarks="专业"/>
+            <column name="COLLEGE_ID" type="BIGINT" remarks="学院"/>
+            <column name="ORG_ID" type="BIGINT" remarks="学校"/>
+            <column name="CREATED_BY" type="BIGINT" remarks="创建人ID"/>
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="最后一次修改时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+        
+        <createIndex indexName="idx_user_account_id" tableName="T_USER" unique="false">
+            <column name="ACCOUNT_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_user_org_id" tableName="T_USER" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_user_college" tableName="T_USER" unique="false">
+            <column name="COLLEGE_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_user_classes" tableName="T_USER" unique="false">
+            <column name="CLASSES_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_user_professional" tableName="T_USER" unique="false">
+            <column name="PROFESSIONAL_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_user_name" tableName="T_USER" unique="false">
+            <column name="NAME" type="VARCHAR"/>
+        </createIndex>
+        <createIndex indexName="idx_user_user_type" tableName="T_USER" unique="false">
+            <column name="USER_TYPE" type="INT"/>
+        </createIndex>
+        <createIndex indexName="idx_user_delete_flag" tableName="T_USER" unique="false">
+            <column name="DELETE_FLAG" type="INT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

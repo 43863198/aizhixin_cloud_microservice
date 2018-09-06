@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<property name="now" value="now()" dbms="mysql,h2" />
+	<property name="now" value="current_timestamp" dbms="postgresql" />
+	<property name="now" value="sysdate" dbms="oracle" />
+
+	<changeSet id="20170526172700" author="meihua.li">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="DD_QUESTIONNAIRE" />
+				<tableExists tableName="DD_QUESTIONS" />
+				<tableExists tableName="DD_QUESTIONNAIRE_ASSGIN" />
+				<tableExists tableName="DD_QUESTIONNAIRE_ASSGIN_STUDENTS" />
+				<tableExists tableName="DD_QUESTION_ANSWER_RECORD" />
+			</not>
+		</preConditions>
+		<createTable tableName="DD_QUESTIONNAIRE">
+			<column name="ID" type="bigint" autoIncrement="true" remarks="问卷表">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="NAME" type="varchar(120)" remarks="问卷名称" />
+			<column name="TOTAL_SCORE" type="int" remarks="总分" />
+			<column name="TOTAL_QUESTIONS" type="int" remarks="题目数量" />
+			<column name="STATUS" type="int(6)" remarks="状态（初始化 10、已分配  20）" />
+			<column name="END_DATE" type="timestamp" remarks="截止日期" />
+			<column name="ORGAN_ID" type="varchar(60)" remarks="学校ID"/>
+			<column name="CREATED_BY" type="BIGINT" remarks="创建人ID" />
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+					remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+					defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+					remarks="删除标记(0正常,1删除)" />
+		</createTable>
+		<createTable tableName="DD_QUESTIONS" remarks="问卷题目表">
+			<column name="ID" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="NO" type="int" remarks="序号" />
+			<column name="QUESTIONNAIRE_ID" type="bigint" remarks="问卷id" />
+			<column name="NAME" type="varchar(300)" remarks="题目名称" />
+			<column name="SCORE" type="int" remarks="题目分值" />
+			<column name="CREATED_BY" type="BIGINT" remarks="创建人ID" />
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+					remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+					defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+					remarks="删除标记(0正常,1删除)" />
+		</createTable>
+		<createTable tableName="DD_QUESTIONNAIRE_ASSGIN" remarks="问卷分配记录表">
+			<column name="ID" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="QUESTIONNAIRE_ID" type="bigint" remarks="问卷id" />
+			<column name="TEACHING_CLASS_ID" type="bigint" remarks="教学班ID" />
+			<column name="TEACHING_CLASS_NAME" type="varchar(80)" remarks="教学班名称" />
+			<column name="COLLEGE_ID" type="bigint" remarks="学院ID" />
+			<column name="COLLEGE_NAME" type="varchar(300)" remarks="学院名称" />
+			<column name="TEACHER_ID" type="bigint" remarks="教师ID" />
+			<column name="TEACHER_NAME" type="varchar(120)" remarks="教师名称" />
+			<column name="COURSE_ID" type="bigint" remarks="课程ID" />
+			<column name="COURSE_NAME" type="varchar(300)" remarks="课程名称" />
+			<column name="COURSE_CODE" type="varchar(60)" remarks="课程编码"/>
+			<column name="SEMESTER_ID" type="bigint" remarks="学期ID" />
+			<column name="STATUS" type="varchar(20)" remarks="状态  10 分配/ 20撤销分配"/>
+			<column name="CREATED_BY" type="BIGINT" remarks="创建人ID" />
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+					remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+					defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+					remarks="删除标记(0正常,1删除)" />
+		</createTable>
+		<createTable tableName="DD_QUESTIONNAIRE_ASSGIN_STUDENTS" remarks="问卷分配具体学生记录表">
+			<column name="ID" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="QUESTIONNAIRE_ASSGIN_ID" type="bigint" remarks="问卷分配记录ID" />
+			<column name="STUDENT_ID" type="bigint" remarks="学生ID" />
+			<column name="STUDENT_NAME" type="varchar(120)" remarks="学生名称" />
+			<column name="CLASSES_ID" type="bigint" remarks="班级ID" />
+			<column name="CLASSES_NAME" type="varchar(300)" remarks="班级名称" />
+			<column name="COMMIT_DATE" type="timestamp" remarks="提交时间" />
+			<column name="SCORE" type="int" remarks="评分" />
+			<column name="STATUS" type="int(6)" remarks="状态（初始化 10、已提交 20）" />
+			<column name="CREATED_BY" type="BIGINT" remarks="创建人ID" />
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+					remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+					defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+					remarks="删除标记(0正常,1删除)" />
+		</createTable>
+		<createTable tableName="DD_QUESTION_ANSWER_RECORD" remarks="答题记录表">
+			<column name="ID" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="QUESTIONNAIRE_ASSGIN_STUDENTS_ID" type="bigint" remarks="分配给具体确定学生记录ID" />
+			<column name="QUESTIONS_ID" type="bigint" remarks="题目id" />
+			<column name="SCORE" type="int" remarks="评分" />
+			<column name="CREATED_BY" type="BIGINT" remarks="创建人ID" />
+			<column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}"
+					remarks="创建时间" />
+			<column name="LAST_MODIFIED_BY" type="BIGINT" remarks="最后一次修改人ID" />
+			<column name="LAST_MODIFIED_DATE" type="DATETIME"
+					defaultValueDate="${now}" remarks="最后一次修改时间" />
+			<column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0"
+					remarks="删除标记(0正常,1删除)" />
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

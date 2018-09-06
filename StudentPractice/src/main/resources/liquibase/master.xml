@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+     <!-- 
+	 <include file="classpath:liquibase/changelog/20170808104200_add_entity_Task.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170809184400_update_entity_Task.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170810104400_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170810164100_update_entity_File.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170812153800_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170825160500_add_entity_PushMessage.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170904153300_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170913160500_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170914162100_add_entity_TaskStatistical.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170914181400_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170915165200_update_entity_TaskStatistical.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170918135500_add_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170920103800_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170920152400_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20170927181500_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20171010103800_update_entity_Task.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20171010104500_add_entity_WeekTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20171020134800_update_entity_WeekTask.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20171024173700_update_entity_Task.xml" relativeToChangelogFile="false"/>
+	 <include file="classpath:liquibase/changelog/20171030101900_update_entity_Task.xml" relativeToChangelogFile="false"/>
+	 
+	  <include file="classpath:liquibase/changelog/20180314154200_update_entity_MentorTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180315135700_update_entity_WeekTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180316105100_add_entity_Task.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180319135000_update_entity_WeekTaskTeam.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180319164100_update_entity_MentorTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180320191400_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180321110100_update_entity_MentorTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180321145100_update_entity_MentorTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180329164500_add_entity_Summary.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180413100900_update_entity_PushMessage.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180420145000_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	 
+	  <include file="classpath:liquibase/changelog/20180424145600_update_entity_MentorTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180426101900_update_entity_Task.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180502105800_add_entity_MentorTaskCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180504102800_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180508110200_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180511150500_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180511151000_add_entity_SummaryCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180514100500_update_entity_SummaryCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180515113100_add_entity_EnterpriseCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180516154000_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180517145700_add_entity_Report.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180518112200_update_entity_Report.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180521181300_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180522152100_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180523154800_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180529161500_update_entity_Report.xml" relativeToChangelogFile="false"/>
+	  -->
+	  <include file="classpath:liquibase/changelog/20180615101400_update_entity_PeopleCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180615105800_add_entity_SignDetail.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180622174200_add_entity_Score.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180626140000_update_entity_TaskStatistical.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180627105100_update_entity_PeopleCountDetail.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180628102200_update_entity_StudentTask.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180628190000_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180629112800_update_entity_PeopleCountDetail.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180629141100_update_entity_Task.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180702112000_update_entity_SummaryCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180704162900_add_entity_CounselorCount.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180709142900_update_entity_SignDetail.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180710142900_update_entity_PeopleCountDetail.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180711095300_add_entity_Evaluate.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180807154600_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	  <!-- 
+	  <include file="classpath:liquibase/changelog/20180808150900_update_entity_PushMessage.xml" relativeToChangelogFile="false"/>
+	  <include file="classpath:liquibase/changelog/20180808151600_update_entity_Summary.xml" relativeToChangelogFile="false"/>
+	   -->
+</databaseChangeLog>
+
+

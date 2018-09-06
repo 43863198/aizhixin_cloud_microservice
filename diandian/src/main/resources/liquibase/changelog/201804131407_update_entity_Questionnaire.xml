@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <changeSet id="201804131407" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="DD_QUESTIONNAIRE" columnName="ques_type"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="DD_QUESTIONNAIRE">
+            <column name="ques_type" type="INT(11)" defaultValue="10" remarks="问卷类型 10:学生评教 20:教师评学 30:同行评教"/>
+            <column name="allocation_num" type="INT(11)" remarks="分配数量"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

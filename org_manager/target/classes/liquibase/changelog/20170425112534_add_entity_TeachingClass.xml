@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <!-- 教学班表结构-->
+    <changeSet id="20170425112534" author="zhen.pan">
+		<preConditions onFail="MARK_RAN">
+	        <not>
+	            <tableExists tableName="T_TEACHING_CLASS"/>
+	        </not>
+	    </preConditions>
+        <createTable tableName="T_TEACHING_CLASS" remarks="教学班表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(120)" remarks="名称"/>
+            <column name="SEMESTER_ID" type="BIGINT" remarks="学期"/>
+            <column name="COURSE_ID" type="BIGINT" remarks="课程"/>
+            <column name="ORG_ID" type="BIGINT" remarks="学校"/>
+            <column name="CLASS_OR_STUDENTS" type="INT(6)" remarks="关联行政班还是直接关联学生"/>
+            <column name="TEACHER_NAMES" type="VARCHAR(150)" remarks="教师名称"/>
+            <column name="CLASSES_NAMES" type="VARCHAR(150)" remarks="班级名称"/>
+            <column name="STUDENTS_COUNT" type="BIGINT" remarks="学生数量"/>
+        </createTable>
+        <createIndex indexName="idx_teaching_class_org_id" tableName="T_TEACHING_CLASS" unique="false">
+            <column name="ORG_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_teaching_class_semester_id" tableName="T_TEACHING_CLASS" unique="false">
+            <column name="SEMESTER_ID" type="BIGINT"/>
+        </createIndex>
+        <createIndex indexName="idx_teaching_class_course_id" tableName="T_TEACHING_CLASS" unique="false">
+            <column name="COURSE_ID" type="BIGINT"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

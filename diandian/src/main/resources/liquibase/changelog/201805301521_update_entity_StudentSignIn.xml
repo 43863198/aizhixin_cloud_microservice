@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+
+    <changeSet id="201805301521" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="DD_STUDENTSIGNIN" columnName="STATUS2"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="DD_STUDENTSIGNIN">
+            <column name="GPS_LOCATION2" type="varchar(200)"/>
+            <column name="GPS_DETAIL2" type="varchar(200)"/>
+            <column name="GPS_TYPE2" type="varchar(200)"/>
+            <column name="SIGN_TIME2" type="varchar(200)"/>
+            <column name="DEVICE_TOKEN2" type="varchar(200)"/>
+            <column name="HAVE_REPORT2" type="int"/>
+            <column name="HAVE_READ2" type="boolean"/>
+            <column name="STATUS2" type="varchar(200)" defaultValue="10"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
