@@ -87,6 +87,11 @@ public class InitScheduleService {
     @Autowired
     private PushMonitor pushMonitor;
 
+    public Boolean checkDayDataTask() {
+        Boolean status = redisTokenStore.getInitScheduleStatus(DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT));
+        return status;
+    }
+
     public void initSchedule() {
         log.info("开始初始化当天的排课信息...");
         Long start = System.currentTimeMillis();
@@ -104,6 +109,7 @@ public class InitScheduleService {
             }
         }
         log.info("当天的排课信息初始化结束,总用时:" + (System.currentTimeMillis() - start) + "ms");
+        redisTokenStore.setInitScheduleStatus(DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT), true);
     }
 
     public void executeTask(Long orgId, String name) {
@@ -589,7 +595,7 @@ public class InitScheduleService {
     }
 
     @Async("threadPool1")
-    private void updateRollcall(List<LocaltionDTO> list, Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto){
+    private void updateRollcall(List<LocaltionDTO> list, Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
