@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: token-auth
-  cloud:
-    config:
-      profile: ${spring.profiles.active}
-      label: master
-      uri: ${configServerIp}

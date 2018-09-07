@@ -1,0 +1,66 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+.idea/**
+.idea
+*.iml
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+zhixinshu
+zhixinshu/**
+sources
+sources/**
+*.class
+
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# eclipse projects files
+.settings/**
+.metadata/**
+.mvn/**
+.settings/**
+Servers/**
+.mvn/wrapper/**
+.springBeans
+mvnw
+mvnw.cmd
+
+logs/**
+# project's specific
+*.log
+target/*
+/target/
+/bin/
+
+# yml config
+api_gateway/src/main/resources/application.yml
+org_manager/src/main/resources/application.yml
+school_manager/src/main/resources/application.yml
+diandian/src/main/resources/application.yml
+diandian/src/main/resources/application-test.yml
+diandian/src/main/resources/bootstrap.yml
+turbine/src/main/resources/application.yml
+org_data_import/src/main/resources/application.yml
+token_auth/src/main/resources/application.yml
+io/src/main/resources/application.yml
+StudentPractice/src/main/resources/application.yml
+demo/src/main/resources/application.yml
+school_manager_api/src/main/resources/application.yml
+ew_api/src/main/resources/application.yml
+mobile_public/src/main/resources/application.yml
+rollcall/src/main/resources/application.yml
+rollcall/src/main/resources/application-test.yml
+paycallback/src/main/resources/application.yml
