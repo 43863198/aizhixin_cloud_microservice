@@ -500,9 +500,7 @@ public class LeaveService {
      * @return
      */
     public Object passLeaveRequest(Long leaveId, AccountDTO account, String accessToken) throws Exception {
-
         try {
-
             Leave leave = leaveRepository.findOne(leaveId);
             if (leave == null) {
                 Map<String, Object> res = new HashMap<>();
@@ -543,56 +541,48 @@ public class LeaveService {
 
             Set<Long> ids = new HashSet<>();
             if (leave.getRequestType().equals(LeaveConstants.TYPE_DAY)) {
-
-//                String beginTeachTime = DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT);
-//                String endTeachTime = DateFormatUtil.format(leave.getEndDate(), DateFormatUtil.FORMAT_SHORT);
-                List<Date> manyDate = DateFormatUtil.getMonthBetweenDate(leave.getStartDate(), leave.getEndDate());
-
+                List<Date> manyDate = DateFormatUtil.getMonthBetweenDate(leave.getStartTime(), leave.getEndTime());
                 for (Date schoolDay : manyDate) {
                     if (!DateFormatUtil.compareDate(schoolDay, DateFormatUtil.parse((DateFormatUtil.formatShort(new Date()) + " 23:59:59"), DateFormatUtil.FORMAT_LONG))) {
                         // 从平台获取排课
                         // 根据日期从平台获取排课数据
-                        List<DianDianDaySchoolTimeTableDomain> ddt
-                                = orgManagerRemoteService.getStudentDaySchoolTimeTable(leave.getStudentId(), DateFormatUtil.format(schoolDay, DateFormatUtil.FORMAT_SHORT));
+                        List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteService.getStudentDaySchoolTimeTable(leave.getStudentId(), DateFormatUtil.format(schoolDay, DateFormatUtil.FORMAT_SHORT));
                         for (DianDianDaySchoolTimeTableDomain dto : ddt) {
-                            Long tempTeacherId = send(leave.getStudentId(), InitScheduleService.parseTeacher(dto.getTeachers()).getId(), dto.getCourseId(), dto.getTeachDate(),
-                                    dto.getPeriodId(), null, leave, account.getId());
+                            Long tempTeacherId = send(leave.getStudentId(), InitScheduleService.parseTeacher(dto.getTeachers()).getId(), dto.getCourseId(), dto.getTeachDate(), dto.getPeriodId(), null, leave, account.getId());
                             if (null != tempTeacherId) {
                                 ids.add(tempTeacherId);
                             }
                         }
                     } else {
-
                         // 直接修改本地数据库排课信息
-                        Set<Long> teachingclassIds
-                                = orgManagerRemoteService.getStudentDayTeachingClassId(leave.getStudentId(), DateFormatUtil.format(schoolDay, DateFormatUtil.FORMAT_SHORT));
+                        Set<Long> teachingclassIds = orgManagerRemoteService.getStudentDayTeachingClassId(leave.getStudentId(), DateFormatUtil.format(schoolDay, DateFormatUtil.FORMAT_SHORT));
                         // 获取当天该学生的排课信息
-                        List<Schedule> scheduleList = scheduleRepository.findByTeachDateAndDeleteFlagAndTeachingclassIdIn(
-                                DateFormatUtil.format(schoolDay, DateFormatUtil.FORMAT_SHORT), DataValidity.VALID.getState(), teachingclassIds);
-
+                        List<Schedule> scheduleList = scheduleRepository.findByTeachDateAndDeleteFlagAndTeachingclassIdIn(DateFormatUtil.format(schoolDay, DateFormatUtil.FORMAT_SHORT), DataValidity.VALID.getState(), teachingclassIds);
                         // 获取该学生的某一天的排课，修改其签到记录。 对于未点名的课程，需要实时获取请假列表查看。
                         Set<Long> scheduleRollCallIds = new HashSet();
                         for (Schedule schedule : scheduleList) {
                             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(schedule.getId());
                             if (null != scheduleRollCall && scheduleRollCall.getIsOpenRollcall()) {
                                 scheduleRollCallIds.add(scheduleRollCall.getId());
-                                boolean inClass = (DateFormatUtil.getNow(DateFormatUtil.FORMAT_SHORT).equals(schedule.getTeachDate())
-                                        && CourseUtils.classBeginTime(schedule.getScheduleStartTime()) && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
+                                boolean inClass = scheduleRollCall.getIsInClassroom();
                                 if (inClass) {
                                     // 课堂内，需要去redis库中修改签到状态。
                                     RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
                                     if (null != rollCall) {
                                         rollCall.setLastType(rollCall.getType());
-                                        rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-                                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                        if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                            rollCall.setDeleteFlag(DataValidity.INVALID.getState());
+                                            redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                        } else {
+                                            rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                            redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                        }
                                     }
                                 }
                             }
-
                             Long tempTeacherId = null;
                             try {
-                                tempTeacherId = send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(),
-                                        DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
+                                tempTeacherId = send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(), DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
@@ -602,22 +592,23 @@ public class LeaveService {
                         }
                         // 修改学生的签到状态
                         if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
-                            rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
+                            if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                rollCallRepository.deleteRollCallByStudentIdAndScheduleRollCall(leave.getStudentId(), scheduleRollCallIds);
+                            } else {
+                                rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
+                            }
                         }
                     }
                 }
             } else if (leave.getRequestType().equals(LeaveConstants.TYPE_PERIOD)) {
                 Map map = getBetweenStartAndEndPeriodId(account.getOrganId(), leave.getStartPeriodId(), leave.getEndPeriodId());
-
                 // 当天以后的请假
                 if (!DateFormatUtil.compareDate(leave.getStartDate(), new Date())) {
                     // 根据日期从平台获取排课数据
-                    List<DianDianDaySchoolTimeTableDomain> ddt
-                            = orgManagerRemoteService.getStudentDaySchoolTimeTable(leave.getStudentId(), DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT));
+                    List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteService.getStudentDaySchoolTimeTable(leave.getStudentId(), DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT));
                     for (DianDianDaySchoolTimeTableDomain dto : ddt) {
                         if (map.containsKey(dto.getPeriodId())) {
-                            Long tempTeacherId = send(leave.getStudentId(), InitScheduleService.parseTeacher(dto.getTeachers()).getId(), dto.getCourseId(), dto.getTeachDate(),
-                                    dto.getPeriodId(), null, leave, account.getId());
+                            Long tempTeacherId = send(leave.getStudentId(), InitScheduleService.parseTeacher(dto.getTeachers()).getId(), dto.getCourseId(), dto.getTeachDate(), dto.getPeriodId(), null, leave, account.getId());
                             if (null != tempTeacherId) {
                                 ids.add(tempTeacherId);
                             }
@@ -625,12 +616,9 @@ public class LeaveService {
                     }
                 } else {
                     // 直接修改本地数据库排课信息
-                    Set<Long> teachingclassIds
-                            = orgManagerRemoteService.getStudentDayTeachingClassId(leave.getStudentId(), DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT));
+                    Set<Long> teachingclassIds = orgManagerRemoteService.getStudentDayTeachingClassId(leave.getStudentId(), DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT));
                     // 获取当天该学生的排课信息
-                    List<Schedule> scheduleList = scheduleRepository.findByTeachDateAndDeleteFlagAndTeachingclassIdIn(
-                            DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT), DataValidity.VALID.getState(), teachingclassIds);
-
+                    List<Schedule> scheduleList = scheduleRepository.findByTeachDateAndDeleteFlagAndTeachingclassIdIn(DateFormatUtil.format(leave.getStartDate(), DateFormatUtil.FORMAT_SHORT), DataValidity.VALID.getState(), teachingclassIds);
                     // 获取该学生的某一天的排课，修改其签到记录。 对于未点名的课程，需要实时获取请假列表查看。
                     Set<Long> scheduleRollCallIds = new HashSet();
                     for (Schedule schedule : scheduleList) {
@@ -638,23 +626,25 @@ public class LeaveService {
                             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(schedule);
                             if (null != scheduleRollCall && scheduleRollCall.getIsOpenRollcall()) {
                                 scheduleRollCallIds.add(scheduleRollCall.getId());
-
-                                boolean inClass = (DateFormatUtil.getNow(DateFormatUtil.FORMAT_SHORT).equals(schedule.getTeachDate())
-                                        && CourseUtils.classBeginTime(schedule.getScheduleStartTime()) && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
+                                boolean inClass = scheduleRollCall.getIsInClassroom();
                                 if (inClass) {
                                     // 课堂内，需要去redis库中修改签到状态。
                                     RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
                                     if (null != rollCall) {
                                         rollCall.setLastType(rollCall.getType());
-                                        rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-                                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                        if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                            rollCall.setDeleteFlag(DataValidity.INVALID.getState());
+                                            redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                        } else {
+                                            rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                            redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                        }
                                     }
                                 }
                             }
                             Long tempTeacherId = null;
                             try {
-                                tempTeacherId = send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(),
-                                        DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
+                                tempTeacherId = send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(), DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
@@ -665,14 +655,17 @@ public class LeaveService {
                     }
                     // 修改学生的签到状态
                     if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
-                        rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
+                        if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                            rollCallRepository.deleteRollCallByStudentIdAndScheduleRollCall(leave.getStudentId(), scheduleRollCallIds);
+                        } else {
+                            rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
+                        }
                     }
                 }
             }
             pushMessageService.createPushMessage("请假审批结果通知", "请假审批结果通知", PushMessageConstants.FUNCTION_STUDENT_NOTICE, PushMessageConstants.MODULE_LEAVE, "请假审批结果通知", leave.getStudentId());
             ids.add(leave.getStudentId());
             pushService.listPush(accessToken, "您有一条未读的请假审批结果通知", "请假审批", "请假审批", ids);
-
             //----新消息服务----start
             List<AudienceDTO> audiences = new ArrayList<>();
             AudienceDTO dto = new AudienceDTO();
@@ -692,7 +685,6 @@ public class LeaveService {
                         rollCallStatsService.statsStuByTeachingClass(account.getOrganId(), semesterId, tcs.getTeachingClassId());
                     }
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();

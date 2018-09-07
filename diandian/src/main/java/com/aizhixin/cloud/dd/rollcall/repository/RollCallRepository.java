@@ -35,6 +35,10 @@ public interface RollCallRepository extends JpaRepository<RollCall, Long> {
     @Query("update com.aizhixin.cloud.dd.rollcall.entity.RollCall rc set rc.type = :type  where rc.studentId = :studentId and rc.scheduleRollcallId in (:scheduleRollCallIds)")
     void updateRollCallByStudentIdAndScheduleRollCall(@Param("type") String type, @Param("studentId") Long studentId, @Param("scheduleRollCallIds") Set<Long> scheduleRollCallIds);
 
+    @Modifying
+    @Query("update com.aizhixin.cloud.dd.rollcall.entity.RollCall rc set rc.deleteFlag = 1  where rc.studentId = :studentId and rc.scheduleRollcallId in (:scheduleRollCallIds)")
+    void deleteRollCallByStudentIdAndScheduleRollCall( @Param("studentId") Long studentId, @Param("scheduleRollCallIds") Set<Long> scheduleRollCallIds);
+
     List<RollCall> findByIdIn(Set<Long> ids);
 
     // List<RollCall> findByScheduleIdAndStudentId(Long scheduleId, Long
