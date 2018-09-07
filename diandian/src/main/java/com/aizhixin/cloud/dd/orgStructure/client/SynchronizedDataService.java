@@ -22,10 +22,7 @@ import org.springframework.util.StringUtils;
 
 import com.aizhixin.cloud.dd.common.domain.CountDomain;
 import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
-import com.aizhixin.cloud.dd.remote.ClassesTeacherClient;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.StudentClient;
-import com.aizhixin.cloud.dd.remote.TeacherClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
 import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
@@ -46,7 +43,7 @@ public class SynchronizedDataService {
     @Autowired
     private OrgInfoRepository orgInfoRepository;
     @Autowired
-    private StudentClient studentClient;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private DDUserService ddUserService;
     @Autowired
@@ -54,11 +51,7 @@ public class SynchronizedDataService {
     @Autowired
     private NewStudentRepository newStudentRepository;
     @Autowired
-    private TeacherClient teacherClient;
-    @Autowired
     private ClassesTeacherRepository classesTeacherRepository;
-    @Autowired
-    private ClassesTeacherClient classesTeacherClient;
     @Autowired
     private TeachingClassRepository teachingClassRepository;
     @Autowired
@@ -402,7 +395,7 @@ public class SynchronizedDataService {
     public void listNewStudent(Long orgId, OrgInfo orgInfo) {
         log.info("开始同步新生:" + orgId);
         newStudentRepository.deleteByOrgId(orgId);
-        Map<String, Object> stringObjectMap = studentClient.choosedormitorylist(orgId, null, null, null, null, 1, 100000);
+        Map<String, Object> stringObjectMap = orgManagerRemoteClient.choosedormitorylist(orgId, null, null, null, null, 1, 100000);
         if (stringObjectMap != null && stringObjectMap.get("data") != null) {
             List<Map<String, Object>> datas = (List<Map<String, Object>>) stringObjectMap.get("data");
             if (datas != null && datas.size() > 0) {
@@ -498,7 +491,7 @@ public class SynchronizedDataService {
      */
     public void listStudent(Long orgId, OrgInfo orgInfo) {
         userInfoRepository.deleteByOrgIdAndUserType(orgId, 70);
-        String json = studentClient.list(orgId, null, null, null, null, 1, Integer.MAX_VALUE);
+        String json = orgManagerRemoteClient.list(orgId, null, null, null, null, 1, Integer.MAX_VALUE);
         if (!StringUtils.isEmpty(json)) {
             try {
                 List<Long> ids = new ArrayList<>();
@@ -611,7 +604,7 @@ public class SynchronizedDataService {
      */
     public void listTeacher(Long orgId, OrgInfo orgInfo) {
         userInfoRepository.deleteByOrgIdAndUserType(orgId, 60);
-        String json = teacherClient.findByTeacherList(orgId, null, 1, Integer.MAX_VALUE);
+        String json = orgManagerRemoteClient.findByTeacherList(orgId, null, 1, Integer.MAX_VALUE);
         if (!StringUtils.isEmpty(json)) {
             try {
                 List<Long> ids = new ArrayList<>();
@@ -709,7 +702,7 @@ public class SynchronizedDataService {
 
     public void listClassesTeacher(Long classesId) {
         classesTeacherRepository.deleteByClassesId(classesId);
-        String json = classesTeacherClient.list(classesId);
+        String json = orgManagerRemoteClient.classesTeacherList(classesId);
         if (!StringUtils.isEmpty(json)) {
             try {
                 Map<String, Object> data = JsonUtil.Json2Object(json);

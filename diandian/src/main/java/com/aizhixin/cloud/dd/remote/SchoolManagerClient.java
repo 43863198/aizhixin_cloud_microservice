@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * hsh
  */
+//@FeignClient(name="school-manager", url="http://gateway.aizhixintest.com:80/school-manager")
 @FeignClient("school-manager")
 public interface SchoolManagerClient {
     @RequestMapping(method = RequestMethod.GET, value = "/v1/school/infomanager/findschoollogoinfo")

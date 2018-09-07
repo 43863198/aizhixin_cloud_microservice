@@ -2,6 +2,7 @@ package com.aizhixin.cloud.dd;
 
 import java.util.Map;
 
+import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,9 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.aizhixin.cloud.dd.Main;
 import com.aizhixin.cloud.dd.common.core.ApiReturnConstants;
-import com.aizhixin.cloud.dd.remote.StudentClient;
 import com.aizhixin.cloud.dd.rollcall.v1.controller.StudentController;
 
 /**
@@ -25,7 +24,7 @@ import com.aizhixin.cloud.dd.rollcall.v1.controller.StudentController;
 public class StudentTest {
 	
 	@Autowired
-	private StudentClient studentClient;
+	private OrgManagerRemoteClient orgManagerRemoteClient;
 
 	@Autowired
 	private StudentController studentController;
@@ -55,6 +54,6 @@ public class StudentTest {
 	}
 	@Test
 	public void test() {
-		System.out.println(studentClient.findByClassId(Long.valueOf(23+"")).isEmpty());
+		System.out.println(orgManagerRemoteClient.findByClassId(Long.valueOf(23+"")).isEmpty());
 	}
 }

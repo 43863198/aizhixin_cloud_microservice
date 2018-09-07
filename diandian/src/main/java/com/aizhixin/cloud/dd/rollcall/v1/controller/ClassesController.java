@@ -6,9 +6,7 @@ import com.aizhixin.cloud.dd.common.domain.PageData;
 import com.aizhixin.cloud.dd.common.domain.UserDomain;
 import com.aizhixin.cloud.dd.common.utils.TokenUtil;
 import com.aizhixin.cloud.dd.constant.ReturnConstants;
-import com.aizhixin.cloud.dd.remote.ClassesClient;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.StudentClient;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.service.ClassesService;
 import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
@@ -45,25 +43,11 @@ import java.util.*;
 @RequestMapping("/api/web/v1/classes")
 @Api(description = "测试组织机构班级管理API")
 public class ClassesController {
-
-    // final static private Logger LOG = LoggerFactory.getLogger(ClassesController.class);
-
     @Autowired
     private TeachingClassesService teachingClassesService;
 
     @Autowired
-    private ClassesClient classesClient;
-
-    @Autowired
-    private StudentClient studentClient;
-
-    @Autowired
     private IOUtil ioUtil = new IOUtil();
-
-    @Autowired
-    public ClassesController(ClassesClient classesClient) {
-        this.classesClient = classesClient;
-    }
 
     @Autowired
     private DDUserService ddUserService;
@@ -75,7 +59,7 @@ public class ClassesController {
     private ClassesService classesService;
 
     @Autowired
-    private OrgManagerRemoteClient orgManagerRemoteService;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
 
     @RequestMapping(value = "/queryStudentNotIncludeException", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "GET", value = "查询学生信息", response = Void.class, notes = "查询学生信息<br><br><b>@author zhen.pan</b>")
@@ -122,7 +106,7 @@ public class ClassesController {
         d.setName("点点测试班级");
         d.setProfessionalId(7L);
         d.setUserId(123L);
-        System.out.println(classesClient.add(d));
+        System.out.println(orgManagerRemoteClient.add(d));
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
@@ -134,7 +118,7 @@ public class ClassesController {
         d.setName("点点测试班级2");
         d.setProfessionalId(7L);
         d.setUserId(123L);
-        System.out.println(classesClient.update(d));
+        System.out.println(orgManagerRemoteClient.update(d));
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
@@ -509,7 +493,7 @@ public class ClassesController {
 
         // 查全校班级
         if (collegeId == null && professionId == null && classAdministrativeId == null) {
-            Map<String, Object> droplistorg = classesClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
+            Map<String, Object> droplistorg = orgManagerRemoteClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
             if (droplistorg != null) {
                 Object data = droplistorg.get("data");
                 JSONArray jsonArray = JSONArray.fromObject(data);
@@ -525,7 +509,7 @@ public class ClassesController {
                 ids.add(classAdministrativeId);
             }
             if (professionId != null && classAdministrativeId == null) {
-                Map<String, Object> droplist = classesClient.droplist(professionId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplist = orgManagerRemoteClient.droplist(professionId, 1, Integer.MAX_VALUE);
                 if (droplist != null) {
                     Object data = droplist.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -538,7 +522,7 @@ public class ClassesController {
                 }
             }
             if (collegeId != null && professionId == null && classAdministrativeId == null) {
-                Map<String, Object> droplistcollege = classesClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplistcollege = orgManagerRemoteClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
                 if (droplistcollege != null) {
                     Object data = droplistcollege.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -555,7 +539,7 @@ public class ClassesController {
         // 计算班级总人数
         int personNum = 0;
         if (ids != null && ids.size() > 0) {
-            Count = studentClient.countbyclassesids(ids);
+            Count = orgManagerRemoteClient.countbyclassesids(ids);
             if (Count != null && Count.size() > 0) {
                 for (CountDomain countDomain : Count) {
                     personNum += countDomain.getCount();
@@ -647,7 +631,7 @@ public class ClassesController {
         // 查全校班级
         if (collegeId == null && professionId == null && classId == null) {
             title = organService.getOrgan(account.getId()).getName();
-            Map<String, Object> droplistorg = classesClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
+            Map<String, Object> droplistorg = orgManagerRemoteClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
             if (droplistorg != null) {
                 Object data = droplistorg.get("data");
                 JSONArray jsonArray = JSONArray.fromObject(data);
@@ -665,7 +649,7 @@ public class ClassesController {
             }
             if (professionId != null && classId == null) {
                 title = teachingClassesService.queryprofession(professionId);
-                Map<String, Object> droplist = classesClient.droplist(professionId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplist = orgManagerRemoteClient.droplist(professionId, 1, Integer.MAX_VALUE);
                 if (droplist != null) {
                     Object data = droplist.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -679,7 +663,7 @@ public class ClassesController {
             }
             if (collegeId != null && professionId == null && classId == null) {
                 title = teachingClassesService.querycollege(collegeId);
-                Map<String, Object> droplistcollege = classesClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplistcollege = orgManagerRemoteClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
                 if (droplistcollege != null) {
                     Object data = droplistcollege.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -696,7 +680,7 @@ public class ClassesController {
         // 计算班级总人数
         int personNum = 0;
         if (ids != null && ids.size() > 0) {
-            Count = studentClient.countbyclassesids(ids);
+            Count = orgManagerRemoteClient.countbyclassesids(ids);
             if (Count != null && Count.size() > 0) {
                 for (CountDomain countDomain : Count) {
                     personNum += countDomain.getCount();
@@ -782,7 +766,7 @@ public class ClassesController {
 
         // 查全校班级
         if (collegeId == null && professionId == null && classAdministrativeId == null) {
-            Map<String, Object> droplistorg = classesClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
+            Map<String, Object> droplistorg = orgManagerRemoteClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
             if (droplistorg != null) {
                 Object data = droplistorg.get("data");
                 JSONArray jsonArray = JSONArray.fromObject(data);
@@ -798,7 +782,7 @@ public class ClassesController {
                 ids.add(classAdministrativeId);
             }
             if (professionId != null && classAdministrativeId == null) {
-                Map<String, Object> droplist = classesClient.droplist(professionId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplist = orgManagerRemoteClient.droplist(professionId, 1, Integer.MAX_VALUE);
                 if (droplist != null) {
                     Object data = droplist.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -811,7 +795,7 @@ public class ClassesController {
                 }
             }
             if (collegeId != null && professionId == null && classAdministrativeId == null) {
-                Map<String, Object> droplistcollege = classesClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplistcollege = orgManagerRemoteClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
                 if (droplistcollege != null) {
                     Object data = droplistcollege.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -828,7 +812,7 @@ public class ClassesController {
         // 计算班级总人数
         int personNum = 0;
         if (ids != null && ids.size() > 0) {
-            Count = studentClient.countbyclassesids(ids);
+            Count = orgManagerRemoteClient.countbyclassesids(ids);
             if (Count != null && Count.size() > 0) {
                 for (CountDomain countDomain : Count) {
                     personNum += countDomain.getCount();
@@ -985,7 +969,7 @@ public class ClassesController {
         // 查全校班级
         if (collegeId == null && professionId == null && classId == null) {
             title = organService.getOrgan(account.getId()).getName();
-            Map<String, Object> droplistorg = classesClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
+            Map<String, Object> droplistorg = orgManagerRemoteClient.droplistorg(account.getOrganId(), 1, Integer.MAX_VALUE);
             if (droplistorg != null) {
                 Object data = droplistorg.get("data");
                 JSONArray jsonArray = JSONArray.fromObject(data);
@@ -1003,7 +987,7 @@ public class ClassesController {
             }
             if (professionId != null && classId == null) {
                 title = teachingClassesService.queryprofession(professionId);
-                Map<String, Object> droplist = classesClient.droplist(professionId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplist = orgManagerRemoteClient.droplist(professionId, 1, Integer.MAX_VALUE);
                 if (droplist != null) {
                     Object data = droplist.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -1017,7 +1001,7 @@ public class ClassesController {
             }
             if (collegeId != null && professionId == null && classId == null) {
                 title = teachingClassesService.querycollege(collegeId);
-                Map<String, Object> droplistcollege = classesClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplistcollege = orgManagerRemoteClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
                 if (droplistcollege != null) {
                     Object data = droplistcollege.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -1034,7 +1018,7 @@ public class ClassesController {
         // 计算班级总人数
         int personNum = 0;
         if (ids != null && ids.size() > 0) {
-            Count = studentClient.countbyclassesids(ids);
+            Count = orgManagerRemoteClient.countbyclassesids(ids);
             if (Count != null && Count.size() > 0) {
                 for (CountDomain countDomain : Count) {
                     personNum += countDomain.getCount();
@@ -1137,9 +1121,9 @@ public class ClassesController {
         @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
         @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
         @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-        List<String> userRoles = orgManagerRemoteService.getUserRoles(managerId);
+        List<String> userRoles = orgManagerRemoteClient.getUserRoles(managerId);
         if (userRoles.size() > 0 && userRoles.contains("ROLE_COLLEGE_ADMIN")) {
-            UserDomain userInfo = orgManagerRemoteService.getUser(managerId);
+            UserDomain userInfo = orgManagerRemoteClient.getUser(managerId);
             if (null != userInfo) {
                 collegeId = userInfo.getCollegeId();
             }
@@ -1150,7 +1134,7 @@ public class ClassesController {
 
         // 查全校班级
         if (collegeId == null && professionId == null && classAdministrativeId == null) {
-            Map<String, Object> droplistorg = classesClient.droplistorg(orgId, 1, Integer.MAX_VALUE);
+            Map<String, Object> droplistorg = orgManagerRemoteClient.droplistorg(orgId, 1, Integer.MAX_VALUE);
             if (droplistorg != null) {
                 Object data = droplistorg.get("data");
                 JSONArray jsonArray = JSONArray.fromObject(data);
@@ -1166,7 +1150,7 @@ public class ClassesController {
                 ids.add(classAdministrativeId);
             }
             if (professionId != null && classAdministrativeId == null) {
-                Map<String, Object> droplist = classesClient.droplist(professionId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplist = orgManagerRemoteClient.droplist(professionId, 1, Integer.MAX_VALUE);
                 if (droplist != null) {
                     Object data = droplist.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -1179,7 +1163,7 @@ public class ClassesController {
                 }
             }
             if (collegeId != null && professionId == null && classAdministrativeId == null) {
-                Map<String, Object> droplistcollege = classesClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
+                Map<String, Object> droplistcollege = orgManagerRemoteClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
                 if (droplistcollege != null) {
                     Object data = droplistcollege.get("data");
                     JSONArray jsonArray = JSONArray.fromObject(data);
@@ -1196,7 +1180,7 @@ public class ClassesController {
         // 计算班级总人数
         int personNum = 0;
         if (ids != null && ids.size() > 0) {
-            Count = studentClient.countbyclassesids(ids);
+            Count = orgManagerRemoteClient.countbyclassesids(ids);
             if (Count != null && Count.size() > 0) {
                 for (CountDomain countDomain : Count) {
                     personNum += countDomain.getCount();

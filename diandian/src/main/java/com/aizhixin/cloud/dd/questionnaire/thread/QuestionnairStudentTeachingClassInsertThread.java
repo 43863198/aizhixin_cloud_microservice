@@ -1,12 +1,12 @@
 package com.aizhixin.cloud.dd.questionnaire.thread;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.aizhixin.cloud.dd.common.core.ApiReturnConstants;
 import com.aizhixin.cloud.dd.messege.dto.AudienceDTO;
 import com.aizhixin.cloud.dd.messege.service.MessageService;
+import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 import com.aizhixin.cloud.dd.common.core.ClassType;
 import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.constant.PushMessageConstants;
-import com.aizhixin.cloud.dd.remote.TeachingClassClient;
 import com.aizhixin.cloud.dd.questionnaire.domain.QuestionnaireAssginStudentsDomain;
 import com.aizhixin.cloud.dd.questionnaire.dto.QuestionnaireAssignDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.TeachingClassesDTO;
@@ -28,7 +27,7 @@ import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
 
 public class QuestionnairStudentTeachingClassInsertThread extends Thread {
     private QuestionnaireServiceV2 qs;
-    private TeachingClassClient tc;
+    private OrgManagerRemoteClient tc;
     private List<TeachingClassesDTO> teachingClasses;
     private Questionnaire questionnaire;
     private IdNameDomain semester;
@@ -39,7 +38,7 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
     private String accessToken;
     private RedisTemplate redisTemplate;
 
-    public QuestionnairStudentTeachingClassInsertThread(QuestionnaireServiceV2 qs, TeachingClassClient tc,
+    public QuestionnairStudentTeachingClassInsertThread(QuestionnaireServiceV2 qs, OrgManagerRemoteClient tc,
                                                         QuestionnaireAssignDTO questionnaireAssignDTO, Questionnaire questionnaire, IdNameDomain semester,
                                                         Long userId, PushMessageRepository pushMessageRepository, PushService pushService, String accessToken, RedisTemplate redisTemplate, MessageService messageService) {
         this.qs = qs;

@@ -1,8 +1,6 @@
 package com.aizhixin.cloud.dd.rollcall.service;
 
 import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
-import com.aizhixin.cloud.dd.remote.ClassesClient;
-import com.aizhixin.cloud.dd.remote.TeachingClassClient;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +22,14 @@ import java.util.Set;
 @Transactional
 public class TeachingClassesService {
     @Autowired
-    private TeachingClassClient teachingClassClient;
-    @Autowired
-    private ClassesClient classesClient;
-    @Autowired
-    private OrgManagerRemoteClient orgManagerRemoteService;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     TeachingClassAttendaceInfoQuery teachingClassAttendaceInfoQuery;
 
 
     public PageData <TeachingClassesDTO> listTeachingClasses(Set <Long> teachingClassesIds, Long orgId, Long semesterId, Long collegeId, String courseName, String teacherName, Integer pageNumber, Integer pageSize) {
         TeachingClassQueryDomain teachingClassQueryDomain = new TeachingClassQueryDomain(teachingClassesIds, orgId, semesterId, collegeId, courseName, teacherName, pageNumber, pageSize);
-        String str = orgManagerRemoteService.listTeachingClasses(teachingClassQueryDomain);
+        String str = orgManagerRemoteClient.listTeachingClasses(teachingClassQueryDomain);
         if (null == str) {
             return null;
         }
@@ -85,13 +79,13 @@ public class TeachingClassesService {
 
 
     public List <IdNameDomain> queryClassInfo(Set <Long> classId) {
-        List <IdNameDomain> classInfo = teachingClassClient.getIdnameByids(classId);
+        List <IdNameDomain> classInfo = orgManagerRemoteClient.getIdnameByids(classId);
         return classInfo;
     }
 
 
     public List <TeachStudentDomain> queryStuInfoId(Set <Long> stuId) {
-        List <TeachStudentDomain> teachStudentDomains = teachingClassClient.batchUpdateClasses(stuId);
+        List <TeachStudentDomain> teachStudentDomains = orgManagerRemoteClient.batchUpdateClasses(stuId);
         return teachStudentDomains;
     }
 
@@ -127,12 +121,12 @@ public class TeachingClassesService {
     }
 
     public List <ClassesIdNameCollegeNameDomain> queryCollegeNameWithClassName(Set <Long> classId) {
-        List <ClassesIdNameCollegeNameDomain> getbyids = classesClient.getbyids(classId);
+        List <ClassesIdNameCollegeNameDomain> getbyids = orgManagerRemoteClient.getbyids(classId);
         return getbyids;
     }
 
     public String queryCurrentDateWeek(Long orgId, String date) {
-        String str = orgManagerRemoteService.getWeek(orgId, date);
+        String str = orgManagerRemoteClient.getWeek(orgId, date);
         if (null == str) {
             return null;
         }
@@ -147,7 +141,7 @@ public class TeachingClassesService {
     }
 
     public String getTeachingClassInfo(Long classId) {
-        String str = teachingClassClient.getteachingclassInfo(classId);
+        String str = orgManagerRemoteClient.getteachingclassInfo(classId);
         if (null == str) {
             return null;
         }
@@ -160,7 +154,7 @@ public class TeachingClassesService {
     }
 
     public String querycollege(Long collegeId) {
-        String str = teachingClassClient.querycollege(collegeId);
+        String str = orgManagerRemoteClient.querycollege(collegeId);
         if (null == str) {
             return null;
         }
@@ -174,7 +168,7 @@ public class TeachingClassesService {
 
 
     public String queryprofession(Long professionId) {
-        String str = teachingClassClient.queryprofession(professionId);
+        String str = orgManagerRemoteClient.queryprofession(professionId);
         if (null == str) {
             return null;
         }
@@ -187,7 +181,7 @@ public class TeachingClassesService {
     }
 
     public String queryAdminclass(Long classAdministrativeId) {
-        String str = teachingClassClient.queryAdminclass(classAdministrativeId);
+        String str = orgManagerRemoteClient.queryAdminclass(classAdministrativeId);
         if (null == str) {
             return null;
         }
@@ -200,6 +194,6 @@ public class TeachingClassesService {
     }
 
     public String getTeachingClassIdByTeacher(Long teacherId, Long semesterId) {
-        return orgManagerRemoteService.getTeachingclassIdBy(teacherId, semesterId);
+        return orgManagerRemoteClient.getTeachingclassIdBy(teacherId, semesterId);
     }
 }

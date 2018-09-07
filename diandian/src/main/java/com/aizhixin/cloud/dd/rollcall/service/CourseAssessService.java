@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,6 @@ import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.common.domain.PageData;
 import com.aizhixin.cloud.dd.common.domain.PageDomain;
 import com.aizhixin.cloud.dd.common.exception.DlEduException;
-import com.aizhixin.cloud.dd.remote.TeachingClassClient;
 import com.aizhixin.cloud.dd.rollcall.JdbcTemplate.CourseAssessDetailsQueryJdbcTemplate;
 import com.aizhixin.cloud.dd.rollcall.JdbcTemplate.CourseAssessDetailsQueryPaginationSQL;
 import com.aizhixin.cloud.dd.rollcall.JdbcTemplate.CourseAssessOneQueryJdbcTemplate;
@@ -31,13 +31,11 @@ import com.aizhixin.cloud.dd.rollcall.dto.PageInfo;
 import com.aizhixin.cloud.dd.rollcall.dto.TeacherPhoneCourseAssessDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.TeacherPhoneCourseAssessDetailsDTO;
 
-import java.util.List;
-
 @Service
 @Transactional
 public class CourseAssessService {
 	@Autowired
-	private TeachingClassClient teachingClassClient;
+	private OrgManagerRemoteClient teachingClassClient;
 	@Autowired
 	private CourseAssessOneQueryJdbcTemplate courseAssessOneQueryJdbcTemplate;
 	@Autowired
