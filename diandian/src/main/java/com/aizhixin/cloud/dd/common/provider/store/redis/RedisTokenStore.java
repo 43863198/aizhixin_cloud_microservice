@@ -33,6 +33,7 @@ public class RedisTokenStore {
     public static final String TYPE_COUNSELLORROLLCALL_GROUP = "counsellor:rollcallgroupid:";
 
     public static final String TYPE_SCHEDULE_STUDENT_TODAY = "schedule:studenttoday:";
+    public static final String TYPE_INIT_SCHEDULE_STATUS = "schedule:initstatus:";
 
     public static final String TYPE_ROLLCALLSTATS_STUDENT_ALL = "rollcallstats:studentall:";
     public static final String TYPE_ROLLCALLSTATS_STUDENT_TEACHINGCLASS = "rollcallstats:studentteachingclass:";
@@ -252,6 +253,20 @@ public class RedisTokenStore {
         return null;
     }
 
+    public Boolean getInitScheduleStatus(String key) {
+        Boolean result = (Boolean) redisTemplate.opsForValue().get(TYPE_INIT_SCHEDULE_STATUS + key.toString());
+        if (result == null || result == false) {
+            return false;
+        }
+        return true;
+    }
+
+    public void setInitScheduleStatus(String key, Boolean data) {
+        if (data != null) {
+            redisTemplate.opsForValue().set(TYPE_INIT_SCHEDULE_STATUS + key, data, 1, TimeUnit.DAYS);
+        }
+    }
+
     public void setScheduleStudentToday(Long userId, List<PeriodDTO> data) {
         if (data != null) {
             String str = JSON.toJSONString(data);
@@ -327,13 +342,13 @@ public class RedisTokenStore {
         return null;
     }
 
-    public void setAd(String key, List<HomeDomain> data){
+    public void setAd(String key, List<HomeDomain> data) {
         if (data != null) {
             setCacheValue(TYPE_GET_AD, key, data);
         }
     }
 
-    public List<HomeDomain> getAd(String key){
+    public List<HomeDomain> getAd(String key) {
         String str = (String) redisTemplate.opsForHash().get(TYPE_GET_AD, key);
         if (!StringUtils.isEmpty(str)) {
             return JSON.parseArray(str, HomeDomain.class);

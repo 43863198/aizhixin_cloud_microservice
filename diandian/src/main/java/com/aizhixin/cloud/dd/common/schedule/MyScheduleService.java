@@ -95,6 +95,27 @@ public class MyScheduleService {
     }
 
     /**
+     * 验证凌晨获取排课信息
+     */
+    @Scheduled(cron = "0 20 5 * * ?")
+    public void checkDayDataTask() {
+        if (distributeLock.getDayInitLock()) {
+            if (execute) {
+                log.info("开始验证天粒度数据预处理任务");
+                if (!initScheduleService.checkDayDataTask()) {
+                    log.info("开始启动天粒度数据预处理任务");
+                    initScheduleService.initSchedule();
+                } else {
+                    log.info("验证天粒度数据预处理任务完成");
+                }
+            }
+            distributeLock.delDayInitLock();
+        } else {
+            log.info("验证凌晨获取排课信息，获取锁失败");
+        }
+    }
+
+    /**
      * 课前课后
      */
     @Scheduled(cron = "1 0,10,20,30,40,50 * * * ?")
