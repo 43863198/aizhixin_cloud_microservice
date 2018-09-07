@@ -92,13 +92,7 @@ public class QuestionnaireService {
     @Autowired
     private QuestionAnswerRecordRepository questionAnswerRecordRepository;
     @Autowired
-    private StudentClient studentClient;
-    @Autowired
-    private CourseClient courseClient;
-    @Autowired
-    private TeacherClient teacherClient;
-    @Autowired
-    private ClassesClient classesClient;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private PushMessageRepository pushMessageRepository;
     @Autowired
@@ -826,7 +820,7 @@ public class QuestionnaireService {
             QuestionnaireAssgin questionnaireAssgin,
             QuestionnaireAssginStudents questionnaireAssginStudents)
             throws JsonParseException, JsonMappingException, IOException {
-        String json = studentClient.findByStudentId(questionnaireAssginStudents.getStudentId());
+        String json = orgManagerRemoteClient.findByStudentId(questionnaireAssginStudents.getStudentId());
         Map<String, Object> map = JsonUtil.Json2Object(json);
         if (map.get("name") != null) {
             questionnaireDetailDTO.setStudentName(map.get("name").toString());
@@ -834,7 +828,7 @@ public class QuestionnaireService {
         if (map.get("classesName") != null) {
             questionnaireDetailDTO.setClassName(map.get("classesName").toString());
         }
-        String jsonCourse = courseClient.findByCourseId(questionnaireAssgin.getCourseId());
+        String jsonCourse = orgManagerRemoteClient.findByCourseId(questionnaireAssgin.getCourseId());
         Map<String, Object> mapCourse = JsonUtil.Json2Object(jsonCourse);
         if (mapCourse.get("code") != null) {
             questionnaireDetailDTO.setCourseCode(mapCourse.get("code").toString());
@@ -842,7 +836,7 @@ public class QuestionnaireService {
         if (mapCourse.get("name") != null) {
             questionnaireDetailDTO.setCourseName(mapCourse.get("name").toString());
         }
-        String jsonTeacher = teacherClient.findByTeacherId(questionnaireAssgin.getTeacherId());
+        String jsonTeacher = orgManagerRemoteClient.findByTeacherId(questionnaireAssgin.getTeacherId());
         Map<String, Object> mapTeacher = JsonUtil.Json2Object(jsonTeacher);
         if (mapTeacher.get("name") != null) {
             questionnaireDetailDTO.setTeacherName(mapTeacher.get("name").toString());
@@ -1044,12 +1038,12 @@ public class QuestionnaireService {
         // 1.查询 问卷名称，老师名称，课堂名称（编号）
         QuestionnaireAssgin questionnaireAssgin = assginRepository.findOne(questionnaireAssginId);
         questionnaireCensusDetailDTO.setQuestionnaireAssginId(questionnaireAssginId);
-        String jsonTeacher = teacherClient.findByTeacherId(questionnaireAssgin.getTeacherId());
+        String jsonTeacher = orgManagerRemoteClient.findByTeacherId(questionnaireAssgin.getTeacherId());
         Map<String, Object> r = JsonUtil.Json2Object(jsonTeacher);
         if (r.get("name") != null) {
             questionnaireCensusDetailDTO.setTeacherName(r.get("name").toString());
         }
-        String jsonCourse = courseClient.findByCourseId(questionnaireAssgin.getCourseId());
+        String jsonCourse = orgManagerRemoteClient.findByCourseId(questionnaireAssgin.getCourseId());
         Map<String, Object> rc = JsonUtil.Json2Object(jsonCourse);
         if (rc.get("name") != null) {
             questionnaireCensusDetailDTO.setCourseName(rc.get("name").toString());
@@ -1069,7 +1063,7 @@ public class QuestionnaireService {
             List<String> classNames = new ArrayList<String>();
             int totalCount = 0;
             for (QuestionnaireCensusDetailDTO questionnaireCensusDetailDTO2 : classAndNums) {
-                String json = classesClient.getById(questionnaireCensusDetailDTO2.getClassId());
+                String json = orgManagerRemoteClient.getById(questionnaireCensusDetailDTO2.getClassId());
                 Map<String, Object> c = JsonUtil.Json2Object(json);
                 if (c.get("name") != null) {
                     classNames.add(c.get("name").toString());
@@ -1110,9 +1104,9 @@ public class QuestionnaireService {
                         questionnaireAssginId, PageUtil.createNoErrorPageRequestAndSort(offset, limit, sort));
             }
             for (int i = 0; i < p.getContent().size(); i++) {
-                String json = classesClient.getById(p.getContent().get(i).getClassesId());
+                String json = orgManagerRemoteClient.getById(p.getContent().get(i).getClassesId());
                 Map<String, Object> c = JsonUtil.Json2Object(json);
-                String jsonStudent = studentClient.findByStudentId(p.getContent().get(i).getStudentId());
+                String jsonStudent = orgManagerRemoteClient.findByStudentId(p.getContent().get(i).getStudentId());
                 Map<String, Object> map = JsonUtil.Json2Object(jsonStudent);
                 if (map.get("name") != null) {
                     p.getContent().get(i).setStudentName(map.get("name").toString());
@@ -1138,7 +1132,7 @@ public class QuestionnaireService {
         List<Map<String, Object>> lt = null;
         List<Map<String, Object>> lc = null;
         if (teacherName != null && !"".equals(teacherName)) {
-            String json = teacherClient.findByTeacherList(organId, teacherName, 1, 300);
+            String json = orgManagerRemoteClient.findByTeacherList(organId, teacherName, 1, 300);
             Map<String, Object> map = JsonUtil.Json2Object(json);
             lt = (List<Map<String, Object>>) map.get("data");
             for (int i = 0; i < lt.size(); i++) {
@@ -1154,7 +1148,7 @@ public class QuestionnaireService {
             }
         }
         if (courseName != null && !"".equals(courseName)) {
-            String json = courseClient.getExcellentCourseLikeName(organId, courseName, 1, 300);
+            String json = orgManagerRemoteClient.getExcellentCourseLikeName(organId, courseName, 1, 300);
             Map<String, Object> map = JsonUtil.Json2Object(json);
             lc = (List<Map<String, Object>>) map.get("data");
             for (int i = 0; i < lc.size(); i++) {
@@ -1209,7 +1203,7 @@ public class QuestionnaireService {
         List<QuestionnaireCensusDetailDTO> classAndNums = page.getData();
         for (QuestionnaireCensusDetailDTO questionnaireCensusDetailDTO : classAndNums) {
             Map tempMap = new HashMap();
-            String json = classesClient.getById(questionnaireCensusDetailDTO.getClassId());
+            String json = orgManagerRemoteClient.getById(questionnaireCensusDetailDTO.getClassId());
             Map<String, Object> map = JsonUtil.Json2Object(json);
             if (map.get("name") != null) {
                 tempMap.put("className", map.get("name").toString());

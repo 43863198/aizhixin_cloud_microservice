@@ -1,7 +1,6 @@
 package com.aizhixin.cloud.dd.rollcall.service;
 
 import com.aizhixin.cloud.dd.common.domain.UserDomain;
-import com.aizhixin.cloud.dd.remote.ClassesClient;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.Attendance.AttendanceRateDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.Statistics.ClassStatisticsDTO;
@@ -33,11 +32,9 @@ import java.util.*;
 @Transactional
 public class EducationInspectionService {
     @Autowired
-    private ClassesClient classesClient;
-    @Autowired
     private EntityManager em;
     @Autowired
-    private OrgManagerRemoteClient orgManagerRemoteService;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private OrganSetService organSetService;
     @Autowired
@@ -370,7 +367,7 @@ public class EducationInspectionService {
             OrganSet organSet = organSetService.findByOrganId(orgId);
             int type = organSet.getArithmetic() == null ? 10 : organSet.getArithmetic();
             Long sid = null;
-            Map<String, Object> semester = orgManagerRemoteService.getorgsemester(orgId, sdf.format(new Date()));
+            Map<String, Object> semester = orgManagerRemoteClient.getorgsemester(orgId, sdf.format(new Date()));
             if (null != semester) {
                 JSONObject jd = JSONObject.fromObject(semester);
                 sid = jd.getLong("id");
@@ -460,7 +457,7 @@ public class EducationInspectionService {
         Long late = 0L;
         Long leave = 0L;
         Long askForLeave = 0L;
-        Map<String, Object> semester = orgManagerRemoteService.getorgsemester(orgId, datatime);
+        Map<String, Object> semester = orgManagerRemoteClient.getorgsemester(orgId, datatime);
         if (null != semester) {
             JSONObject jd = JSONObject.fromObject(semester);
             sid = jd.getLong("id");
@@ -528,7 +525,7 @@ public class EducationInspectionService {
                 commentDTO.setContent(String.valueOf(d[2]));
                 Long studentId = Long.valueOf(String.valueOf(d[3]));
                 if (null != studentId) {
-                    UserDomain user = orgManagerRemoteService.getUser(studentId);
+                    UserDomain user = orgManagerRemoteClient.getUser(studentId);
                     if (null != user) {
                         commentDTO.setStrudentName(user.getName());
                     }
@@ -711,7 +708,7 @@ public class EducationInspectionService {
             OrganSet organSet = organSetService.findByOrganId(orgId);
             int type = organSet.getArithmetic() == null ? 10 : organSet.getArithmetic();
             Long sid = null;
-            Map<String, Object> semester = orgManagerRemoteService.getorgsemester(orgId, datatime);
+            Map<String, Object> semester = orgManagerRemoteClient.getorgsemester(orgId, datatime);
             if (null != semester) {
                 JSONObject jd = JSONObject.fromObject(semester);
                 sid = jd.getLong("id");
@@ -792,7 +789,7 @@ public class EducationInspectionService {
             OrganSet organSet = organSetService.findByOrganId(orgId);
             int type = organSet.getArithmetic() == null ? 10 : organSet.getArithmetic();
             Long sid = null;
-            Map<String, Object> semester = orgManagerRemoteService.getorgsemester(orgId, datatime);
+            Map<String, Object> semester = orgManagerRemoteClient.getorgsemester(orgId, datatime);
             if (null != semester) {
                 JSONObject jd = JSONObject.fromObject(semester);
                 sid = jd.getLong("id");
@@ -848,7 +845,7 @@ public class EducationInspectionService {
                 if (null != sub) {
                     for (ComprehensiveRankingDTO cr : sub) {
                         if (null != cr.getClassId()) {
-                            Map<String, Object> classesteacher = orgManagerRemoteService.getClassTeacherByClassId(cr.getClassId());
+                            Map<String, Object> classesteacher = orgManagerRemoteClient.getClassTeacherByClassId(cr.getClassId());
                             if (null != classesteacher) {
                                 JSONObject jd = JSONObject.fromObject(classesteacher);
                                 JSONArray jsonArray = jd.getJSONArray("data");

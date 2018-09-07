@@ -4,9 +4,7 @@ import com.aizhixin.cloud.dd.common.core.PageUtil;
 import com.aizhixin.cloud.dd.common.domain.PageData;
 import com.aizhixin.cloud.dd.communication.entity.RollCallReport;
 import com.aizhixin.cloud.dd.communication.service.RollCallEverService;
-import com.aizhixin.cloud.dd.remote.ClassesClient;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.TeacherClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AttendanceRecordDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.Statistics.ClassNamingDetailsDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.Statistics.RollcallStatisticsDTO;
@@ -43,11 +41,7 @@ public class AttendanceRecordService {
     @Autowired
     private RollCallRepository rollCallRepository;
     @Autowired
-    private ClassesClient classesClient;
-    @Autowired
-    private TeacherClient teacherClient;
-    @Autowired
-    private OrgManagerRemoteClient orgManagerRemoteService;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private RollCallEverService rollCallEverService;
     @Autowired
@@ -313,7 +307,7 @@ public class AttendanceRecordService {
         Long count = 0L;
         try {
             if (null != orgId) {
-                classTeacherIds = orgManagerRemoteService.getClassTeacherIds(orgId, tcollegeId, nj);
+                classTeacherIds = orgManagerRemoteClient.getClassTeacherIds(orgId, tcollegeId, nj);
             }
             if (null != classTeacherIds && classTeacherIds.size() > 0) {
                 List<Long> ids = rollCallEverService.getRollcalleverIdByTeacherId(classTeacherIds, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate + " 00:00:00"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate + " 23:59:59"));
@@ -340,7 +334,7 @@ public class AttendanceRecordService {
                                 Object[] d = (Object[]) obj;
                                 RollcallStatisticsDTO rollcallStatisticsDTO = new RollcallStatisticsDTO();
                                 if (null != d[0]) {
-                                    String teacherDomain = teacherClient.findByTeacherId(Long.valueOf(String.valueOf(d[0])));
+                                    String teacherDomain = orgManagerRemoteClient.findByTeacherId(Long.valueOf(String.valueOf(d[0])));
                                     if (null != teacherDomain) {
                                         JSONObject td = JSONObject.fromObject(teacherDomain);
                                         String teacherName = td.getString("name");
@@ -358,7 +352,7 @@ public class AttendanceRecordService {
                                     }
                                 }
                                 if (null != d[1]) {
-                                    String classesDomain = classesClient.get(Long.valueOf(String.valueOf(d[1])));
+                                    String classesDomain = orgManagerRemoteClient.get(Long.valueOf(String.valueOf(d[1])));
                                     if (null != classesDomain) {
                                         JSONObject cd = JSONObject.fromObject(classesDomain);
                                         String cName = cd.getString("name");
@@ -415,7 +409,7 @@ public class AttendanceRecordService {
                         }
                         for (Long id : dd) {
                             RollcallStatisticsDTO rollcallStatisticsDTO = new RollcallStatisticsDTO();
-                            String teacherDomain = teacherClient.findByTeacherId(id);
+                            String teacherDomain = orgManagerRemoteClient.findByTeacherId(id);
                             if (null != teacherDomain) {
                                 JSONObject td = JSONObject.fromObject(teacherDomain);
                                 String teacherName = td.getString("name");
@@ -443,7 +437,7 @@ public class AttendanceRecordService {
                         }
                         for (Long id : dd) {
                             RollcallStatisticsDTO rollcallStatisticsDTO = new RollcallStatisticsDTO();
-                            String teacherDomain = teacherClient.findByTeacherId(id);
+                            String teacherDomain = orgManagerRemoteClient.findByTeacherId(id);
                             if (null != teacherDomain) {
                                 JSONObject td = JSONObject.fromObject(teacherDomain);
                                 String teacherName = td.getString("name");
@@ -516,7 +510,7 @@ public class AttendanceRecordService {
                 }
             }
             if (null != studentsId && studentsId.size() > 0) {
-                String studentInf = orgManagerRemoteService.findUserByIds(studentsId);
+                String studentInf = orgManagerRemoteClient.findUserByIds(studentsId);
                 if (null != studentInf) {
                     JSONArray jsonArray = JSONArray.fromObject(studentInf);
                     if (null != jsonArray && jsonArray.length() > 0) {

@@ -25,7 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.aizhixin.cloud.dd.common.services.DistributeLock;
 import com.aizhixin.cloud.dd.remote.PaycallbackClient;
-import com.aizhixin.cloud.dd.remote.StudentClient;
 import com.aizhixin.cloud.dd.questionnaire.repository.QuestionnaireAssginStudentsRepository;
 import com.aizhixin.cloud.dd.messege.service.PushService;
 import com.aizhixin.cloud.dd.rollcall.service.SmsService;
@@ -46,8 +45,6 @@ public class xgTest {
 	@Autowired
 	private RedisTemplate< String, String> redisTemplate;
 	@Autowired
-	private StudentClient studentClient;
-	@Autowired
 	private PaycallbackClient paycallbackClient;
 	@Autowired
 	private DistributeLock dis;
@@ -60,7 +57,7 @@ public class xgTest {
 	@Autowired
 	private AdjustCourseScheduleRecordService adjustCourseScheduleRecordService;
 	@Autowired
-	private OrgManagerRemoteClient orgManagerRemoteService;
+	private OrgManagerRemoteClient orgManagerRemoteClient;
 	@Test
 	public void tt() {
 		smsService.sendSms("18328029743", "[知新教师] 夏根发起了调停课审批申请，等待您的审批");

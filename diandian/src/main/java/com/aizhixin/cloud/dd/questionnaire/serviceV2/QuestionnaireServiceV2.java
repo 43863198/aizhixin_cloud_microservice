@@ -60,17 +60,11 @@ public class QuestionnaireServiceV2 {
     @Autowired
     private QuestionnaireAssginStudentsJdbc questionnaireAssginStudentsJdbc;
     @Autowired
-    private TeachingClassClient tc;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private PushMessageRepository pushMessageRepository;
     @Autowired
     private PushService pushService;
-    @Autowired
-    private ClassesClient classesClient;
-    @Autowired
-    private ClassesTeacherClient classesTeacherClient;
-    @Autowired
-    private StudentClient studentClient;
     @Autowired
     private QuestionnaireRepository questionnaireRepository;
     @Autowired
@@ -79,8 +73,6 @@ public class QuestionnaireServiceV2 {
     private QuestionnaireAssginRepository questionnaireAssginRepository;
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private OrgManagerRemoteClient orgManagerRemoteService;
     @Autowired
     private MessageService messageService;
 
@@ -168,7 +160,7 @@ public class QuestionnaireServiceV2 {
         redisData.put(ApiReturnConstants.RESULT, "10");
         redisData.put(ApiReturnConstants.DATA, "进行中");
         redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), redisData, 1, TimeUnit.DAYS);
-        QuestionnairStudentTeachingClassInsertThread qt = new QuestionnairStudentTeachingClassInsertThread(this, tc, questionnaireAssignDTO, q, semester, account.getId(), pushMessageRepository, pushService, accessToken, redisTemplate, messageService);
+        QuestionnairStudentTeachingClassInsertThread qt = new QuestionnairStudentTeachingClassInsertThread(this, orgManagerRemoteClient, questionnaireAssignDTO, q, semester, account.getId(), pushMessageRepository, pushService, accessToken, redisTemplate, messageService);
         qt.start();
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         result.put(ApiReturnConstants.DATA, q.getId());
@@ -293,14 +285,14 @@ public class QuestionnaireServiceV2 {
         List<PushMessage> messages = new ArrayList<>();
         List<QuestionnaireAssginStudentsDomain> qasdl = new ArrayList<>();
         List<Long> userIds = new ArrayList<Long>();
-        List<Map<String, Object>> ml = studentClient.findByClassesIds(classesIds);
+        List<Map<String, Object>> ml = orgManagerRemoteClient.findByClassesIds(classesIds);
         Map<Long, Long> mm = new HashMap<>();
         Map<Long, List<Long>> mml = new HashMap<>();
         if (null != ml && 0 < ml.size()) {
             for (int i = 0; i < classesIds.size(); i++) {
                 List<Long> userIdAll = new ArrayList<Long>();
                 try {
-                    String json = classesClient.get(classesIds.get(i));
+                    String json = orgManagerRemoteClient.get(classesIds.get(i));
                     if (!StringUtils.isEmpty(json)) {
                         Map<String, Object> map = JsonUtil.Json2Object(json);
                         QuestionnaireAssgin qa = findByQuestionnaireAssgin(20, classesIds.get(i), questionnaire.getId());
@@ -327,7 +319,7 @@ public class QuestionnaireServiceV2 {
                             if (null != map.get("professionalName")) {
                                 qa.setProfName(map.get("professionalName").toString());
                             }
-                            String teacherinfo = classesTeacherClient.list(classesIds.get(i));
+                            String teacherinfo = orgManagerRemoteClient.classesTeacherList(classesIds.get(i));
                             if (!StringUtils.isEmpty(teacherinfo)) {
                                 Map<String, Object> teacherJson = JsonUtil.Json2Object(teacherinfo);
                                 if (null != teacherJson.get("data")) {
@@ -424,7 +416,7 @@ public class QuestionnaireServiceV2 {
     public void insertProfStudent(List<Long> profIds, String accessToken, Questionnaire questionnaire, Long userId, IdNameDomain semester) {
         List<Long> classesIds = new ArrayList<>();
         for (Long professionalId : profIds) {
-            Map<String, Object> map = classesClient.droplist(professionalId, 1, Integer.MAX_VALUE);
+            Map<String, Object> map = orgManagerRemoteClient.droplist(professionalId, 1, Integer.MAX_VALUE);
             if (null != map && null != map.get("data")) {
                 List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("data");
                 if (null != data && 0 < data.size()) {
@@ -449,7 +441,7 @@ public class QuestionnaireServiceV2 {
     public void insertCollegeStudent(List<Long> collegeIds, String accessToken, Questionnaire questionnaire, Long userId, IdNameDomain semester) {
         List<Long> classesIds = new ArrayList<>();
         for (Long collegeId : collegeIds) {
-            Map<String, Object> map = classesClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
+            Map<String, Object> map = orgManagerRemoteClient.droplistcollege(collegeId, 1, Integer.MAX_VALUE);
             if (null != map && null != map.get("data")) {
                 List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("data");
                 if (null != data && 0 < data.size()) {
@@ -473,7 +465,7 @@ public class QuestionnaireServiceV2 {
 
     public void insertOrgStudent(Long orgId, String accessToken, Questionnaire questionnaire, Long userId, IdNameDomain semester) {
         List<Long> classesIds = new ArrayList<>();
-        Map<String, Object> map = classesClient.droplistorg(orgId, 1, Integer.MAX_VALUE);
+        Map<String, Object> map = orgManagerRemoteClient.droplistorg(orgId, 1, Integer.MAX_VALUE);
         if (null != map && null != map.get("data")) {
             List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("data");
             if (null != data && 0 < data.size()) {

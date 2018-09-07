@@ -34,7 +34,6 @@ import com.aizhixin.cloud.dd.dorms.repository.BedStuRepository;
 import com.aizhixin.cloud.dd.dorms.repository.FloorRepository;
 import com.aizhixin.cloud.dd.dorms.repository.RoomAssginRepository;
 import com.aizhixin.cloud.dd.dorms.repository.RoomRepository;
-import com.aizhixin.cloud.dd.remote.StudentClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
 import com.aizhixin.cloud.dd.rollcall.service.SmsService;
@@ -47,7 +46,7 @@ public class BedStuService {
     @Autowired
     private BedStuRepository bedStuRepository;
     @Autowired
-    private StudentClient studentClient;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private DDUserService ddUserService;
     @Autowired
@@ -62,8 +61,6 @@ public class BedStuService {
     private SmsService smsService;
     @Autowired
     private RoomAssginJdbc roomAssginJdbc;
-    @Autowired
-    private OrgManagerRemoteClient orgManagerRemoteService;
     @Autowired
     private NewStudentRepository studentRepository;
     @Autowired
@@ -216,7 +213,7 @@ public class BedStuService {
                     }
                 }
                 Map<Long, AccountDTO> map = ddUserService.getUserinfoByIdsV2(stuIds);
-                List<Map<String, Object>> mapList = studentClient.findByIdsNoClasses(stuIds);
+                List<Map<String, Object>> mapList = orgManagerRemoteClient.findByIdsNoClasses(stuIds);
                 if (null != mapList && 0 < mapList.size()) {
                     for (Map<String, Object> data : mapList) {
                         AccountDTO ad = new AccountDTO();
@@ -323,7 +320,7 @@ public class BedStuService {
         /**
          * 冗余学生信息
          */
-        String userStr = orgManagerRemoteService.getUserInfo(a.getId());
+        String userStr = orgManagerRemoteClient.getUserInfo(a.getId());
         if (!StringUtils.isEmpty(userStr)) {
             JSONObject userInfo = JSONObject.fromObject(userStr);
             if (userInfo != null) {
@@ -417,7 +414,7 @@ public class BedStuService {
                     bedIds.add(bedStu.getBedId());
                 }
                 if (!stuIds.isEmpty()) {
-                    List<Map<String, Object>> listMap = studentClient.findByIdsNoClasses(stuIds);
+                    List<Map<String, Object>> listMap = orgManagerRemoteClient.findByIdsNoClasses(stuIds);
                     List<Bed> lb = bedRepository.findByIdInAndDeleteFlag(bedIds, DataValidity.VALID.getState());
                     for (Bed bed : lb) {
                         StuBedInfoDomain sbd = new StuBedInfoDomain();
@@ -515,7 +512,7 @@ public class BedStuService {
         /**
          * 冗余学生信息
          */
-        String userStr = orgManagerRemoteService.getUserInfo(bedStuDomain.getStuId());
+        String userStr = orgManagerRemoteClient.getUserInfo(bedStuDomain.getStuId());
         if (!StringUtils.isEmpty(userStr)) {
             JSONObject userInfo = JSONObject.fromObject(userStr);
             if (userInfo != null) {
@@ -553,7 +550,7 @@ public class BedStuService {
             r.setEmBeds(Integer.parseInt(emBeds + ""));
             roomRepository.save(r);
         }
-        String json = studentClient.findByStudentId(bedStuDomain.getStuId());
+        String json = orgManagerRemoteClient.findByStudentId(bedStuDomain.getStuId());
         Integer sexType = 0;
         if (!StringUtils.isEmpty(json)) {
             try {
@@ -620,9 +617,9 @@ public class BedStuService {
             for (RoomAssgin item : ral) {
                 profNams += item.getProfName() + ",";
             }
-            jsonData = studentClient.newstudentlist(orgId, null, null, name, sex, pageNumber, pageSize);
+            jsonData = orgManagerRemoteClient.newstudentlist(orgId, null, null, name, sex, pageNumber, pageSize);
         } else {
-            jsonData = studentClient.newstudentlist(orgId, null, null, name, null, pageNumber, pageSize);
+            jsonData = orgManagerRemoteClient.newstudentlist(orgId, null, null, name, null, pageNumber, pageSize);
         }
         List<NewStudentDomain> nsdl = new ArrayList<>();
         try {

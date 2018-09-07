@@ -5,6 +5,7 @@ import com.aizhixin.cloud.dd.common.domain.IdNameCode;
 import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.common.domain.UserDomain;
 import com.aizhixin.cloud.dd.communication.dto.ElectricFenceBaseDTO;
+import com.aizhixin.cloud.dd.communication.dto.TeacherDomain;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.statistics.dto.ClassesCollegeDTO;
 import io.swagger.annotations.ApiOperation;
@@ -19,9 +20,120 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// , url="http://gateway.aizhixintest.com:80/org-manager"
-@FeignClient(name = "org-manager")
+//@FeignClient(name = "org-manager", url="http://gateway.aizhixintest.com:80/org-manager")
+@FeignClient("org-manager")
 public interface OrgManagerRemoteClient {
+
+    @RequestMapping(value="/v1/classesteacher/list",method=RequestMethod.GET)
+    String classesTeacherList(@RequestParam("classesId")Long classesId);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/teachingclass/getidnamebyids")
+    List<IdNameDomain> getIdnameByids(@RequestBody Set<Long> ids);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/teachingclass/get/{id}")
+    String getteachingclassInfo(@PathVariable("id") Long id);
+
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/user/simple")
+    List<TeachStudentDomain> batchUpdateClasses(@RequestBody Set<Long> userIds);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/college/get/{id}")
+    String querycollege(@PathVariable("id") Long id);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/professionnal/get/{id}")
+    String queryprofession(@PathVariable("id") Long id);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/get/{id}")
+    String queryAdminclass(@PathVariable("id") Long id);
+
+    @RequestMapping(method=RequestMethod.GET,value="/v1/teachingclass/countstudents")
+    Integer countStudents(@RequestParam("id") Long id);
+
+    @RequestMapping(method=RequestMethod.GET,value="/v1/teachingclassstudent/list")
+    String findTeachingClassListStudent(@RequestParam("teachingClassId") Long teachingClassId,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/teacher/list")
+    String findByTeacherList(@RequestParam("orgId") Long orgId, @RequestParam("name") String name, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/teacher/getteacheridsbyorgid")
+    List<Long> getTeacherIdsByOrgId(@RequestParam("orgId") Long orgId);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/teacher/get/teacherinfo")
+    public TeacherDomain getTeacherInfo2(@ApiParam(value = "teacherId 教师ID", required = true) @RequestParam(value = "teacherId") Long teacherId);
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/students/get/{id}")
+    String findByStudentId(@PathVariable("id") Long id);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/students/classesid")
+    List<Map<String, Object>> findByClassId(@PathVariable("classesId") Long classesId);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/students/getbyclassesids")
+    List<Map<String, Object>> findByClassesIds(@RequestBody List<Long> classesIds);
+
+    @RequestMapping(method=RequestMethod.PUT,value="/v1/students/byids")
+    List<Map<String, Object>> findByIds(@RequestBody List<Long> userIds);
+
+    @RequestMapping(method=RequestMethod.PUT,value="/v1/students/byidsnoclasses")
+    List<Map<String, Object>> findByIdsNoClasses(@RequestBody List<Long> userIds);
+
+    @RequestMapping(method=RequestMethod.GET,value="/v1/students/list")
+    String list(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("classesId")Long classesId,@RequestParam("name")String name,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+
+    @RequestMapping(method=RequestMethod.GET,value="/v1/students/newstudentlist")
+    String newstudentlist(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("name")String name,@RequestParam("sex")String sex,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+
+    @RequestMapping(method=RequestMethod.GET,value="/v1/students/newstudentlist")
+    Map<String, Object> getNewstudentList(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("name")String name,@RequestParam("sex")String sex,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+
+    @RequestMapping(method=RequestMethod.GET,value="/v1/students/choosedormitorylist")
+    Map<String, Object> choosedormitorylist(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("name")String name,@RequestParam("sex")String sex,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/course/get/{id}")
+    String findByCourseId(@PathVariable("id")Long id);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/course/list")
+    String getExcellentCourseLikeName(@RequestParam("orgId")Long orgId,@RequestParam("name")String name,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/classes/add")
+    String add(@RequestBody ClassesDTO classesDomain);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/classes/update")
+    String update(@RequestBody ClassesDTO classesDomain);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/get/{id}")
+    String getById(@PathVariable("id") Long id);
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/v1/classes/delete/{id}")
+    String delete(@PathVariable("id") Long id, @RequestParam("userId") Long userId);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/list")
+    String list(@RequestParam(value = "orgId") Long orgId,
+                @RequestParam(value = "professionalId", required = false) Long professionalId,
+                @RequestParam(value = "name", required = false) String name,
+                @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                @RequestParam(value = "pageSize", required = false) Integer pageSize);
+
+    @RequestMapping(value = "/v1/classes/get/{id}", method = RequestMethod.GET)
+    String get(@PathVariable("id") Long id);
+
+    @RequestMapping(value = "/v1/classes/list", method = RequestMethod.GET)
+    Map<String, List<TeacherDomain>> list(@RequestParam("classesId") Long classesId);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/classes/getbyids")
+    List<ClassesIdNameCollegeNameDomain> getbyids(@RequestBody Set<Long> ids);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/droplist")
+    Map<String, Object> droplist(@RequestParam(value = "professionalId") Long professionalId,@RequestParam(value = "pageNumber") Integer pageNumber,@RequestParam(value = "pageSize") Integer pageSize);
+
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/droplistcollege")
+    Map<String, Object> droplistcollege(@RequestParam(value = "collegeId") Long collegeId,@RequestParam(value = "pageNumber") Integer pageNumber,@RequestParam(value = "pageSize") Integer pageSize);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/droplistorg")
+    Map<String, Object> droplistorg(@RequestParam(value = "orgId") Long orgId,@RequestParam(value = "pageNumber") Integer pageNumber,@RequestParam(value = "pageSize") Integer pageSize);
+
 
     /**
      * 学校API : 获取学校信息
