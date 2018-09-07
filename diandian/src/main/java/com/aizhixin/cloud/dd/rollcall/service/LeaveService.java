@@ -947,6 +947,12 @@ public class LeaveService {
             dto.setTeacherId(stleave.getHeadTeacherId());
             dto.setTeacherName(stleave.getTeacherName());
 
+            dto.setStartTime(DateFormatUtil.format(stleave.getStartTime(), DateFormatUtil.FORMAT_MINUTE));
+            dto.setEndTime(DateFormatUtil.format(stleave.getEndTime(), DateFormatUtil.FORMAT_MINUTE));
+            dto.setLeavePublic(stleave.getLeavePublic());
+            dto.setLeaveType(stleave.getLeaveType());
+            dto.setDuration(stleave.getDuration());
+
             ltList.add(dto);
         }
 

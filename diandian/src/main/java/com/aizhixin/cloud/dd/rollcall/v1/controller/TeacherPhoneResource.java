@@ -806,18 +806,6 @@ public class TeacherPhoneResource {
             @ApiParam(value = "orderByKey 请假状态（最后修改时间：lastModifiedTime；创建时间：createdTime；）") @RequestParam(value = "orderByKey", required = true) String orderByKey,
             @ApiParam(value = "orderBy 排序（顺序：asc；撤销：desc）") @RequestParam(value = "orderBy", required = true) String orderBy,
             @RequestHeader("Authorization") String accessToken) {
-
-//        if (!orderByKey.equals("lastModifiedTime") && !orderByKey.equals("createdTime")) {
-//            Map<String, Object> resBody = new HashMap<>();
-//            resBody.put("message", "orderByKey faild");
-//            return new ResponseEntity<Object>(resBody, HttpStatus.BAD_REQUEST);
-//        }
-//        if (!orderBy.equals("asc") && !orderBy.equals("desc")) {
-//            Map<String, Object> resBody = new HashMap<>();
-//            resBody.put("message", "orderBy faild");
-//            return new ResponseEntity<Object>(resBody, HttpStatus.UNAUTHORIZED);
-//        }
-//        orderByKey = orderByKey.equals("lastModifiedTime") ? "last_modified_date" : "created_date";
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(),
