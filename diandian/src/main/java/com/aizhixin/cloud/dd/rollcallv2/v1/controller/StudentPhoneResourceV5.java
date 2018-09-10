@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,7 @@ public class StudentPhoneResourceV5 {
     @Autowired
     private DDUserService ddUserService;
 
+    @Lazy
     @Autowired
     private ScheduleRollCallServiceV5 scheduleRollCallServiceV5;
 

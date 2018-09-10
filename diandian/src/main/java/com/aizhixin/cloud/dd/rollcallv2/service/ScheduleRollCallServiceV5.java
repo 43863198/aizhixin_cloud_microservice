@@ -26,6 +26,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -53,6 +54,7 @@ public class ScheduleRollCallServiceV5 {
     @Autowired
     private WeekService weekService;
 
+    @Lazy
     @Autowired
     private RollCallService rollCallService;
 
