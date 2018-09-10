@@ -99,7 +99,7 @@ public class LeaveController {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
         Pageable pageable = PageUtil.createNoErrorPageRequest(pageNumber, pageSize);
-        PageData<LeaveDomain> result = leaveService.getLeaveList(pageable, stuName, teacherName, status, className, leavePublic, leaveType);
+        PageData<LeaveDomain> result = leaveService.getLeaveList(pageable, account.getOrganId(), stuName, teacherName, status, className, leavePublic, leaveType);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 

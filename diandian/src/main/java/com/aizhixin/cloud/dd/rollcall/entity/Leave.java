@@ -17,6 +17,11 @@ public class Leave extends AbstractEntity {
 
     private static final long serialVersionUID = 1L;
 
+    @Column(name = "`org_id`")
+    @Getter
+    @Setter
+    private Long orgId;
+
     // 请假学生id
     @Column(name = "`student_id`")
     @Getter
