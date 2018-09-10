@@ -977,7 +977,7 @@ public class RollCallService {
         }
         Schedule schedule = scheduleRollCall.getSchedule();
         Long teachingclassId = schedule.getTeachingclassId();
-        List<StudentDTO> studentList = studentService.listStudents(teachingclassId);
+        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId);
         if (null == studentList) {
             log.info("根据教学班id获取学生列表信息为空!" + schedule.getId());
             return false;
