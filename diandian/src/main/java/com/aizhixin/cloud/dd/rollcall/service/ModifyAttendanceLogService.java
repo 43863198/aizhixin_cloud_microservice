@@ -3,8 +3,10 @@ package com.aizhixin.cloud.dd.rollcall.service;
 import com.aizhixin.cloud.dd.rollcall.entity.ModifyAttendanceLog;
 import com.aizhixin.cloud.dd.rollcall.entity.RollCall;
 import com.aizhixin.cloud.dd.rollcall.repository.ModifyAttendanceLogRepository;
+import com.aizhixin.cloud.dd.rollcall.repository.RollCallRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +22,9 @@ import java.util.*;
 public class ModifyAttendanceLogService {
     @Autowired
     private ModifyAttendanceLogRepository modifyAttendanceLogRepository;
+
     @Autowired
-    private RollCallService rollCallService;
+    private RollCallRepository rollCallRepository;
 
     /**
      * 保存考勤日志
@@ -64,7 +67,7 @@ public class ModifyAttendanceLogService {
     }
 
     public void modifyAttendance(Long rollCallId, String type, String operator, Long operatorId) {
-        RollCall rollCall = rollCallService.findOneByRollcallId(rollCallId);
+        RollCall rollCall = rollCallRepository.findOne(rollCallId);
         if (null != rollCall) {
             ModifyAttendanceLog modifyAttendanceLog = new ModifyAttendanceLog();
             modifyAttendanceLog.setOperatingDate(new Date());
