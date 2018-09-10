@@ -141,6 +141,7 @@ public class LeaveService {
                 l.setStudentId(account.getId());
                 l.setStudentName(account.getName());
                 l.setStudentJobNum(stu.getJobNum());
+                l.setOrgId(stu.getOrgId());
                 if (user != null) {
                     l.setTeacherJobNum(user.getJobNum());
                 }
@@ -174,6 +175,7 @@ public class LeaveService {
                 l.setStudentId(account.getId());
                 l.setStudentName(account.getName());
                 l.setStudentJobNum(stu.getJobNum());
+                l.setOrgId(stu.getOrgId());
                 if (user != null) {
                     l.setTeacherJobNum(user.getJobNum());
                 }
@@ -219,6 +221,7 @@ public class LeaveService {
                             l.setStudentId(account.getId());
                             l.setStudentName(account.getName());
                             l.setStudentJobNum(stu.getJobNum());
+                            l.setOrgId(stu.getOrgId());
                             if (user != null) {
                                 l.setTeacherJobNum(user.getJobNum());
                             }
@@ -270,6 +273,7 @@ public class LeaveService {
                             l.setStudentId(account.getId());
                             l.setStudentName(account.getName());
                             l.setStudentJobNum(stu.getJobNum());
+                            l.setOrgId(stu.getOrgId());
                             if (user != null) {
                                 l.setTeacherJobNum(user.getJobNum());
                             }

@@ -60,36 +60,44 @@ public class LeaveServiceV2 {
 
     @Async
     public void initLeaveData() {
-        List<Leave> leaves = leaveRepository.findByDeleteFlagAndStartTimeIsNull(DataValidity.VALID.getState());
+        List<Leave> leaves = leaveRepository.findByDeleteFlagAndStartTimeIsNullOrOrgIdIsNull(DataValidity.VALID.getState());
         Map<Long, UserInfo> userInfoMap = new HashMap<>();
         Map<Long, Map<String, Object>> periodMap = new HashMap<>();
         for (Leave leave : leaves) {
-            if (leave.getRequestType().equals(LeaveConstants.TYPE_DAY)) {
-                leave.setStartTime(leave.getStartDate());
-                leave.setEndTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getEndDate()) + " 23:59:59", DateFormatUtil.FORMAT_MINUTE));
+            if (leave.getStartTime() != null) {
+                UserInfo stu = getUserInfo(userInfoMap, leave.getStudentId());
+                if (stu != null) {
+                    leave.setOrgId(stu.getOrgId());
+                }
             } else {
-                Map<String, Object> startp = getPeriod(periodMap, leave.getStartPeriodId());
-                if (startp != null) {
-                    leave.setStartTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getStartDate()) + " " + startp.get("startTime"), DateFormatUtil.FORMAT_MINUTE));
+                if (leave.getRequestType().equals(LeaveConstants.TYPE_DAY)) {
+                    leave.setStartTime(leave.getStartDate());
+                    leave.setEndTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getEndDate()) + " 23:59:59", DateFormatUtil.FORMAT_MINUTE));
+                } else {
+                    Map<String, Object> startp = getPeriod(periodMap, leave.getStartPeriodId());
+                    if (startp != null) {
+                        leave.setStartTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getStartDate()) + " " + startp.get("startTime"), DateFormatUtil.FORMAT_MINUTE));
+                    }
+                    Map<String, Object> endp = getPeriod(periodMap, leave.getEndPeriodId());
+                    if (endp != null) {
+                        leave.setEndTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getStartDate()) + " " + endp.get("endTime"), DateFormatUtil.FORMAT_MINUTE));
+                    }
                 }
-                Map<String, Object> endp = getPeriod(periodMap, leave.getEndPeriodId());
-                if (endp != null) {
-                    leave.setEndTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getStartDate()) + " " + endp.get("endTime"), DateFormatUtil.FORMAT_MINUTE));
+                UserInfo stu = getUserInfo(userInfoMap, leave.getStudentId());
+                if (stu != null) {
+                    leave.setStudentName(stu.getName());
+                    leave.setStudentJobNum(stu.getJobNum());
+                    leave.setClassName(stu.getClassesName());
+                    leave.setOrgId(stu.getOrgId());
                 }
-            }
-            UserInfo stu = getUserInfo(userInfoMap, leave.getStudentId());
-            if (stu != null) {
-                leave.setStudentName(stu.getName());
-                leave.setStudentJobNum(stu.getJobNum());
-                leave.setClassName(stu.getClassesName());
-            }
-            UserInfo teacher = getUserInfo(userInfoMap, leave.getHeadTeacherId());
-            if (teacher != null) {
-                leave.setTeacherJobNum(teacher.getJobNum());
-            }
-            if (leave.getStartTime() != null && leave.getEndTime() != null) {
-                String duration = getDuration(leave.getEndTime(), leave.getStartTime());
-                leave.setDuration(duration);
+                UserInfo teacher = getUserInfo(userInfoMap, leave.getHeadTeacherId());
+                if (teacher != null) {
+                    leave.setTeacherJobNum(teacher.getJobNum());
+                }
+                if (leave.getStartTime() != null && leave.getEndTime() != null) {
+                    String duration = getDuration(leave.getEndTime(), leave.getStartTime());
+                    leave.setDuration(duration);
+                }
             }
             leaveRepository.save(leave);
         }
@@ -118,7 +126,7 @@ public class LeaveServiceV2 {
         return user;
     }
 
-    public PageData<LeaveDomain> getLeaveList(Pageable pageable, String stuName, String teacherName, Integer status, String className, Integer leavePublic, Integer leaveType) {
+    public PageData<LeaveDomain> getLeaveList(Pageable pageable, Long orgId, String stuName, String teacherName, Integer status, String className, Integer leavePublic, Integer leaveType) {
         String statusStr = "reject";
         if (status == 1) {
             statusStr = "pass";
@@ -134,11 +142,11 @@ public class LeaveServiceV2 {
         }
         Page<LeaveDomain> page = null;
         if (leavePublic != null && leaveType != null) {
-            page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(pageable, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className);
+            page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className);
         } else if (leavePublic != null) {
-            page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndNameLike(pageable, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className);
+            page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className);
         } else {
-            page = leaveRepository.findByStatusAndDeleteFlagAndNameLike(pageable, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className);
+            page = leaveRepository.findByStatusAndDeleteFlagAndNameLike(pageable, orgId, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className);
         }
         PageDomain pageDomain = new PageDomain();
         pageDomain.setPageSize(page.getSize());
@@ -237,6 +245,7 @@ public class LeaveServiceV2 {
                 l.setStudentName(account.getName());
                 l.setStudentJobNum(stu.getJobNum());
                 l.setClassName(stu.getClassesName());
+                l.setOrgId(stu.getOrgId());
                 if (teacher != null) {
                     l.setTeacherJobNum(teacher.getJobNum());
                 }
@@ -273,6 +282,7 @@ public class LeaveServiceV2 {
                 l.setStudentName(account.getName());
                 l.setStudentJobNum(stu.getJobNum());
                 l.setClassName(stu.getClassesName());
+                l.setOrgId(stu.getOrgId());
                 if (teacher != null) {
                     l.setTeacherJobNum(teacher.getJobNum());
                 }
@@ -318,6 +328,7 @@ public class LeaveServiceV2 {
                             l.setStudentName(account.getName());
                             l.setStudentJobNum(stu.getJobNum());
                             l.setClassName(stu.getClassesName());
+                            l.setOrgId(stu.getOrgId());
                             if (user != null) {
                                 l.setTeacherJobNum(user.getJobNum());
                             }
@@ -374,6 +385,7 @@ public class LeaveServiceV2 {
                             l.setStudentName(account.getName());
                             l.setStudentJobNum(stu.getJobNum());
                             l.setClassName(stu.getClassesName());
+                            l.setOrgId(stu.getOrgId());
                             if (user != null) {
                                 l.setTeacherJobNum(user.getJobNum());
                             }
