@@ -477,6 +477,7 @@ public class LeaveServiceV2 {
                     }
                 }
             }
+            return Long.parseLong(list.get(0).get("id").toString());
         }
         return null;
     }
@@ -496,6 +497,7 @@ public class LeaveServiceV2 {
                     }
                 }
             }
+            return Long.parseLong(list.get(0).get("id").toString());
         }
         return null;
     }
