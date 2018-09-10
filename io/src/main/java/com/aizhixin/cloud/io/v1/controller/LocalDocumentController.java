@@ -1,10 +1,15 @@
 package com.aizhixin.cloud.io.v1.controller;
 
+import java.util.List;
+
+import com.aizhixin.cloud.io.domain.BatchUploadDomain;
 import com.aizhixin.cloud.io.domain.LocalFileDomain;
 import com.aizhixin.cloud.io.service.v2.LocalDocumentV2Service;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +43,15 @@ public class LocalDocumentController {
         return localDocumentV2Service.uploadDocument(file, filename, bucket, ttl, appId, token);
     }
 
+    @RequestMapping(value = "/batchupload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "POST", value = "上传一个本地文档", response = Void.class, notes = "上传一个本地文档<br>@author panzhen@aizhixin.com")
+    public List<LocalFileDomain> batchUpload(@ApiParam(value = "files 批量上传的文档对象集合", required = true) @RequestParam(value = "files") List<BatchUploadDomain> files,
+                                  @ApiParam(value = "bucket 应用存储桶，不填写则使用缺省值") @RequestParam(value = "bucket", required = false) String bucket,
+                                  @ApiParam(value = "ttl 文档有效时长（单位秒），缺省不过期") @RequestParam(value = "ttl", required = false) Long ttl,
+                                  @ApiParam(value = "appId 应用ID", required = true) @RequestParam(value = "appId") String appId,
+                                  @ApiParam(value = "token 应用token", required = true) @RequestParam(value = "token") String token) {
+        return localDocumentV2Service.batchUploadDocument(files, bucket, ttl, appId, token);
+    }
     
     @RequestMapping(value = "/info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "GET", value = "获取文档的基本信息", response = Void.class, notes = "获取文档的基本信息<br>@author panzhen@aizhixin.com")
