@@ -394,6 +394,28 @@ public class CreditService {
         UserInfo userInfo = userInfoRepository.findByUserId(stuId);
         if (userInfo != null && userInfo.getClassesId() != null) {
             List<CreditClass> list = classRepository.findByClassIdAndDeleteFlagOrderByIdDesc(userInfo.getClassesId(), DataValidity.VALID.getState());
+            if (list != null && list.size() > 0) {
+                Map<Long, List<CreditRatingPerson>> personMap = new HashMap<>();
+                for (CreditClass creditClass : list) {
+                    List<CreditRatingPerson> personList = new ArrayList<>();
+                    if (creditClass.getCredit() != null && creditClass.getCredit().getRatingPersonList() != null) {
+                        for (CreditRatingPerson p : creditClass.getCredit().getRatingPersonList()) {
+                            if (p.getClassId() != null && creditClass.getClassId() != null && p.getDeleteFlag().intValue() == DataValidity.VALID.getState().intValue() && p.getClassId().intValue() == creditClass.getClassId().intValue()) {
+                                personList.add(p);
+                            }
+                        }
+                        personMap.put(creditClass.getClassId(), personList);
+                    }
+                }
+                for (CreditClass creditClass : list) {
+                    List<CreditRatingPerson> personList = personMap.get(creditClass.getClassId());
+                    Credit credit = creditClass.getCredit();
+                    Credit credit1 = new Credit();
+                    BeanUtils.copyProperties(credit, credit1);
+                    credit1.setRatingPersonList(personList);
+                    creditClass.setCredit(credit1);
+                }
+            }
             return list;
         }
         return new ArrayList();
