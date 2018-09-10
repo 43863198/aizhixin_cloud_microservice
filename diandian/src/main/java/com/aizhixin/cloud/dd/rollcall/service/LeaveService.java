@@ -597,7 +597,7 @@ public class LeaveService {
                         // 修改学生的签到状态
                         if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
                             if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                rollCallRepository.deleteRollCallByStudentIdAndScheduleRollCall(leave.getStudentId(), scheduleRollCallIds);
+                                rollCallRepository.deleteByStudentIdAndScheduleRollcallIdIn(leave.getStudentId(), scheduleRollCallIds);
                             } else {
                                 rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
                             }
@@ -660,7 +660,7 @@ public class LeaveService {
                     // 修改学生的签到状态
                     if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
                         if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                            rollCallRepository.deleteRollCallByStudentIdAndScheduleRollCall(leave.getStudentId(), scheduleRollCallIds);
+                            rollCallRepository.deleteByStudentIdAndScheduleRollcallIdIn(leave.getStudentId(), scheduleRollCallIds);
                         } else {
                             rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
                         }
