@@ -392,6 +392,7 @@ public class CreditService {
 
     public List getCreditListByStuId(Long stuId) {
         UserInfo userInfo = userInfoRepository.findByUserId(stuId);
+        List<CreditClass> result = new ArrayList<>();
         if (userInfo != null && userInfo.getClassesId() != null) {
             List<CreditClass> list = classRepository.findByClassIdAndDeleteFlagOrderByIdDesc(userInfo.getClassesId(), DataValidity.VALID.getState());
             if (list != null && list.size() > 0) {
@@ -404,19 +405,22 @@ public class CreditService {
                                 personList.add(p);
                             }
                         }
-                        personMap.put(creditClass.getClassId(), personList);
+                        personMap.put(creditClass.getId(), personList);
                     }
                 }
                 for (CreditClass creditClass : list) {
-                    List<CreditRatingPerson> personList = personMap.get(creditClass.getClassId());
+                    List<CreditRatingPerson> personList = personMap.get(creditClass.getId());
                     Credit credit = creditClass.getCredit();
                     Credit credit1 = new Credit();
                     BeanUtils.copyProperties(credit, credit1);
                     credit1.setRatingPersonList(personList);
-                    creditClass.setCredit(credit1);
+                    CreditClass cc = new CreditClass();
+                    BeanUtils.copyProperties(cc, creditClass);
+                    cc.setCredit(credit1);
+                    result.add(cc);
                 }
             }
-            return list;
+            return result;
         }
         return new ArrayList();
     }
