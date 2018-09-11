@@ -131,6 +131,8 @@ public class LeaveService {
                 l.setStartTime(startTime);
                 l.setEndTime(endTime);
                 l.setDuration(duration);
+                l.setStartPeriodId(getStartPeriodId((List<Map<String, Object>>) periodMap.get("data")));
+                l.setEndPeriodId(getEndPeriodId((List<Map<String, Object>>) periodMap.get("data")));
                 l.setLeaveType(LeaveConstants.TYPE_PR_SJ);
                 l.setLeavePublic(LeaveConstants.TYPE_PR);
                 l.setStatus(LeaveConstants.STATUS_REQUEST);
@@ -364,6 +366,21 @@ public class LeaveService {
         if (list != null && list.size() > 0) {
             Collections.reverse(list);
             return list.get(0).get("endTime").toString();
+        }
+        return null;
+    }
+
+    private Long getStartPeriodId(List<Map<String, Object>> list) {
+        if (list != null && list.size() > 0) {
+            return Long.parseLong(list.get(0).get("id").toString());
+        }
+        return null;
+    }
+
+    private Long getEndPeriodId(List<Map<String, Object>> list) {
+        if (list != null && list.size() > 0) {
+            Collections.reverse(list);
+            return Long.parseLong(list.get(0).get("id").toString());
         }
         return null;
     }
