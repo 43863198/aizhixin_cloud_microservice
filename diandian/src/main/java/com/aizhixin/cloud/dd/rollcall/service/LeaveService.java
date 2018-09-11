@@ -622,10 +622,10 @@ public class LeaveService {
                             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(schedule.getId());
                             if (null != scheduleRollCall && scheduleRollCall.getIsOpenRollcall()) {
                                 if (leave.getStartPeriodId() != null && leave.getEndPeriodId() != null) {
+                                    boolean inClass = scheduleRollCall.getIsInClassroom();
                                     if (DateFormatUtil.formatShort(schoolDay).equals(DateFormatUtil.formatShort(leave.getStartTime()))) {
-                                        if (scheduleRollCall.getSchedule().getPeriodId() >= leave.getStartPeriodId()) {
+                                        if (scheduleRollCall.getSchedule().getPeriodId() >= leave.getStartPeriodId() || inClass) {
                                             scheduleRollCallIds.add(scheduleRollCall.getId());
-                                            boolean inClass = scheduleRollCall.getIsInClassroom();
                                             if (inClass) {
                                                 // 课堂内，需要去redis库中修改签到状态。
                                                 RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
@@ -642,9 +642,8 @@ public class LeaveService {
                                             }
                                         }
                                     } else if (DateFormatUtil.formatShort(schoolDay).equals(DateFormatUtil.formatShort(leave.getEndTime()))) {
-                                        if (leave.getEndPeriodId() >= scheduleRollCall.getSchedule().getPeriodId()) {
+                                        if (leave.getEndPeriodId() >= scheduleRollCall.getSchedule().getPeriodId() || inClass) {
                                             scheduleRollCallIds.add(scheduleRollCall.getId());
-                                            boolean inClass = scheduleRollCall.getIsInClassroom();
                                             if (inClass) {
                                                 // 课堂内，需要去redis库中修改签到状态。
                                                 RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
@@ -662,7 +661,6 @@ public class LeaveService {
                                         }
                                     } else {
                                         scheduleRollCallIds.add(scheduleRollCall.getId());
-                                        boolean inClass = scheduleRollCall.getIsInClassroom();
                                         if (inClass) {
                                             // 课堂内，需要去redis库中修改签到状态。
                                             RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());

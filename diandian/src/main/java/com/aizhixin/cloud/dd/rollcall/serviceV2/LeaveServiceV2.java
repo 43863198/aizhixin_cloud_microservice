@@ -140,7 +140,6 @@ public class LeaveServiceV2 {
             className = "";
         }
         Page<LeaveDomain> page = null;
-        pageable.getSort().and(new Sort(new Sort.Order(Sort.Direction.DESC, "id")));
         if (leavePublic != null && leaveType != null) {
             page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className);
         } else if (leavePublic != null) {
