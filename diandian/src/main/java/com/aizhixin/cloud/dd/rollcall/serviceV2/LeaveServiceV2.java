@@ -223,10 +223,11 @@ public class LeaveServiceV2 {
         List<Long> ids = new ArrayList<Long>();
         List<AudienceDTO> audiences = new ArrayList<>();
         UserInfo stu = userInfoRepository.findByUserId(account.getId());
+        List<PeriodDTO> startPeriods =  getPeriodList(account.getId(), account.getOrganId(), startTime);
+        List<PeriodDTO> endPeriods =  getPeriodList(account.getId(), account.getOrganId(), endTime);
         // 由班主任照常请
         if (headTeacherId != null) {
             UserInfo teacher = userInfoRepository.findByUserId(headTeacherId);
-
             if (requestType.equals(LeaveConstants.TYPE_DAY)) {
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
@@ -259,9 +260,8 @@ public class LeaveServiceV2 {
                 dto.setData(l);
                 audiences.add(dto);
             } else if (requestType.equals(LeaveConstants.TYPE_PERIOD)) {
-                Map<String, Object> periodMap = orgManagerRemoteClient.listPeriod(account.getOrganId(), 0, 1000);
-                Long startPeriodId = getStartPeriodId(startTime, (List<Map<String, Object>>) periodMap.get("data"));
-                Long endPeriodId = getEndPeriodId(endTime, (List<Map<String, Object>>) periodMap.get("data"));
+                Long startPeriodId = getStartPeriodId(startTime, startPeriods);
+                Long endPeriodId = getEndPeriodId(endTime, endPeriods);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
                 l.setTeacherName(headTeacherName);
@@ -355,12 +355,9 @@ public class LeaveServiceV2 {
             } else {
                 String teachTime = DateFormatUtil.format(startDay);
                 // 课程节id;
-                Map<String, Object> periodMap = orgManagerRemoteClient.listPeriod(account.getOrganId(), 0, 1000);
-                Long startPeriodId = getStartPeriodId(startTime, (List<Map<String, Object>>) periodMap.get("data"));
-                Long endPeriodId = getEndPeriodId(endTime, (List<Map<String, Object>>) periodMap.get("data"));
-
+                Long startPeriodId = getStartPeriodId(startTime, startPeriods);
+                Long endPeriodId = getEndPeriodId(endTime, endPeriods);
                 Map map = getBetweenStartAndEndPeriodId(account.getOrganId(), startPeriodId, endPeriodId);
-
                 List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(account.getId(), null);
                 Date date = new Date();
                 for (DianDianDaySchoolTimeTableDomain ddds : ddt) {
@@ -463,41 +460,55 @@ public class LeaveServiceV2 {
         return map;
     }
 
-    private Long getStartPeriodId(Date startTime, List<Map<String, Object>> list) {
+    private List<PeriodDTO> getPeriodList(Long stuId, Long orgId, Date date) {
+        List<PeriodDTO> list = periodService.findAllByOrganIdAndStatusV2(stuId, orgId, date);
+        return list;
+    }
+
+    private Long getStartPeriodId(Date startTime, List<PeriodDTO> list) {
         if (list != null && list.size() > 0) {
             long start = startTime.getTime();
             String dayStr = DateFormatUtil.formatShort(startTime);
-            for (Map<String, Object> item : list) {
-                if (item.get("startTime") != null) {
-                    Date date = DateFormatUtil.parse2(dayStr + " " + item.get("startTime"), "yyyy-MM-dd HH:mm");
-                    if (date != null) {
-                        if (start >= date.getTime()) {
-                            return Long.parseLong(item.get("id").toString());
+            for (PeriodDTO p : list) {
+                Date date = DateFormatUtil.parse2(dayStr + " " + p.getStartTime(), "yyyy-MM-dd HH:mm");
+                if (date != null) {
+                    if (start >= date.getTime()) {
+                        return p.getId();
+                    } else {
+                        Date edate = DateFormatUtil.parse2(dayStr + " " + p.getEndTime(), "yyyy-MM-dd HH:mm");
+                        if (edate != null) {
+                            if (start <= edate.getTime()) {
+                                return p.getId();
+                            }
                         }
                     }
                 }
             }
-            return Long.parseLong(list.get(0).get("id").toString());
+            return list.get(0).getId();
         }
         return null;
     }
 
-    private Long getEndPeriodId(Date endTime, List<Map<String, Object>> list) {
+    private Long getEndPeriodId(Date endTime, List<PeriodDTO> list) {
         if (list != null && list.size() > 0) {
             long end = endTime.getTime();
             String dayStr = DateFormatUtil.formatShort(endTime);
             Collections.reverse(list);
-            for (Map<String, Object> item : list) {
-                if (item.get("startTime") != null) {
-                    Date date = DateFormatUtil.parse2(dayStr + " " + item.get("startTime"), "yyyy-MM-dd HH:mm");
-                    if (date != null) {
-                        if (end <= date.getTime()) {
-                            return Long.parseLong(item.get("id").toString());
+            for (PeriodDTO p : list) {
+                Date date = DateFormatUtil.parse2(dayStr + " " + p.getStartTime(), "yyyy-MM-dd HH:mm");
+                if (date != null) {
+                    if (end >= date.getTime()) {
+                        return p.getId();
+                    } else {
+                        Date edate = DateFormatUtil.parse2(dayStr + " " + p.getEndTime(), "yyyy-MM-dd HH:mm");
+                        if (edate != null) {
+                            if (end >= edate.getTime()) {
+                                return p.getId();
+                            }
                         }
                     }
                 }
             }
-//            return Long.parseLong(list.get(0).get("id").toString());
         }
         return null;
     }
