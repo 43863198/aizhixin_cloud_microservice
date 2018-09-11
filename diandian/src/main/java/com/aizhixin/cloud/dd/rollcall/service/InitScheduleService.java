@@ -588,6 +588,7 @@ public class InitScheduleService {
         log.info("计算中值，合格距离" + deviation + ",满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课id为:" + scheduleRollCallId + "中值为：" + midValu);
 
         scheduleRollCallRepository.updateScheduleVerify(scheduleRollCallId, gdMap.getMidDistribution());
+        redisTemplate.opsForValue().set("l-" + scheduleRollCallId, gdMap.getMidDistribution(), 1, TimeUnit.DAYS);
         ScheduleRollCallIngDTO dto = (ScheduleRollCallIngDTO) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId), scheduleRollCallId);
 
         updateRollcall(organId, scheduleRollCallId, gdMap, deviation, dto);
@@ -595,20 +596,19 @@ public class InitScheduleService {
 
 
     private void updateRollcall(Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
-//        List<LocaltionDTO> list = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
-        List<RollCall> list = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallKey(scheduleRollCallId));
-        for (RollCall localtionDTO : list) {
+        List<LocaltionDTO> list = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
+        for (LocaltionDTO localtionDTO : list) {
             updateStuRollcall(localtionDTO, scheduleRollCallId, gdMap, deviation, dto);
         }
         deleteRedisRollCallIng(organId, scheduleRollCallId);
     }
 
     @Async("threadPool1")
-    private void updateStuRollcall(RollCall rcs, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
-        Long studentId = rcs.getStudentId();
-//        RollCall rcs = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), studentId);
+    private void updateStuRollcall(LocaltionDTO localtionDTO, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
+        Long studentId = localtionDTO.getId();
+        RollCall rcs = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), studentId);
         rcs.setLastType(rcs.getType());
-        double distance = gdMap.compareMid(rcs.getGpsLocation());
+        double distance = gdMap.compareMid(localtionDTO.getLo());
         int dis = (int) (distance / 10);
         if (dis < 1) {
             dis = 1;
@@ -616,7 +616,7 @@ public class InitScheduleService {
         dis = Integer.parseInt(String.valueOf(dis) + "0");
         // 结果
         if (distance < deviation) {
-            rcs.setType(CourseUtils.getResultType(dto.getBeginTime(), dto.getLateTime(), dto.getAbsenteeismTime(), rcs.getSignTime()));
+            rcs.setType(CourseUtils.getResultType(dto.getBeginTime(), dto.getLateTime(), dto.getAbsenteeismTime(), localtionDTO.getSignTime()));
             rcs.setDistance("  <" + dis + "m");
         } else {
             rcs.setType(RollCallConstants.TYPE_EXCEPTION);

@@ -183,7 +183,7 @@ public class RollCallServiceV2 {
                     return resBody;
                 }
             } else if (ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC.equals(signInDTO.getRollCallType())) {
-
+                verify = (String) redisTemplate.opsForValue().get("l-"+scheduleRollCallId);
                 if (StringUtils.isBlank(verify)) {
                     RollCallMapUtil.setValue(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId), account.getId(), new LocaltionDTO(account.getId(), rollCall.getGpsLocation(), rollCall.getSignTime()));
                     rollCall.setType(RollCallConstants.TYPE_COMMITTED);
