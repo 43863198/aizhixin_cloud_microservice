@@ -591,37 +591,38 @@ public class InitScheduleService {
 
         ScheduleRollCallIngDTO dto = (ScheduleRollCallIngDTO) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId), scheduleRollCallId);
 
-        updateRollcall(list, organId, scheduleRollCallId, gdMap, deviation, dto);
+        updateRollcall(organId, scheduleRollCallId, gdMap, deviation, dto);
+    }
+
+
+    private void updateRollcall(Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
+        List<LocaltionDTO> list = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
+        for (LocaltionDTO localtionDTO : list) {
+            updateStuRollcall(localtionDTO, scheduleRollCallId, gdMap, deviation, dto);
+        }
+        deleteRedisRollCallIng(organId, scheduleRollCallId);
     }
 
     @Async("threadPool1")
-    private void updateRollcall(List<LocaltionDTO> list, Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    private void updateStuRollcall(LocaltionDTO localtionDTO, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
+        Long studentId = localtionDTO.getId();
+        RollCall rcs = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), studentId);
+        rcs.setLastType(rcs.getType());
+        double distance = gdMap.compareMid(localtionDTO.getLo());
+        int dis = (int) (distance / 10);
+        if (dis < 1) {
+            dis = 1;
         }
-        for (LocaltionDTO localtionDTO : list) {
-            Long studentId = localtionDTO.getId();
-            RollCall rcs = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), studentId);
-            rcs.setLastType(rcs.getType());
-            double distance = gdMap.compareMid(localtionDTO.getLo());
-            int dis = (int) (distance / 10);
-            if (dis < 1) {
-                dis = 1;
-            }
-            dis = Integer.parseInt(String.valueOf(dis) + "0");
-            // 结果
-            if (distance < deviation) {
-                rcs.setType(CourseUtils.getResultType(dto.getBeginTime(), dto.getLateTime(), dto.getAbsenteeismTime(), localtionDTO.getSignTime()));
-                rcs.setDistance("  <" + dis + "m");
-            } else {
-                rcs.setType(RollCallConstants.TYPE_EXCEPTION);
-                rcs.setDistance("  >" + deviation + "m");
-            }
-            redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), rcs.getStudentId(), rcs);
+        dis = Integer.parseInt(String.valueOf(dis) + "0");
+        // 结果
+        if (distance < deviation) {
+            rcs.setType(CourseUtils.getResultType(dto.getBeginTime(), dto.getLateTime(), dto.getAbsenteeismTime(), localtionDTO.getSignTime()));
+            rcs.setDistance("  <" + dis + "m");
+        } else {
+            rcs.setType(RollCallConstants.TYPE_EXCEPTION);
+            rcs.setDistance("  >" + deviation + "m");
         }
-        deleteRedisRollCallIng(organId, scheduleRollCallId);
+        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), rcs.getStudentId(), rcs);
     }
 
     public void deleteRedisRollCallIng(Long organId, Long scheduleRollCallId) {
