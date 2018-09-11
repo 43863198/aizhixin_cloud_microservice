@@ -112,19 +112,15 @@ public class LeaveService {
         List<Long> ids = new ArrayList<Long>();
         List<AudienceDTO> audiences = new ArrayList<>();
         Map<String, Object> periodMap = orgManagerRemoteClient.listPeriod(account.getOrganId(), 0, 1000);
-        Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
-        Date endTime = null;
-        if (requestType.equals(LeaveConstants.TYPE_DAY)) {
-            endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
-        } else {
-            endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
-        }
-        String duration = getDuration(endTime, startTime);
+
         UserInfo stu = userInfoRepository.findByUserId(account.getId());
         // 由班主任照常请
         if (headTeacherId != null) {
             UserInfo user = userInfoRepository.findByUserId(headTeacherId);
             if (requestType.equals(LeaveConstants.TYPE_DAY)) {
+                Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
+                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
+                String duration = getDuration(endTime, startTime);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
                 l.setTeacherName(headTeacherName);
@@ -156,6 +152,9 @@ public class LeaveService {
                 dto.setData(l);
                 audiences.add(dto);
             } else if (requestType.equals(LeaveConstants.TYPE_PERIOD)) {
+                Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), startPeriodId), "yyyy-MM-dd HH:mm");
+                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), endPeriodId), "yyyy-MM-dd HH:mm");
+                String duration = getDuration(endTime, startTime);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
                 l.setTeacherName(headTeacherName);
@@ -208,6 +207,10 @@ public class LeaveService {
                             continue;
                         }
                         for (IdNameDomain idNameDomain : idNameDomains) {
+                            Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            String duration = getDuration(endTime, startTime);
+
                             Leave l = new Leave();
                             Long teacherId = idNameDomain.getId();
                             UserInfo user = userInfoRepository.findByUserId(teacherId);
@@ -260,6 +263,10 @@ public class LeaveService {
                             continue;
                         }
                         for (IdNameDomain idNameDomain : idNameDomains) {
+                            Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            String duration = getDuration(endTime, startTime);
+
                             Leave l = new Leave();
                             Long teacherId = idNameDomain.getId();
                             UserInfo user = userInfoRepository.findByUserId(teacherId);
@@ -319,6 +326,29 @@ public class LeaveService {
             long hour = diff % nd / nh;
 //        long min = diff % nd % nh / nm;
             return day + "天" + hour + "小时";// + min + "分钟";
+        }
+        return null;
+    }
+
+    private String getStartPeriodTime(List<Map<String, Object>> list, Long id) {
+        if (list != null && list.size() > 0) {
+            for(Map<String, Object> m : list){
+                if(m.get("id").equals(id)){
+                    return list.get(0).get("startTime").toString();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getEndPeriodTime(List<Map<String, Object>> list, Long id) {
+        if (list != null && list.size() > 0) {
+            Collections.reverse(list);
+            for(Map<String, Object> m:list){
+                if(m.get("id").equals(id)){
+                    return list.get(0).get("endTime").toString();
+                }
+            }
         }
         return null;
     }
@@ -546,6 +576,7 @@ public class LeaveService {
             Set<Long> ids = new HashSet<>();
             if (leave.getRequestType().equals(LeaveConstants.TYPE_DAY)) {
                 List<Date> manyDate = DateFormatUtil.getMonthBetweenDate(leave.getStartTime(), leave.getEndTime());
+                int i = 0;
                 for (Date schoolDay : manyDate) {
                     if (!DateFormatUtil.compareDate(schoolDay, DateFormatUtil.parse((DateFormatUtil.formatShort(new Date()) + " 23:59:59"), DateFormatUtil.FORMAT_LONG))) {
                         // 从平台获取排课
@@ -567,19 +598,78 @@ public class LeaveService {
                         for (Schedule schedule : scheduleList) {
                             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(schedule.getId());
                             if (null != scheduleRollCall && scheduleRollCall.getIsOpenRollcall()) {
-                                scheduleRollCallIds.add(scheduleRollCall.getId());
-                                boolean inClass = scheduleRollCall.getIsInClassroom();
-                                if (inClass) {
-                                    // 课堂内，需要去redis库中修改签到状态。
-                                    RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
-                                    if (null != rollCall) {
-                                        rollCall.setLastType(rollCall.getType());
-                                        if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                            rollCall.setDeleteFlag(DataValidity.INVALID.getState());
-                                            redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
-                                        } else {
-                                            rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-                                            redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                if (leave.getStartPeriodId() != null && leave.getEndPeriodId() != null) {
+                                    if (DateFormatUtil.formatShort(schoolDay).equals(DateFormatUtil.formatShort(leave.getStartTime()))) {
+                                        if (scheduleRollCall.getSchedule().getPeriodId() >= leave.getStartPeriodId()) {
+                                            scheduleRollCallIds.add(scheduleRollCall.getId());
+                                            boolean inClass = scheduleRollCall.getIsInClassroom();
+                                            if (inClass) {
+                                                // 课堂内，需要去redis库中修改签到状态。
+                                                RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
+                                                if (null != rollCall) {
+                                                    rollCall.setLastType(rollCall.getType());
+                                                    if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                                        rollCall.setDeleteFlag(DataValidity.INVALID.getState());
+                                                        redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                    } else {
+                                                        rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if (DateFormatUtil.formatShort(schoolDay).equals(DateFormatUtil.formatShort(leave.getEndTime()))) {
+                                        if (leave.getEndPeriodId() >= scheduleRollCall.getSchedule().getPeriodId()) {
+                                            scheduleRollCallIds.add(scheduleRollCall.getId());
+                                            boolean inClass = scheduleRollCall.getIsInClassroom();
+                                            if (inClass) {
+                                                // 课堂内，需要去redis库中修改签到状态。
+                                                RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
+                                                if (null != rollCall) {
+                                                    rollCall.setLastType(rollCall.getType());
+                                                    if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                                        rollCall.setDeleteFlag(DataValidity.INVALID.getState());
+                                                        redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                    } else {
+                                                        rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        scheduleRollCallIds.add(scheduleRollCall.getId());
+                                        boolean inClass = scheduleRollCall.getIsInClassroom();
+                                        if (inClass) {
+                                            // 课堂内，需要去redis库中修改签到状态。
+                                            RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
+                                            if (null != rollCall) {
+                                                rollCall.setLastType(rollCall.getType());
+                                                if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                                    rollCall.setDeleteFlag(DataValidity.INVALID.getState());
+                                                    redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                } else {
+                                                    rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                                    redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    scheduleRollCallIds.add(scheduleRollCall.getId());
+                                    boolean inClass = scheduleRollCall.getIsInClassroom();
+                                    if (inClass) {
+                                        // 课堂内，需要去redis库中修改签到状态。
+                                        RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
+                                        if (null != rollCall) {
+                                            rollCall.setLastType(rollCall.getType());
+                                            if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                                rollCall.setDeleteFlag(DataValidity.INVALID.getState());
+                                                redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                            } else {
+                                                rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                                redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+                                            }
                                         }
                                     }
                                 }
@@ -603,6 +693,7 @@ public class LeaveService {
                             }
                         }
                     }
+                    i++;
                 }
             } else if (leave.getRequestType().equals(LeaveConstants.TYPE_PERIOD)) {
                 Map map = getBetweenStartAndEndPeriodId(account.getOrganId(), leave.getStartPeriodId(), leave.getEndPeriodId());
