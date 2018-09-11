@@ -190,7 +190,7 @@ public class RollCallServiceV2 {
                 } else {
                     // verify 中值已计算出来。
                     String gps = signInDTO.getGps();
-                    double distance = GDMapUtil.compare(gps, scheduleRollCall.getLocaltion());
+                    double distance = GDMapUtil.compare(gps, verify);
                     // gps 与 verify 比较 是否在偏移量范围内
                     int dis = (int) (distance / 10);
                     if (dis < 1) {
