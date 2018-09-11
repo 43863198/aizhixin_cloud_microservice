@@ -225,6 +225,8 @@ public class LeaveServiceV2 {
         UserInfo stu = userInfoRepository.findByUserId(account.getId());
         List<PeriodDTO> startPeriods =  getPeriodList(account.getId(), account.getOrganId(), startTime);
         List<PeriodDTO> endPeriods =  getPeriodList(account.getId(), account.getOrganId(), endTime);
+        Long startPeriodId = getStartPeriodId(startTime, startPeriods);
+        Long endPeriodId = getEndPeriodId(endTime, endPeriods);
         // 由班主任照常请
         if (headTeacherId != null) {
             UserInfo teacher = userInfoRepository.findByUserId(headTeacherId);
@@ -234,6 +236,8 @@ public class LeaveServiceV2 {
                 l.setTeacherName(headTeacherName);
                 l.setRequestContent(content);
                 l.setRequestType(requestType);
+                l.setStartPeriodId(startPeriodId);
+                l.setEndPeriodId(endPeriodId);
                 l.setStartDate(startDay);
                 l.setEndDate(endDay);
                 l.setStartTime(startTime);
@@ -260,8 +264,6 @@ public class LeaveServiceV2 {
                 dto.setData(l);
                 audiences.add(dto);
             } else if (requestType.equals(LeaveConstants.TYPE_PERIOD)) {
-                Long startPeriodId = getStartPeriodId(startTime, startPeriods);
-                Long endPeriodId = getEndPeriodId(endTime, endPeriods);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
                 l.setTeacherName(headTeacherName);
@@ -353,10 +355,6 @@ public class LeaveServiceV2 {
                     }
                 }
             } else {
-                String teachTime = DateFormatUtil.format(startDay);
-                // 课程节id;
-                Long startPeriodId = getStartPeriodId(startTime, startPeriods);
-                Long endPeriodId = getEndPeriodId(endTime, endPeriods);
                 Map map = getBetweenStartAndEndPeriodId(account.getOrganId(), startPeriodId, endPeriodId);
                 List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(account.getId(), null);
                 Date date = new Date();
