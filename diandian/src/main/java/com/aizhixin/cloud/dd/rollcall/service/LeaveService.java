@@ -118,8 +118,8 @@ public class LeaveService {
         if (headTeacherId != null) {
             UserInfo user = userInfoRepository.findByUserId(headTeacherId);
             if (requestType.equals(LeaveConstants.TYPE_DAY)) {
-                Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
-                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
+                Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
+                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data")), "yyyy-MM-dd HH:mm");
                 String duration = getDuration(endTime, startTime);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
@@ -154,8 +154,8 @@ public class LeaveService {
                 dto.setData(l);
                 audiences.add(dto);
             } else if (requestType.equals(LeaveConstants.TYPE_PERIOD)) {
-                Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), startPeriodId), "yyyy-MM-dd HH:mm");
-                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), endPeriodId), "yyyy-MM-dd HH:mm");
+                Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), startPeriodId), "yyyy-MM-dd HH:mm");
+                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), endPeriodId), "yyyy-MM-dd HH:mm");
                 String duration = getDuration(endTime, startTime);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
@@ -209,8 +209,8 @@ public class LeaveService {
                             continue;
                         }
                         for (IdNameDomain idNameDomain : idNameDomains) {
-                            Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
-                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
                             String duration = getDuration(endTime, startTime);
 
                             Leave l = new Leave();
@@ -265,8 +265,8 @@ public class LeaveService {
                             continue;
                         }
                         for (IdNameDomain idNameDomain : idNameDomains) {
-                            Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
-                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
                             String duration = getDuration(endTime, startTime);
 
                             Leave l = new Leave();
@@ -334,8 +334,8 @@ public class LeaveService {
 
     private String getStartPeriodTime(List<Map<String, Object>> list, Long id) {
         if (list != null && list.size() > 0) {
-            for(Map<String, Object> m : list){
-                if(m.get("id").equals(id)){
+            for (Map<String, Object> m : list) {
+                if (m.get("id").equals(id)) {
                     return list.get(0).get("startTime").toString();
                 }
             }
@@ -346,9 +346,11 @@ public class LeaveService {
     private String getEndPeriodTime(List<Map<String, Object>> list, Long id) {
         if (list != null && list.size() > 0) {
             Collections.reverse(list);
-            for(Map<String, Object> m:list){
-                if(m.get("id").equals(id)){
-                    return list.get(0).get("endTime").toString();
+            for (Map<String, Object> m : list) {
+                if (m.get("id").equals(id)) {
+                    String str = list.get(0).get("endTime").toString();
+                    Collections.reverse(list);
+                    return str;
                 }
             }
         }
@@ -365,7 +367,9 @@ public class LeaveService {
     private String getEndPeriodTime(List<Map<String, Object>> list) {
         if (list != null && list.size() > 0) {
             Collections.reverse(list);
-            return list.get(0).get("endTime").toString();
+            String str = list.get(0).get("endTime").toString();
+            Collections.reverse(list);
+            return str;
         }
         return null;
     }
@@ -380,7 +384,9 @@ public class LeaveService {
     private Long getEndPeriodId(List<Map<String, Object>> list) {
         if (list != null && list.size() > 0) {
             Collections.reverse(list);
-            return Long.parseLong(list.get(0).get("id").toString());
+            Long l = Long.parseLong(list.get(0).get("id").toString());
+            Collections.reverse(list);
+            return l;
         }
         return null;
     }
