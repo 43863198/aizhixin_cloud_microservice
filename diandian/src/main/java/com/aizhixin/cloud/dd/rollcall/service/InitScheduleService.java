@@ -408,6 +408,7 @@ public class InitScheduleService {
             scheduleRollCallRepository.save(scheduleRollCall);
 
             // ==========================reidsRollCall==============================
+            redisTemplate.opsForValue().set("l-" + scheduleRollCall.getId(), "", 1, TimeUnit.DAYS);
             // 将上课的id放入reids,定时任务后续将计算中值 排课点名id
             Set<Long> scheduleRollCallIds = (Set<Long>) redisTemplate.opsForHash().get(RedisUtil.getScheduleOrganId(), schedule.getOrganId().longValue());
             if (null == scheduleRollCallIds) {
