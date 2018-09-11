@@ -25,17 +25,16 @@ import com.aizhixin.cloud.dd.rollcall.repository.LeaveRepository;
 import com.aizhixin.cloud.dd.rollcall.service.InitScheduleService;
 import com.aizhixin.cloud.dd.rollcall.service.PeriodService;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
-import org.apache.catalina.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.Period;
 import java.util.*;
 
 @Service
@@ -141,6 +140,7 @@ public class LeaveServiceV2 {
             className = "";
         }
         Page<LeaveDomain> page = null;
+        pageable.getSort().and(new Sort(new Sort.Order(Sort.Direction.DESC, "id")));
         if (leavePublic != null && leaveType != null) {
             page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className);
         } else if (leavePublic != null) {
