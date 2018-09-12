@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -15,12 +17,14 @@ import java.util.List;
 @ToString
 public class RollCallAppeal extends AbstractOnlyIdAndCreatedDateEntity {
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(cascade = {CascadeType.REFRESH}, optional = true)
     @JoinColumn(name = "schedule_rollcall_id")
     @Getter
     @Setter
     private ScheduleRollCall scheduleRollCall;
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(cascade = {CascadeType.REFRESH}, optional = true)
     @JoinColumn(name = "rollcall_id")
     @Getter

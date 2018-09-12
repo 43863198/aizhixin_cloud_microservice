@@ -122,7 +122,7 @@ public class CounsellorRollcallService {
             throw new NullPointerException();
         }
         List<CounsellorRollcall> conunsellorRollcalls = counsellorRollcallRepository.findAllByTempGroupAndStatusAndDeleteFlag(tempGroup, Boolean.TRUE, DataValidity.VALID.getState());
-        if(conunsellorRollcalls != null && conunsellorRollcalls.size()>0){
+        if (conunsellorRollcalls != null && conunsellorRollcalls.size() > 0) {
             for (CounsellorRollcall conunsellorRollcall : conunsellorRollcalls) {
                 conunsellorRollcall.setStatus(Boolean.FALSE);
             }
@@ -355,9 +355,11 @@ public class CounsellorRollcallService {
                 CounsellorRollcall counsellorRollcall = findOne(counsellorId);
                 counsellorRollcall.setDeleteFlag(DataValidity.INVALID.getState());
                 list.add(counsellorRollcall);
-                counsellorRollcallRepository.save(counsellorRollcall);
             }
-            counsellorRedisService.cleanCache(null, list, true, false, false);
+            if (list.size() > 0) {
+                counsellorRollcallRepository.save(list);
+                counsellorRedisService.cleanCache(null, list, true, false, false);
+            }
         } catch (Exception e) {
             return ApiReturn.message(Boolean.FALSE, e.getMessage(), null);
         }
