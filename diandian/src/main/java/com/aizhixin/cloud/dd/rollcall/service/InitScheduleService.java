@@ -112,6 +112,11 @@ public class InitScheduleService {
         redisTokenStore.setInitScheduleStatus(DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT), true);
     }
 
+    @Async("threadPool1")
+    public void initScheduleAsync() {
+        initSchedule();
+    }
+
     public void executeTask(Long orgId, String name) {
         pushMonitor.clearDaybreak(orgId, DateFormatUtil.formatShort(new Date()));
         String currentDate = DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT);
@@ -150,6 +155,11 @@ public class InitScheduleService {
         }
 
         refStuTodaySchedule(orgId);
+    }
+
+    @Async("threadPool1")
+    public void executeTaskAsync(Long orgId, String name) {
+        executeTask(orgId, name);
     }
 
     public void refStuTodaySchedule(Long orgId) {
