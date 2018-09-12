@@ -322,24 +322,19 @@ public class PhoneController {
         Map map = new HashMap();
         map.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
         map.put(ApiReturnConstants.MESSAGE, "请联系管理员,获取执行权限!");
-
         if (StringUtils.isEmpty(psw) || psw.length() < 14) {
             return new ResponseEntity(map, HttpStatus.OK);
         }
         if (!psw.substring(0, 12).equals(pswTemp) || psw.substring(12, 14).equals(tempString)) {
             return new ResponseEntity(map, HttpStatus.OK);
         }
-
         if (null != organId) {
-            initScheduleService.executeTask(organId, "");
-
+            initScheduleService.executeTaskAsync(organId, "");
         } else {
-            initScheduleService.initSchedule();
+            initScheduleService.initScheduleAsync();
         }
         tempString = psw.substring(12, 14);
-
         contrastToolService.contrastTask();
-
         return new ResponseEntity(Boolean.TRUE, HttpStatus.OK);
     }
 
