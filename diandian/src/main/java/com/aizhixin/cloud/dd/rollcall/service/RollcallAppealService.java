@@ -184,8 +184,8 @@ public class RollcallAppealService {
         return pageData;
     }
 
-    private List<RollCallAppealDomain> typeAppealDomains(List<RollCallAppeal> appeals){
-        if(appeals == null || appeals.size() == 0){
+    private List<RollCallAppealDomain> typeAppealDomains(List<RollCallAppeal> appeals) {
+        if (appeals == null || appeals.size() == 0) {
             return null;
         }
         List<RollCallAppealDomain> list = new ArrayList<>();
@@ -199,28 +199,29 @@ public class RollcallAppealService {
             stuMap.put(item.getUserId(), item);
         }
         for (RollCallAppeal item : appeals) {
-            RollCallAppealDomain d = new RollCallAppealDomain();
-            d.setId(item.getId());
-            d.setStuId(item.getStuId());
-            UserInfo stu = stuMap.get(item.getStuId());
-            if (stu != null) {
-                d.setAvatar(stu.getAvatar());
-                d.setStuName(stu.getName());
-            }
-            d.setTeacherId(item.getTeacherId());
-            d.setContent(item.getContent());
-            d.setAppealFiles(item.getAppealFiles());
-            d.setAppealStatus(item.getAppealStatus());
-            d.setAppealDate(item.getAppealDate());
-            d.setCreatedDate(item.getCreatedDate());
-            if (item.getRollCall() != null) {
-                RollCall rollCall = item.getRollCall();
-                d.setType(rollCall.getType());
-                d.setSignTime(rollCall.getSignTime());
-                d.setClassId(rollCall.getClassId());
-                d.setClassName(rollCall.getClassName());
-            }
-            if (item.getScheduleRollCall() != null && item.getScheduleRollCall().getSchedule() != null) {
+            if (item.getRollCall() != null && item.getScheduleRollCall() != null && item.getScheduleRollCall().getSchedule() != null) {
+                RollCallAppealDomain d = new RollCallAppealDomain();
+                d.setId(item.getId());
+                d.setStuId(item.getStuId());
+                UserInfo stu = stuMap.get(item.getStuId());
+                if (stu != null) {
+                    d.setAvatar(stu.getAvatar());
+                    d.setStuName(stu.getName());
+                }
+                d.setTeacherId(item.getTeacherId());
+                d.setContent(item.getContent());
+                d.setAppealFiles(item.getAppealFiles());
+                d.setAppealStatus(item.getAppealStatus());
+                d.setAppealDate(item.getAppealDate());
+                d.setCreatedDate(item.getCreatedDate());
+                if (item.getRollCall() != null) {
+                    RollCall rollCall = item.getRollCall();
+                    d.setType(rollCall.getType());
+                    d.setSignTime(rollCall.getSignTime());
+                    d.setClassId(rollCall.getClassId());
+                    d.setClassName(rollCall.getClassName());
+                }
+
                 Schedule schedule = item.getScheduleRollCall().getSchedule();
                 d.setTeacherName(schedule.getTeacherNname());
                 d.setCourseId(schedule.getCourseId());
@@ -232,8 +233,9 @@ public class RollcallAppealService {
                 d.setPeriodNo(schedule.getPeriodNo());
                 d.setPeriodNum(schedule.getPeriodNum());
                 d.setTeachDate(schedule.getTeachDate());
+
+                list.add(d);
             }
-            list.add(d);
         }
         return list;
     }
