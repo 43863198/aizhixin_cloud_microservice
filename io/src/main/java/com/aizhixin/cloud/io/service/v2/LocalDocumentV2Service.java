@@ -5,9 +5,11 @@ import com.aizhixin.cloud.io.auth.TokenAuth;
 import com.aizhixin.cloud.io.common.core.PublicErrorCode;
 import com.aizhixin.cloud.io.common.exception.CommonException;
 import com.aizhixin.cloud.io.common.util.DateUtil;
+import com.aizhixin.cloud.io.domain.BatchUploadDomain;
 import com.aizhixin.cloud.io.domain.LocalFileDomain;
 import com.aizhixin.cloud.io.entity.LocalFile;
 import com.aizhixin.cloud.io.provider.store.redis.RedisTokenStore;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +148,22 @@ public class LocalDocumentV2Service {
         return fd;
     }
 
-
+    public List<LocalFileDomain> batchUploadDocument(List<BatchUploadDomain> files, String bucket, Long ttl, String appId, String token) {
+    	ArrayList<LocalFileDomain> fileList = new ArrayList<LocalFileDomain>();
+    	LocalFileDomain file = null;
+    	for(BatchUploadDomain domain : files){
+    		try{
+    			 file = uploadDocument(domain.getFile(), domain.getFilename(), bucket, ttl, appId, token);
+    		}catch(Exception ex){
+    			ex.printStackTrace();
+    			continue;
+    		}
+    		if(null != file){
+    			fileList.add(file);
+    		}
+    	}
+    	return fileList;
+    }
 
     @Transactional(readOnly = true)
     public LocalFileDomain getDocumentInfo(String key, String appId, String token) {
