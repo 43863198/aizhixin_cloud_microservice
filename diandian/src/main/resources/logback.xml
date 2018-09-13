@@ -23,6 +23,6 @@
 		<appender-ref ref="FILE" />
 		<appender-ref ref="CONSOLE" />
 	</root>
-	<logger name="com.aizhixin.cloud.dd" level="DEBUG" />
-	<logger name="org.springframework.cache" level="DEBUG" />
+	<logger name="com.aizhixin.cloud.dd" level="INFO" />
+	<logger name="org.springframework.cache" level="INFO" />
 </configuration>
