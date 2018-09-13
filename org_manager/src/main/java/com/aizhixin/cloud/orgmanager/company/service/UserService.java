@@ -1575,6 +1575,21 @@ public class UserService {
         }
     }
 
+    public Boolean changeProf(Long stuId, Long profId){
+        Professional professional = professionalService.findById(profId);
+        if(professional == null){
+            return false;
+        }
+        User user = userRepository.findByIdAndDeleteFlag(stuId, DataValidity.VALID.getState());
+        if(user == null){
+            return false;
+        }
+        user.setProfessional(professional);
+        user.setCollege(professional.getCollege());
+        userRepository.save(user);
+        return true;
+    }
+
     @Transactional(readOnly = true)
     public PageData<TeacherSimpleDomain> querySimpleTeacherList(Pageable pageable, Long orgId, Long collegeId, String name, Long userId) {
         PageData<TeacherSimpleDomain> pageData = new PageData<>();

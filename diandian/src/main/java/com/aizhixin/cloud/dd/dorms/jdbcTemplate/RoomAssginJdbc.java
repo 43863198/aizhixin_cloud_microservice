@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.dorms.domain.StuStatsDomain;
 import com.aizhixin.cloud.dd.dorms.entity.BedStu;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,36 +19,25 @@ import com.aizhixin.cloud.dd.dorms.domain.AssginDomain;
 import com.aizhixin.cloud.dd.dorms.domain.RoomInfoDomain;
 import com.aizhixin.cloud.dd.dorms.domain.RoomChooseInfo;
 
-/**
- * @className:RoomAssginJdbc.java
- * @date:2017年12月29日
- * @autor: xiagen
- * 　　　　　　　　┏┓　　　┏┓+ +
- * 　　　　　　　┏┛┻━━━┛┻┓ + +
- * 　　　　　　　┃　　　　　　　┃
- * 　　　　　　　┃　　　━　　　┃ ++ + + +
- * 　　　　　　 ████━████ ┃+
- * 　　　　　　　┃　　　　　　　┃ +
- * 　　　　　　　┃　　　┻　　　┃
- * 　　　　　　　┃　　　　　　　┃ + +
- * 　　　　　　　┗━┓　　　┏━┛
- * 　　　　　　　　　┃　　　┃
- * 　　　　　　　　　┃　　　┃ + + + +
- * 　　　　　　　　　┃　　　┃　　　　Code is far away from bug with the animal protecting
- * 　　　　　　　　　┃　　　┃ + 　　　　神兽保佑,代码无bug
- * 　　　　　　　　　┃　　　┃
- * 　　　　　　　　　┃　　　┃　　+
- * 　　　　　　　　　┃　 　　┗━━━┓ + +
- * 　　　　　　　　　┃ 　　　　　　　┣┓
- * 　　　　　　　　　┃ 　　　　　　　┏┛
- * 　　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +
- * 　　　　　　　　　　┃┫┫　┃┫┫
- * 　　　　　　　　　　┗┻┛　┗┻┛+ + + +
- */
+
 @Repository
 public class RoomAssginJdbc {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public List<IdNameDomain> findProfByTeacherId(Long orgId, Long teacherId) {
+        String sql = "SELECT dra.prof_id, dra.prof_name FROM dd_room_assgin dra WHERE dra.org_id=" + orgId + " AND dra.DELETE_FLAG=0 AND dra.counselor_ids LIKE '%" + teacherId + "%' GROUP BY dra.prof_id";
+        RowMapper<IdNameDomain> rowMapper = new RowMapper<IdNameDomain>() {
+            @Override
+            public IdNameDomain mapRow(ResultSet rs, int rowNum) throws SQLException {
+                IdNameDomain ad = new IdNameDomain();
+                ad.setId(rs.getLong("prof_id"));
+                ad.setName(rs.getString("prof_name"));
+                return ad;
+            }
+        };
+        return jdbcTemplate.query(sql, rowMapper);
+    }
 
     public List<AssginDomain> findRoomAssginGroupById(Long orgId) {
         String sql = "SELECT dra.college_id,dra.college_name FROM `dd_room_assgin` AS dra WHERE dra.DELETE_FLAG=0 AND dra.org_id="
