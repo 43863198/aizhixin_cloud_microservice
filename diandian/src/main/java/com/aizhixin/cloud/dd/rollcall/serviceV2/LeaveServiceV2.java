@@ -222,8 +222,8 @@ public class LeaveServiceV2 {
         List<Long> ids = new ArrayList<Long>();
         List<AudienceDTO> audiences = new ArrayList<>();
         UserInfo stu = userInfoRepository.findByUserId(account.getId());
-        List<PeriodDTO> startPeriods =  getPeriodList(account.getId(), account.getOrganId(), startTime);
-        List<PeriodDTO> endPeriods =  getPeriodList(account.getId(), account.getOrganId(), endTime);
+        List<PeriodDTO> startPeriods =  getStartPeriodList(account.getId(), account.getOrganId(), startTime);
+        List<PeriodDTO> endPeriods =  getEndPeriodList(account.getId(), account.getOrganId(), endTime);
         Long startPeriodId = getStartPeriodId(startTime, startPeriods);
         Long endPeriodId = getEndPeriodId(endTime, endPeriods);
         // 由班主任照常请
@@ -462,6 +462,16 @@ public class LeaveServiceV2 {
         return list;
     }
 
+    private List<PeriodDTO> getStartPeriodList(Long stuId, Long orgId, Date date) {
+        return periodService.listPeriod(orgId);
+    }
+
+    private List<PeriodDTO> getEndPeriodList(Long stuId, Long orgId, Date date) {
+        List<PeriodDTO> list = periodService.listPeriod(orgId);
+        Collections.reverse(list);
+        return list;
+    }
+
     private Long getStartPeriodId(Date startTime, List<PeriodDTO> list) {
         if (list != null && list.size() > 0) {
             long start = startTime.getTime();
@@ -469,19 +479,18 @@ public class LeaveServiceV2 {
             for (PeriodDTO p : list) {
                 Date date = DateFormatUtil.parse2(dayStr + " " + p.getStartTime(), "yyyy-MM-dd HH:mm");
                 if (date != null) {
-                    if (start >= date.getTime()) {
+                    if (date.getTime() >= start) {
                         return p.getId();
                     } else {
                         Date edate = DateFormatUtil.parse2(dayStr + " " + p.getEndTime(), "yyyy-MM-dd HH:mm");
                         if (edate != null) {
-                            if (start <= edate.getTime()) {
+                            if (edate.getTime() >= start) {
                                 return p.getId();
                             }
                         }
                     }
                 }
             }
-            return list.get(0).getId();
         }
         return null;
     }
@@ -490,7 +499,6 @@ public class LeaveServiceV2 {
         if (list != null && list.size() > 0) {
             long end = endTime.getTime();
             String dayStr = DateFormatUtil.formatShort(endTime);
-            Collections.reverse(list);
             for (PeriodDTO p : list) {
                 Date date = DateFormatUtil.parse2(dayStr + " " + p.getStartTime(), "yyyy-MM-dd HH:mm");
                 if (date != null) {
