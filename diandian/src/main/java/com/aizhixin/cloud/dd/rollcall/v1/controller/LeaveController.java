@@ -55,17 +55,12 @@ public class LeaveController {
 
     @RequestMapping(value = "/student/requestleave", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "POST", value = "学生请假申请", response = Void.class, notes = "学生请假申请<br>@author hsh")
-    public ResponseEntity<?> requestLeave(
-            @RequestHeader("Authorization") String accessToken,
-            @ApiParam(value = "申诉信息", required = true) @RequestBody LeaveDTO dto) {
-
+    public ResponseEntity<?> requestLeave(@RequestHeader("Authorization") String accessToken,
+                                          @ApiParam(value = "请假信息", required = true) @RequestBody LeaveDTO dto) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-
-        Map<String, Object> resBody = new HashMap<>();
-        // TODO: 要支持多个辅导员
         Map<String, Object> teacherMap = userService.getClassTeacherByStudentId(account.getId());
         Long headTeacherId = null;
         String headTeacherName = "";
