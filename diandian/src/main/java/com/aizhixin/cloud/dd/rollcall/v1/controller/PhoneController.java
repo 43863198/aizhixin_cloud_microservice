@@ -329,9 +329,9 @@ public class PhoneController {
             return new ResponseEntity(map, HttpStatus.OK);
         }
         if (null != organId) {
-            initScheduleService.executeTaskAsync(organId, "");
+            initScheduleService.executeTask(organId, "");
         } else {
-            initScheduleService.initScheduleAsync();
+            initScheduleService.initSchedule();
         }
         tempString = psw.substring(12, 14);
         contrastToolService.contrastTask();
