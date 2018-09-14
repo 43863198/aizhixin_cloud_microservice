@@ -81,11 +81,9 @@ public class ChangeProfessionalService {
 
     public PageData<NewStudentDomain> getStudentList(Pageable pageable, Long orgId, String name) {
         if (StringUtils.isEmpty(name)) {
-            name = "%";
-        } else {
-            name = "%" + name + "%";
+            name = "";
         }
-        Page<NewStudent> page = studentRepository.findByOrgIdAndIdNumberLikeOrNameLike(pageable, orgId, name);
+        Page<NewStudent> page = studentRepository.findByOrgIdAndNameLike(pageable, orgId, name);
         PageDomain pageDomain = new PageDomain();
         pageDomain.setPageSize(page.getSize());
         pageDomain.setPageNumber(page.getNumber());

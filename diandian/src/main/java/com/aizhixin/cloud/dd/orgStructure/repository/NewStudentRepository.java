@@ -14,8 +14,8 @@ public interface NewStudentRepository extends MongoRepository<NewStudent, String
 
     public List<NewStudent> findByOrgIdAndProfessionalNameAndSexAndNameLike(Long orgId, String professionalName, String sex, String name);
 
-    @Query("select u from #{#entityName} u where u.orgId = :orgId and (u.name like :name or u.idNumber like :name)")
-    public Page<NewStudent> findByOrgIdAndIdNumberLikeOrNameLike(Pageable pageable, @Param("orgId") Long orgId, @Param("name") String name);
+    @Query(value = "select u from #{#entityName} u where u.orgId = :orgId and (u.name LIKE CONCAT('%',:name,'%') or u.idNumber LIKE CONCAT('%',:name,'%'))")
+    public Page<NewStudent> findByOrgIdAndNameLike(Pageable pageable, @Param("orgId") Long orgId, @Param("name") String name);
 
     public List<NewStudent> findByStuIdIn(List<Long> userIds);
 
