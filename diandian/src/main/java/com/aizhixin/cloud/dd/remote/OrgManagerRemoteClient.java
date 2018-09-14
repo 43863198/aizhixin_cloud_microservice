@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//@FeignClient(name = "org-manager", url="http://gateway.aizhixintest.com:80/org-manager")
+//@FeignClient(name = "org-manager", url = "http://gateway.aizhixintest.com:80/org-manager")
 @FeignClient("org-manager")
 public interface OrgManagerRemoteClient {
 
-    @RequestMapping(value="/v1/classesteacher/list",method=RequestMethod.GET)
-    String classesTeacherList(@RequestParam("classesId")Long classesId);
+    @RequestMapping(value = "/v1/classesteacher/list", method = RequestMethod.GET)
+    String classesTeacherList(@RequestParam("classesId") Long classesId);
 
     @RequestMapping(method = RequestMethod.PUT, value = "/v1/teachingclass/getidnamebyids")
     List<IdNameDomain> getIdnameByids(@RequestBody Set<Long> ids);
@@ -46,11 +46,11 @@ public interface OrgManagerRemoteClient {
     @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/get/{id}")
     String queryAdminclass(@PathVariable("id") Long id);
 
-    @RequestMapping(method=RequestMethod.GET,value="/v1/teachingclass/countstudents")
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/teachingclass/countstudents")
     Integer countStudents(@RequestParam("id") Long id);
 
-    @RequestMapping(method=RequestMethod.GET,value="/v1/teachingclassstudent/list")
-    String findTeachingClassListStudent(@RequestParam("teachingClassId") Long teachingClassId,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/teachingclassstudent/list")
+    String findTeachingClassListStudent(@RequestParam("teachingClassId") Long teachingClassId, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
 
     @RequestMapping(method = RequestMethod.GET, value = "/v1/teacher/list")
     String findByTeacherList(@RequestParam("orgId") Long orgId, @RequestParam("name") String name, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
@@ -71,29 +71,29 @@ public interface OrgManagerRemoteClient {
     @RequestMapping(method = RequestMethod.PUT, value = "/v1/students/getbyclassesids")
     List<Map<String, Object>> findByClassesIds(@RequestBody List<Long> classesIds);
 
-    @RequestMapping(method=RequestMethod.PUT,value="/v1/students/byids")
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/students/byids")
     List<Map<String, Object>> findByIds(@RequestBody List<Long> userIds);
 
-    @RequestMapping(method=RequestMethod.PUT,value="/v1/students/byidsnoclasses")
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/students/byidsnoclasses")
     List<Map<String, Object>> findByIdsNoClasses(@RequestBody List<Long> userIds);
 
-    @RequestMapping(method=RequestMethod.GET,value="/v1/students/list")
-    String list(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("classesId")Long classesId,@RequestParam("name")String name,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/students/list")
+    String list(@RequestParam("orgId") Long orgId, @RequestParam("collegeId") Long collegeId, @RequestParam("professionalId") Long professionalId, @RequestParam("classesId") Long classesId, @RequestParam("name") String name, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
 
-    @RequestMapping(method=RequestMethod.GET,value="/v1/students/newstudentlist")
-    String newstudentlist(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("name")String name,@RequestParam("sex")String sex,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/students/newstudentlist")
+    String newstudentlist(@RequestParam("orgId") Long orgId, @RequestParam("collegeId") Long collegeId, @RequestParam("professionalId") Long professionalId, @RequestParam("name") String name, @RequestParam("sex") String sex, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
 
-    @RequestMapping(method=RequestMethod.GET,value="/v1/students/newstudentlist")
-    Map<String, Object> getNewstudentList(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("name")String name,@RequestParam("sex")String sex,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/students/newstudentlist")
+    Map<String, Object> getNewstudentList(@RequestParam("orgId") Long orgId, @RequestParam("collegeId") Long collegeId, @RequestParam("professionalId") Long professionalId, @RequestParam("name") String name, @RequestParam("sex") String sex, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
 
-    @RequestMapping(method=RequestMethod.GET,value="/v1/students/choosedormitorylist")
-    Map<String, Object> choosedormitorylist(@RequestParam("orgId")Long orgId,@RequestParam("collegeId")Long collegeId,@RequestParam("professionalId")Long professionalId,@RequestParam("name")String name,@RequestParam("sex")String sex,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/students/choosedormitorylist")
+    Map<String, Object> choosedormitorylist(@RequestParam("orgId") Long orgId, @RequestParam("collegeId") Long collegeId, @RequestParam("professionalId") Long professionalId, @RequestParam("name") String name, @RequestParam("sex") String sex, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
 
     @RequestMapping(method = RequestMethod.GET, value = "/v1/course/get/{id}")
-    String findByCourseId(@PathVariable("id")Long id);
+    String findByCourseId(@PathVariable("id") Long id);
 
     @RequestMapping(method = RequestMethod.GET, value = "/v1/course/list")
-    String getExcellentCourseLikeName(@RequestParam("orgId")Long orgId,@RequestParam("name")String name,@RequestParam("pageNumber")Integer pageNumber,@RequestParam("pageSize")Integer pageSize);
+    String getExcellentCourseLikeName(@RequestParam("orgId") Long orgId, @RequestParam("name") String name, @RequestParam("pageNumber") Integer pageNumber, @RequestParam("pageSize") Integer pageSize);
 
     @RequestMapping(method = RequestMethod.POST, value = "/v1/classes/add")
     String add(@RequestBody ClassesDTO classesDomain);
@@ -124,15 +124,14 @@ public interface OrgManagerRemoteClient {
     List<ClassesIdNameCollegeNameDomain> getbyids(@RequestBody Set<Long> ids);
 
     @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/droplist")
-    Map<String, Object> droplist(@RequestParam(value = "professionalId") Long professionalId,@RequestParam(value = "pageNumber") Integer pageNumber,@RequestParam(value = "pageSize") Integer pageSize);
-
+    Map<String, Object> droplist(@RequestParam(value = "professionalId") Long professionalId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
 
     @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/droplistcollege")
-    Map<String, Object> droplistcollege(@RequestParam(value = "collegeId") Long collegeId,@RequestParam(value = "pageNumber") Integer pageNumber,@RequestParam(value = "pageSize") Integer pageSize);
+    Map<String, Object> droplistcollege(@RequestParam(value = "collegeId") Long collegeId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
     @RequestMapping(method = RequestMethod.GET, value = "/v1/classes/droplistorg")
-    Map<String, Object> droplistorg(@RequestParam(value = "orgId") Long orgId,@RequestParam(value = "pageNumber") Integer pageNumber,@RequestParam(value = "pageSize") Integer pageSize);
+    Map<String, Object> droplistorg(@RequestParam(value = "orgId") Long orgId, @RequestParam(value = "pageNumber") Integer pageNumber, @RequestParam(value = "pageSize") Integer pageSize);
 
 
     /**
@@ -246,7 +245,7 @@ public interface OrgManagerRemoteClient {
                                    @RequestParam(value = "pageSize", required = false) Integer pageSize);
 
     @RequestMapping(value = "/v1/period/get/{id}", method = RequestMethod.GET)
-    Map<String, Object> getPeriod(@PathVariable("id")Long id);
+    Map<String, Object> getPeriod(@PathVariable("id") Long id);
 
     /**
      * 教学班教师API : 查找老师特定学期的所有课程
@@ -297,7 +296,7 @@ public interface OrgManagerRemoteClient {
 
     @RequestMapping(value = "/v1/teachingclassstudent/listNotIncludeException", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     Map<String, Object> listNotIncludeExceptionV2(@RequestParam(value = "teachingClassId", required = true) Long teachingClassId,
-                                   @RequestParam(value = "pageNumber", required = true) Integer pageNumber, @RequestParam(value = "pageSize", required = true) Integer pageSize);
+                                                  @RequestParam(value = "pageNumber", required = true) Integer pageNumber, @RequestParam(value = "pageSize", required = true) Integer pageSize);
 
     /**
      * 教学班学生API : 获取教学班学生列表信息,包含班级等详细信息
@@ -392,6 +391,10 @@ public interface OrgManagerRemoteClient {
     @RequestMapping(value = "/v1/students/newstudentinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     Map<String, Object> getNewStudentInfo(@ApiParam(value = "idNumber", required = true) @RequestParam(value = "idNumber") String idNumber,
                                           @ApiParam(value = "name", required = true) @RequestParam(value = "name") String name);
+
+    @RequestMapping(value = "/v1/students/changeProf", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    Map<String, Object> changeProf(@ApiParam(value = "stuId", required = true) @RequestParam(value = "stuId") Long stuId,
+                                   @ApiParam(value = "profId", required = true) @RequestParam(value = "profId") Long profId);
 
     /**
      * B端学生管理API:分页获取指定班级的学生ID和name列表
