@@ -5,6 +5,7 @@ import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.counsellorollcall.domain.*;
 import com.aizhixin.cloud.dd.counsellorollcall.entity.*;
+import com.aizhixin.cloud.dd.counsellorollcall.repository.AlarmClockRepository;
 import com.aizhixin.cloud.dd.counsellorollcall.repository.StudentSubGroupRepository;
 import com.aizhixin.cloud.dd.counsellorollcall.thread.UpdateRollcallMessageThread;
 import com.aizhixin.cloud.dd.counsellorollcall.v2.service.CounselorRollcallStudentService;
@@ -44,6 +45,12 @@ public class CounsellorRedisService {
 
     @Autowired
     private StudentSubGroupRepository subGroupRepository;
+
+    @Autowired
+    private CounsellorRedisService counsellorRedisService;
+
+    @Autowired
+    private AlarmClockRepository alarmClockRepository;
 
     /**
      * 从缓存更新是否已读
@@ -177,12 +184,26 @@ public class CounsellorRedisService {
                             redisTokenStore.storeRedisData(stusingin.getStudentId(), list);
                         }
                         //v2
-                        if(closeAll){
+                        if (closeAll) {
                             List<StuTempGroupDomainV2> stuListV2 = redisTokenStore.readRedisDataV2(stusingin.getStudentId());
                             if (tempGroup != null && stuListV2 != null && stuListV2.size() > 0) {
+                                AlarmClock ac = alarmClockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
                                 for (StuTempGroupDomainV2 d : stuListV2) {
                                     if (d.getGroupId().longValue() == tempGroup.getId().longValue() && d.getReportList() != null && d.getReportList().size() > 0) {
                                         d.setIsOpen(false);
+                                        if (ac != null) {
+                                            if (tempGroup.getRollcallNum() != null && tempGroup.getRollcallNum() > 1) {
+                                                d.setAlarmTime(ac.getStartEndTime());
+                                                d.setFirstTime(ac.getClockTime());
+                                                d.setLateTime(ac.getLateTime());
+                                                d.setSecondTime(ac.getSecondTime());
+                                                d.setEndTime(ac.getEndTime());
+                                            } else {
+                                                d.setAlarmTime(ac.getClockTime());
+                                                d.setFirstTime(ac.getClockTime());
+                                            }
+                                            d.setAlarmModel(ac.getClockMode());
+                                        }
                                         d.setReportList(new ArrayList<>());
                                         break;
                                     }
