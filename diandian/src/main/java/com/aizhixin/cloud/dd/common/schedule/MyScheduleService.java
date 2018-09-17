@@ -222,7 +222,7 @@ public class MyScheduleService {
     /**
      * 导员点名应用点名规则
      */
-    @Scheduled(cron = "0 1 0 * * ?")
+    @Scheduled(cron = "1 0 0 * * ?")
     public void applyCounsellorRollcallRule() {
         if (distributeLock.getCounsellorRollcallRuleLock()) {
             log.info("导员点名应用点名规则");
@@ -233,7 +233,7 @@ public class MyScheduleService {
         }
     }
 
-    @Scheduled(cron = "1 0 0 * * ?")
+    @Scheduled(cron = "1 1 0 * * ?")
     public void closeAllTempGroup() {
         if (distributeLock.getCounsellorRollcallCloseAllLock()) {
             log.info("处理关闭导员点名任务");

@@ -209,20 +209,20 @@ public class RollCallService {
         String ids = "";
         Map<Long, RollCallClassDTO> map = new TreeMap<Long, RollCallClassDTO>();
 
-        List<Long> slss = studentLeaveScheduleService.findStudentIdByScheduleId(schedule);
+//        List<Long> slss = studentLeaveScheduleService.findStudentIdByScheduleId(schedule);
         for (RollCall rollCall : rollCallList) {
-            if (!RollCallConstants.TYPE_CANCEL_ROLLCALL.equals(rollCall.getType()) && slss != null && slss.contains(rollCall.getStudentId())) {
-                String tempType = rollCall.getType();
-                rollCall.setLastType(tempType);
-                rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-                if (!RollCallConstants.TYPE_ASK_FOR_LEAVE.equals(tempType)) {
-                    if (inClass) {
-                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
-                    } else {
-                        rollCallRepository.save(rollCall);
-                    }
-                }
-            }
+//            if (!RollCallConstants.TYPE_CANCEL_ROLLCALL.equals(rollCall.getType()) && slss != null && slss.contains(rollCall.getStudentId())) {
+//                String tempType = rollCall.getType();
+//                rollCall.setLastType(tempType);
+//                rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+//                if (!RollCallConstants.TYPE_ASK_FOR_LEAVE.equals(tempType)) {
+//                    if (inClass) {
+//                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
+//                    } else {
+//                        rollCallRepository.save(rollCall);
+//                    }
+//                }
+//            }
 
             RollCallDTO rollCallDTO = new RollCallDTO();
             // 组装数据
