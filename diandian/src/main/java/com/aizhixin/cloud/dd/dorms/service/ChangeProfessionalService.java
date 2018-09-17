@@ -83,7 +83,7 @@ public class ChangeProfessionalService {
         if (StringUtils.isEmpty(name)) {
             name = "";
         }
-        Page<NewStudent> page = studentRepository.findByNameContainingOrIdNumberContainingAndOrgId(pageable, name, name, orgId);
+        Page<NewStudent> page = studentRepository.findByOrgIdAndNameRegexOrOrgIdAndIdNumberRegex(pageable, orgId, name, orgId, name);
         PageDomain pageDomain = new PageDomain();
         pageDomain.setPageSize(page.getSize());
         pageDomain.setPageNumber(page.getNumber());

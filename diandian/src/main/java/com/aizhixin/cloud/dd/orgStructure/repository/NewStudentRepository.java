@@ -14,7 +14,7 @@ public interface NewStudentRepository extends MongoRepository<NewStudent, String
 
     public List<NewStudent> findByOrgIdAndProfessionalNameAndSexAndNameLike(Long orgId, String professionalName, String sex, String name);
 
-    public Page<NewStudent> findByNameContainingOrIdNumberContainingAndOrgId(Pageable pageable, String name, String idNumber, Long orgId);
+    public Page<NewStudent> findByOrgIdAndNameRegexOrOrgIdAndIdNumberRegex(Pageable pageable, Long orgId, String name,Long orgId2, String idNumber);
 
     public List<NewStudent> findByStuIdIn(List<Long> userIds);
 
