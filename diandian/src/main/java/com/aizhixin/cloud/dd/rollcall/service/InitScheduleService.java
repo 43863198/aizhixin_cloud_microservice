@@ -467,7 +467,8 @@ public class InitScheduleService {
         }
         Schedule schedule = scheduleRollCall.getSchedule();
         Long teachingclassId = schedule.getTeachingclassId();
-        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId);
+        Date date = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
+        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, date);
         if (null == studentList) {
             log.info("根据教学班id获取学生列表信息为空!" + schedule.getId());
             return false;

@@ -65,7 +65,7 @@ public class StudentService {
         return null;
     }
 
-    public List<StudentDTO> listStudents2(Long teachingClassesId) {
+    public List<StudentDTO> listStudents2(Long teachingClassesId, Date date) {
         String str = orgManagerRemoteService.listNotIncludeException(teachingClassesId, 1, Integer.MAX_VALUE);
         if (null == str) {
             return null;
@@ -95,7 +95,7 @@ public class StudentService {
                 ids.add(studentDTO.getStudentId());
             }
             try {
-                List<Leave> leaves = leaveRepository.findByLeavePUblicAndStatusAndDeleteFlagAndStudentIdIn(LeaveConstants.TYPE_PU, LeaveConstants.STATUS_PASS, DataValidity.VALID.getState(), new Date(), ids);
+                List<Leave> leaves = leaveRepository.findByLeavePUblicAndStatusAndDeleteFlagAndStudentIdIn(LeaveConstants.TYPE_PU, LeaveConstants.STATUS_PASS, DataValidity.VALID.getState(), date, ids);
                 if (leaves != null && leaves.size() > 0) {
                     Map<Long, Boolean> idMap = new HashMap<>();
                     for (Leave l : leaves) {
