@@ -335,8 +335,8 @@ public class LeaveService {
     private String getStartPeriodTime(List<Map<String, Object>> list, Long id) {
         if (list != null && list.size() > 0) {
             for (Map<String, Object> m : list) {
-                if (m.get("id").equals(id)) {
-                    return list.get(0).get("startTime").toString();
+                if (Integer.parseInt(m.get("id").toString()) == id) {
+                    return m.get("startTime").toString();
                 }
             }
         }
@@ -347,8 +347,8 @@ public class LeaveService {
         if (list != null && list.size() > 0) {
             Collections.reverse(list);
             for (Map<String, Object> m : list) {
-                if (m.get("id").equals(id)) {
-                    String str = list.get(0).get("endTime").toString();
+                if (Integer.parseInt(m.get("id").toString()) == id) {
+                    String str = m.get("endTime").toString();
                     Collections.reverse(list);
                     return str;
                 }
@@ -599,7 +599,6 @@ public class LeaveService {
             Set<Long> ids = new HashSet<>();
             if (leave.getRequestType().equals(LeaveConstants.TYPE_DAY)) {
                 List<Date> manyDate = DateFormatUtil.getMonthBetweenDate(leave.getStartTime(), leave.getEndTime());
-                int i = 0;
                 for (Date schoolDay : manyDate) {
                     if (!DateFormatUtil.compareDate(schoolDay, DateFormatUtil.parse((DateFormatUtil.formatShort(new Date()) + " 23:59:59"), DateFormatUtil.FORMAT_LONG))) {
                         // 从平台获取排课
@@ -714,7 +713,6 @@ public class LeaveService {
                             }
                         }
                     }
-                    i++;
                 }
             } else if (leave.getRequestType().equals(LeaveConstants.TYPE_PERIOD)) {
                 Map map = getBetweenStartAndEndPeriodId(account.getOrganId(), leave.getStartPeriodId(), leave.getEndPeriodId());
