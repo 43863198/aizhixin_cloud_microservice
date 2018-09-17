@@ -620,7 +620,7 @@ public class LeaveService {
                         for (Schedule schedule : scheduleList) {
                             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(schedule.getId());
                             if (null != scheduleRollCall && scheduleRollCall.getIsOpenRollcall()) {
-                                if (leave.getStartPeriodId() != null && leave.getEndPeriodId() != null) {
+                                if (leave.getStartPeriodId() != null) {
                                     boolean inClass = scheduleRollCall.getIsInClassroom();
                                     if (DateFormatUtil.formatShort(schoolDay).equals(DateFormatUtil.formatShort(leave.getStartTime()))) {
                                         if (scheduleRollCall.getSchedule().getPeriodId() >= leave.getStartPeriodId() || inClass) {
@@ -641,7 +641,7 @@ public class LeaveService {
                                             }
                                         }
                                     } else if (DateFormatUtil.formatShort(schoolDay).equals(DateFormatUtil.formatShort(leave.getEndTime()))) {
-                                        if (leave.getEndPeriodId() >= scheduleRollCall.getSchedule().getPeriodId() || inClass) {
+                                        if (leave.getEndPeriodId() != null && (leave.getEndPeriodId() >= scheduleRollCall.getSchedule().getPeriodId() || inClass)) {
                                             scheduleRollCallIds.add(scheduleRollCall.getId());
                                             if (inClass) {
                                                 // 课堂内，需要去redis库中修改签到状态。
