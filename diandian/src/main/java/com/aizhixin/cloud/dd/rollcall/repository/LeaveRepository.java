@@ -33,7 +33,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long>, JpaSpecific
     @Query(value = "SELECT * FROM `dd_leave` WHERE student_id IN (?1) AND start_date =CURRENT_DATE", nativeQuery = true)
     public List<Leave> findAllByStudentIdWithCurrentDate(Set<Long> ids);
 
-    public List<Leave> findByDeleteFlagAndStartTimeIsNullOrOrgIdIsNull(Integer deleteFlage);
+    public List<Leave> findByDeleteFlagAndStartTimeIsNullOrEndTimeIsNullOrOrgIdIsNull(Integer deleteFlage);
 
     @Query(value = "select new com.aizhixin.cloud.dd.rollcall.domain.LeaveDomain(id, studentId, studentName, headTeacherId, teacherName, startTime, endTime, className, requestContent, status, leavePublic, leaveType) FROM #{#entityName} t where t.orgId=:orgId and t.status=:status and t.leavePublic=:leavePublic and t.leaveType=:leaveType and t.deleteFlag=:deleteFlag and (t.studentName LIKE CONCAT('%',:studentName,'%') or t.studentJobNum LIKE CONCAT('%',:studentName,'%')) and (t.teacherName LIKE CONCAT('%',:teacherName,'%') or t.teacherJobNum LIKE CONCAT('%',:teacherName,'%')) and t.className LIKE CONCAT('%',:className,'%')")
     public Page<LeaveDomain> findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(Pageable pageable, @Param("orgId") Long  orgId, @Param("status") String status, @Param("leavePublic") Integer leavePublic, @Param("leaveType") Integer leaveType, @Param("deleteFlag") Integer deleteFlag, @Param("studentName") String studentName, @Param("teacherName") String teacherName, @Param("className") String className);
