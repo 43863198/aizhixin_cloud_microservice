@@ -180,6 +180,10 @@ public class LeaveServiceV2 {
         put3.put("type", LeaveConstants.TYPE_PU_GS);
         put3.put("name", "公事");
         puList.add(put3);
+        Map<String, Object> put35 = new HashMap<>();
+        put35.put("type", LeaveConstants.TYPE_PU_QT);
+        put35.put("name", "其它");
+        puList.add(put35);
         result.put("公假", puList);
         List<Map<String, Object>> prList = new ArrayList<>();
         Map<String, Object> put4 = new HashMap<>();
@@ -190,6 +194,10 @@ public class LeaveServiceV2 {
         put5.put("type", LeaveConstants.TYPE_PR_SJ);
         put5.put("name", "事假");
         prList.add(put5);
+        Map<String, Object> put55 = new HashMap<>();
+        put55.put("type", LeaveConstants.TYPE_PR_QT);
+        put55.put("name", "其它");
+        puList.add(put55);
         result.put("私假", prList);
         return result;
     }
