@@ -118,6 +118,14 @@ public class CounselorRollcallStudentService {
                         reportList = new ArrayList<>();
                         StuRollcallReportDomainV2 domainV2 = typeStuRollcallReportDomainV2(signIn, alarmClock, rollcall.getId());
                         reportList.add(domainV2);
+                        if (alarmClock != null) {
+                            item.setAlarmTime(alarmClock.getClockTime());
+                            item.setAlarmModel(alarmClock.getClockMode());
+                            item.setFirstTime(alarmClock.getClockTime());
+                            item.setLateTime(alarmClock.getLateTime());
+                            item.setSecondTime(alarmClock.getSecondTime());
+                            item.setEndTime(alarmClock.getEndTime());
+                        }
                     } else {
                         if (reportList == null) {
                             reportList = new ArrayList<>();
