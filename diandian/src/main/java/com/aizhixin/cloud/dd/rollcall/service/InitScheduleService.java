@@ -473,7 +473,7 @@ public class InitScheduleService {
             log.info("根据教学班id获取学生列表信息为空!" + schedule.getId());
             return false;
         }
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
+        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, date);
         RollCall rollCall = null;
         Map<Long, RollCall> rollCallMap = new HashMap();
         for (StudentDTO dto : studentList) {
