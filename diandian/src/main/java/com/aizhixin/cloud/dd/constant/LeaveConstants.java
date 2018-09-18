@@ -41,11 +41,13 @@ public interface LeaveConstants {
     Integer TYPE_PU_SX = 10;
     Integer TYPE_PU_ZS = 20;
     Integer TYPE_PU_GS = 30;
+    Integer TYPE_PU_QT = 35;
     /**
      * 类型：私假
      */
     Integer TYPE_PR = 0;
     Integer TYPE_PR_BJ = 40;
     Integer TYPE_PR_SJ = 50;
+    Integer TYPE_PR_QT = 55;
 
 }
