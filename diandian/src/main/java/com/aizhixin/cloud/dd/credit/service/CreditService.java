@@ -415,7 +415,11 @@ public class CreditService {
                     BeanUtils.copyProperties(credit, credit1);
                     credit1.setRatingPersonList(personList);
                     CreditClass cc = new CreditClass();
-                    BeanUtils.copyProperties(cc, creditClass);
+                    cc.setId(creditClass.getId());
+                    cc.setCommitCount(creditClass.getCommitCount());
+                    cc.setClassName(creditClass.getClassName());
+                    cc.setClassId(creditClass.getClassId());
+                    cc.setCreatedDate(creditClass.getCreatedDate());
                     cc.setCredit(credit1);
                     result.add(cc);
                 }
