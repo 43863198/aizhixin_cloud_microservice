@@ -1282,7 +1282,7 @@ public class RollCallService {
             log.info("根据教学班id获取学生列表信息为空!");
             return;
         }
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(scheduleId);
+        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, date);
         RollCall rollCall = null;
         List list = new ArrayList();
         for (StudentDTO dto : studentList) {

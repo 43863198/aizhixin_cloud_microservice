@@ -155,7 +155,7 @@ public class LeaveService {
                 audiences.add(dto);
             } else if (requestType.equals(LeaveConstants.TYPE_PERIOD)) {
                 Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), startPeriodId), "yyyy-MM-dd HH:mm");
-                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), endPeriodId), "yyyy-MM-dd HH:mm");
+                Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), endPeriodId), "yyyy-MM-dd HH:mm");
                 String duration = getDuration(endTime, startTime);
                 Leave l = new Leave();
                 l.setHeadTeacherId(headTeacherId);
@@ -266,7 +266,7 @@ public class LeaveService {
                         }
                         for (IdNameDomain idNameDomain : idNameDomains) {
                             Date startTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getStartPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
-                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
+                            Date endTime = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDay) + " " + getEndPeriodTime((List<Map<String, Object>>) periodMap.get("data"), ddds.getPeriodId()), "yyyy-MM-dd HH:mm");
                             String duration = getDuration(endTime, startTime);
 
                             Leave l = new Leave();

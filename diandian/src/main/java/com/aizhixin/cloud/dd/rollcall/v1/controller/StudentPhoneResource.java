@@ -289,14 +289,13 @@ public class StudentPhoneResource {
         }
         Map<String, Object> resBody = new HashMap<>();
         if (requestType.equals(LeaveConstants.TYPE_DAY) && endDate == null) {
-            resBody.put(ApiReturnConstants.MESSAGE,                    "if requestType was 'day' then endDate must be required");
+            resBody.put(ApiReturnConstants.MESSAGE, "if requestType was 'day' then endDate must be required");
             resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             return new ResponseEntity<Object>(resBody, HttpStatus.BAD_REQUEST);
         }
         if (requestType.equals(LeaveConstants.TYPE_PERIOD)
                 && (startPeriodId == null || endPeriodId == null)) {
-            resBody.put(                    ApiReturnConstants.MESSAGE,
-                    "if requestType was 'period' then endPeriodId and startPeriodId must be required");
+            resBody.put(ApiReturnConstants.MESSAGE, "if requestType was 'period' then endPeriodId and startPeriodId must be required");
             resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             return new ResponseEntity<Object>(resBody, HttpStatus.BAD_REQUEST);
         }
@@ -312,10 +311,7 @@ public class StudentPhoneResource {
                 headTeacherName = String.valueOf(teacherMap.get("name"));
             }
         }
-        Object res = leaveService.requestLeave(account, isLeaveSchoole,
-                requestType, startPeriodId, endPeriodId, startDate, endDate,
-                content, headTeacherId, headTeacherName, accessToken, null);
-
+        Object res = leaveService.requestLeave(account, isLeaveSchoole, requestType, startPeriodId, endPeriodId, startDate, endDate, content, headTeacherId, headTeacherName, accessToken, null);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
