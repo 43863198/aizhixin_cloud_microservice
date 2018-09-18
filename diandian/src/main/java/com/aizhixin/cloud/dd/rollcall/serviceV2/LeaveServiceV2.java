@@ -59,7 +59,7 @@ public class LeaveServiceV2 {
 
     @Async
     public void initLeaveData() {
-        List<Leave> leaves = leaveRepository.findByDeleteFlagAndStartTimeIsNullOrOrgIdIsNull(DataValidity.VALID.getState());
+        List<Leave> leaves = leaveRepository.findByDeleteFlagAndStartTimeIsNullOrEndTimeIsNullOrOrgIdIsNull(DataValidity.VALID.getState());
         Map<Long, UserInfo> userInfoMap = new HashMap<>();
         Map<Long, Map<String, Object>> periodMap = new HashMap<>();
         for (Leave leave : leaves) {
@@ -67,6 +67,12 @@ public class LeaveServiceV2 {
                 UserInfo stu = getUserInfo(userInfoMap, leave.getStudentId());
                 if (stu != null) {
                     leave.setOrgId(stu.getOrgId());
+                }
+                if(leave.getEndTime() == null && leave.getRequestType().equals(LeaveConstants.TYPE_PERIOD)){
+                    Map<String, Object> endp = getPeriod(periodMap, leave.getEndPeriodId());
+                    if (endp != null) {
+                        leave.setEndTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getStartDate()) + " " + endp.get("endTime"), DateFormatUtil.FORMAT_MINUTE));
+                    }
                 }
             } else {
                 if (leave.getRequestType().equals(LeaveConstants.TYPE_DAY)) {
@@ -93,10 +99,10 @@ public class LeaveServiceV2 {
                 if (teacher != null) {
                     leave.setTeacherJobNum(teacher.getJobNum());
                 }
-                if (leave.getStartTime() != null && leave.getEndTime() != null) {
-                    String duration = getDuration(leave.getEndTime(), leave.getStartTime());
-                    leave.setDuration(duration);
-                }
+            }
+            if (leave.getStartTime() != null && leave.getEndTime() != null) {
+                String duration = getDuration(leave.getEndTime(), leave.getStartTime());
+                leave.setDuration(duration);
             }
             leaveRepository.save(leave);
         }
