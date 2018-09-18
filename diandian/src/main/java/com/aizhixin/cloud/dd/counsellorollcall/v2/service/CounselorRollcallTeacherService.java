@@ -726,6 +726,10 @@ public class CounselorRollcallTeacherService {
         String alarmModel = rule.getDays();
 
         AlarmClock alarmClock = clockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
+        if(alarmClock == null){
+            alarmClock = new AlarmClock();
+            alarmClock.setTempGroup(tempGroup);
+        }
         alarmClock.setClockTime(alarmTime);
         alarmClock.setClockMode(alarmModel);
         alarmClock.setLateTime(lateTime);

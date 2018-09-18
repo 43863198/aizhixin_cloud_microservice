@@ -3,12 +3,19 @@ package com.aizhixin.cloud.dd;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.aizhixin.cloud.dd.approve.services.AdjustCourseScheduleRecordService;
+import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.communication.jdbcTemplate.StudentSignRollJdbc;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
+import com.aizhixin.cloud.dd.rollcall.dto.StudentDTO;
+import com.aizhixin.cloud.dd.rollcall.entity.Schedule;
+import com.aizhixin.cloud.dd.rollcall.repository.ScheduleRepository;
+import com.aizhixin.cloud.dd.rollcall.service.StudentLeaveScheduleService;
+import com.aizhixin.cloud.dd.rollcall.service.StudentService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -36,64 +43,77 @@ import lombok.Data;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Main.class)
 public class xgTest {
-	@Autowired
-	private QuestionnaireAssginStudentsRepository questionnaireAssginStudentsRepository;
-	@Autowired
-	private UserInfoRepository userInfoRepository;
-	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
-	@Autowired
-	private RedisTemplate< String, String> redisTemplate;
-	@Autowired
-	private PaycallbackClient paycallbackClient;
-	@Autowired
-	private DistributeLock dis;
-	@Autowired
-	private PushService pushService;
-	@Autowired
-	private StudentSignRollJdbc studentSignRollJdbc;
-	@Autowired
-	private SmsService smsService;
-	@Autowired
-	private AdjustCourseScheduleRecordService adjustCourseScheduleRecordService;
-	@Autowired
-	private OrgManagerRemoteClient orgManagerRemoteClient;
-	@Test
-	public void tt() {
-		smsService.sendSms("18328029743", "[知新教师] 夏根发起了调停课审批申请，等待您的审批");
-	}
-	@Data
-	class TeachingClassTeachersDomain{
-		List<Long> ids;
-		Long teachingClassId;
-		
-	}
-	
-	@Test
-	public void TestHttpClient() throws ClientProtocolException, IOException {
-		HttpClient hc=HttpClients.createDefault();
-		HttpPost hp=new HttpPost("http://gateway.aizhixintest.com:80/org-manager/v1/teachingclassstudent/add");
-		TeachingClassTeachersDomain t=new TeachingClassTeachersDomain();
-		List<Long> ids=new ArrayList<>();
-		ids.add(1l);
-		t.setTeachingClassId(138L);
-		t.setIds(ids);
-		ObjectMapper om=new ObjectMapper();
-		StringEntity s=new StringEntity(om.writeValueAsString(t), Charset.forName("UTF-8"));
-		s.setContentType("application/json");
-		hp.setEntity(s);
-		HttpResponse re=hc.execute(hp);
-		System.out.println(re.getStatusLine().getStatusCode());
-		System.out.println(re.getEntity());
-	}
-	
-	@Test
-	public void ttt() throws InterruptedException {
-		Long a=System.currentTimeMillis();
-		stringRedisTemplate.opsForList().rightPush("ffff","12312");
-		stringRedisTemplate.opsForList().rightPush("ffff","12");
-		Long b=System.currentTimeMillis();
-		System.out.println(b-a);
-		System.out.println(stringRedisTemplate.opsForList().leftPop("ffff"));
-	}
+    @Autowired
+    private QuestionnaireAssginStudentsRepository questionnaireAssginStudentsRepository;
+    @Autowired
+    private UserInfoRepository userInfoRepository;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    private PaycallbackClient paycallbackClient;
+    @Autowired
+    private DistributeLock dis;
+    @Autowired
+    private PushService pushService;
+    @Autowired
+    private StudentSignRollJdbc studentSignRollJdbc;
+    @Autowired
+    private SmsService smsService;
+    @Autowired
+    private AdjustCourseScheduleRecordService adjustCourseScheduleRecordService;
+    @Autowired
+    private OrgManagerRemoteClient orgManagerRemoteClient;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+    @Autowired
+    private StudentLeaveScheduleService studentLeaveScheduleService;
+
+    @Test
+    public void ttttt() {
+        Schedule schedule = scheduleRepository.findOne(203284L);
+        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
+        System.out.println(studentLeaves);
+    }
+
+    @Test
+    public void tt() {
+        smsService.sendSms("18328029743", "[知新教师] 夏根发起了调停课审批申请，等待您的审批");
+    }
+
+    @Data
+    class TeachingClassTeachersDomain {
+        List<Long> ids;
+        Long teachingClassId;
+
+    }
+
+    @Test
+    public void TestHttpClient() throws ClientProtocolException, IOException {
+        HttpClient hc = HttpClients.createDefault();
+        HttpPost hp = new HttpPost("http://gateway.aizhixintest.com:80/org-manager/v1/teachingclassstudent/add");
+        TeachingClassTeachersDomain t = new TeachingClassTeachersDomain();
+        List<Long> ids = new ArrayList<>();
+        ids.add(1l);
+        t.setTeachingClassId(138L);
+        t.setIds(ids);
+        ObjectMapper om = new ObjectMapper();
+        StringEntity s = new StringEntity(om.writeValueAsString(t), Charset.forName("UTF-8"));
+        s.setContentType("application/json");
+        hp.setEntity(s);
+        HttpResponse re = hc.execute(hp);
+        System.out.println(re.getStatusLine().getStatusCode());
+        System.out.println(re.getEntity());
+    }
+
+    @Test
+    public void ttt() throws InterruptedException {
+        Long a = System.currentTimeMillis();
+        stringRedisTemplate.opsForList().rightPush("ffff", "12312");
+        stringRedisTemplate.opsForList().rightPush("ffff", "12");
+        Long b = System.currentTimeMillis();
+        System.out.println(b - a);
+        System.out.println(stringRedisTemplate.opsForList().leftPop("ffff"));
+    }
 }
