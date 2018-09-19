@@ -206,7 +206,9 @@ public class LeaveServiceV2 {
                                Long headTeacherId, String headTeacherName, String accessToken, List<AppealFile> files) {
         String leavePictureUrls = "";
         String requestType = LeaveConstants.TYPE_DAY;
-        if (endTime.getTime() - startTime.getTime() < 1000 * 60 * 60 * 24) {
+        Date startDay = DateFormatUtil.parseDay(DateFormatUtil.formatShort(startTime));
+        Date endDay = DateFormatUtil.parseDay(DateFormatUtil.formatShort(endTime));
+        if (startDay.equals(endDay)) {
             requestType = LeaveConstants.TYPE_PERIOD;
         }
         Integer leavePublic = LeaveConstants.TYPE_PR;
@@ -214,8 +216,6 @@ public class LeaveServiceV2 {
             leavePublic = LeaveConstants.TYPE_PU;
         }
         String duration = getDuration(endTime, startTime);
-        Date startDay = DateFormatUtil.parseDay(DateFormatUtil.formatShort(startTime));
-        Date endDay = DateFormatUtil.parseDay(DateFormatUtil.formatShort(endTime));
         try {
             if (files != null && files.size() > 0) {
                 for (int i = 0; i < files.size(); i++) {
