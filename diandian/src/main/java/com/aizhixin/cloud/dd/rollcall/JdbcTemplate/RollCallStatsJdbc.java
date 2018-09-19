@@ -18,7 +18,7 @@ public class RollCallStatsJdbc {
     }
 
     public List<Map<String, Object>> getStuStatsByStuId(Long orgId, Long semesterId, Long stuId) {
-        String sql = "SELECT STUDENT_ID, STUDENT_NUM, STUDENT_NAME, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount  FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND org_id=" + orgId + " AND SEMESTER_ID=" + semesterId + " AND STUDENT_ID="+stuId;
+        String sql = "SELECT STUDENT_ID, STUDENT_NUM, STUDENT_NAME, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount  FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND org_id=" + orgId + " AND SEMESTER_ID=" + semesterId + " AND STUDENT_ID=" + stuId;
         return jdbcTemplate.queryForList(sql);
     }
 
@@ -39,6 +39,11 @@ public class RollCallStatsJdbc {
 
     public List<Map<String, Object>> getTeachingClassStatsHistory(Long teachingClassId, Long semesterId) {
         String sql = "SELECT TEACHINGCLASS_ID, DATE_FORMAT(CREATED_DATE,'%Y-%m-%d') date, COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND TEACHINGCLASS_ID=" + teachingClassId + " AND SEMESTER_ID=" + semesterId + " GROUP BY SCHEDULE_ROLLCALL_ID";
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> getStatsByStuIdsAndDate(String ids, String startDate, String endDate) {
+        String sql = "SELECT COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND dr.STUDENT_ID IN (" + ids + ") AND DATE_FORMAT(dr.CREATED_DATE, '%Y-%m-%d') >= '" + startDate + "' AND DATE_FORMAT(dr.CREATED_DATE,'%Y-%m-%d') <= '" + endDate + "'";
         return jdbcTemplate.queryForList(sql);
     }
 }
