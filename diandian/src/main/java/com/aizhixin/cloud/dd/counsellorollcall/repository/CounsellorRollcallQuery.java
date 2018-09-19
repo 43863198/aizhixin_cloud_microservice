@@ -26,8 +26,8 @@ public class CounsellorRollcallQuery {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public void updateByStudentIdAndDate(Long stuId, String startDate, String endDate){
-        String sql = "UPDATE dd_studentsignin SET DELETE_FLAG=0 WHERE DELETE_FLAG=0 AND STUDENT_ID='\"+stuId+\"' AND COUNSERLLORROLLCALL_ID IN (SELECT dcc.ID FROM dd_counsellorrollcall dcc WHERE dcc.DELETE_FLAG=0 AND ((dcc.TEMPGROUP_ID IN (SELECT dtg.ID FROM dd_tempgroup dtg WHERE dtg.DELETE_FLAG=0 AND dtg.rollcall_num=1) AND DATE_FORMAT(dcc.open_time,'%Y-%m-%d %h:%i')>='\"+startDate+\"' AND DATE_FORMAT(dcc.open_time,'%Y-%m-%d %h:%i')<='\"+endDate+\"') OR dcc.TEMPGROUP_ID IN (SELECT dtg.ID FROM dd_tempgroup dtg LEFT JOIN dd_alarmclock da ON da.TEMPGROUP_ID=dtg.id WHERE dtg.DELETE_FLAG=0 AND dtg.rollcall_num=2 AND CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d '),da.CLOCK_TIME)>='\"+startDate+\"' AND CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d '),da.END_TIME)<='\"+endDate+\"')));";
+    public void updateByStudentIdAndDate(Long stuId, String startDate, String endDate) {
+        String sql = "UPDATE dd_studentsignin SET DELETE_FLAG=0 WHERE DELETE_FLAG=0 AND STUDENT_ID='" + stuId + "' AND COUNSERLLORROLLCALL_ID IN (SELECT dcc.ID FROM dd_counsellorrollcall dcc WHERE dcc.DELETE_FLAG=0 AND ((dcc.TEMPGROUP_ID IN (SELECT dtg.ID FROM dd_tempgroup dtg WHERE dtg.DELETE_FLAG=0 AND dtg.rollcall_num=1) AND DATE_FORMAT(dcc.open_time,'%Y-%m-%d %h:%i')>='" + startDate + "' AND DATE_FORMAT(dcc.open_time,'%Y-%m-%d %h:%i')<='" + endDate + "') OR dcc.TEMPGROUP_ID IN (SELECT dtg.ID FROM dd_tempgroup dtg LEFT JOIN dd_alarmclock da ON da.TEMPGROUP_ID=dtg.id WHERE dtg.DELETE_FLAG=0 AND dtg.rollcall_num=2 AND CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d '),da.CLOCK_TIME)>='" + startDate + "' AND CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d '),da.END_TIME)<='" + endDate + "')));";
         jdbcTemplate.update(sql);
     }
 
