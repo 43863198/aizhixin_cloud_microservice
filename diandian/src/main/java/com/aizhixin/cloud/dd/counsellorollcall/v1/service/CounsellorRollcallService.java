@@ -7,11 +7,17 @@ import java.util.*;
 import com.aizhixin.cloud.dd.common.core.ApiReturn;
 import com.aizhixin.cloud.dd.common.core.PageUtil;
 import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
+import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
+import com.aizhixin.cloud.dd.constant.LeaveConstants;
 import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallStatisticsDTO;
+import com.aizhixin.cloud.dd.counsellorollcall.entity.AlarmClock;
+import com.aizhixin.cloud.dd.counsellorollcall.repository.AlarmClockRepository;
 import com.aizhixin.cloud.dd.counsellorollcall.repository.CounsellorRollcallQuery;
 import com.aizhixin.cloud.dd.counsellorollcall.repository.TempGroupRepository;
 import com.aizhixin.cloud.dd.counsellorollcall.utils.CounsellorStatus;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
+import com.aizhixin.cloud.dd.rollcall.entity.Leave;
+import com.aizhixin.cloud.dd.rollcall.repository.LeaveRepository;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,31 +50,28 @@ public class CounsellorRollcallService {
     @Lazy
     @Autowired
     private StudentSubGroupService studentSubGroupService;
-
     @Lazy
     @Autowired
     private TempGroupService tempGroupService;
-
     @Autowired
     private TempGroupRepository tempGroupRepository;
-
     @Lazy
     @Autowired
     private StudentSignInService studentSignInService;
-
     @Lazy
     @Autowired
     private OrgManagerRemoteClient orgManagerRemoteService;
-
     @Autowired
     private CounsellorRollcallQuery counsellorRollcallQuery;
-
     @Lazy
     @Autowired
     private CounsellorRedisService counsellorRedisService;
-
     @Autowired
     private RedisTokenStore redisTokenStore;
+    @Autowired
+    private LeaveRepository leaveRepository;
+    @Autowired
+    private AlarmClockRepository alarmClockRepository;
 
     /**
      * 添加点名记录
@@ -87,10 +90,29 @@ public class CounsellorRollcallService {
         for (StudentSubGroup studentSubGroup : studentSubGroups) {
             studentIds.add(studentSubGroup.getStudentId());
         }
+
         CounsellorRollcall conunsellorRollcall = new CounsellorRollcall(tempGroup, tempGroup.getTeacherId(), tempGroup.getTeacherName(), new Timestamp(System.currentTimeMillis()), Boolean.TRUE);
         conunsellorRollcall = counsellorRollcallRepository.save(conunsellorRollcall);
+
+        List<Leave> leaves = null;
+        if (tempGroup.getRollcallNum() != null && tempGroup.getRollcallNum() > 1) {
+            AlarmClock alarmClock = alarmClockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
+            if (alarmClock != null) {
+                leaves = leaveRepository.findByStatusAndDeleteFlagAndStudentIdIn2(LeaveConstants.STATUS_PASS, DataValidity.VALID.getState(), DateFormatUtil.parse2(DateFormatUtil.formatShort(new Date()) + " " + alarmClock.getClockTime(), DateFormatUtil.FORMAT_MINUTE), DateFormatUtil.parse2(DateFormatUtil.formatShort(new Date()) + " " + alarmClock.getEndTime(), DateFormatUtil.FORMAT_MINUTE), studentIds);
+            }
+        } else {
+            leaves = leaveRepository.findByStatusAndDeleteFlagAndStudentIdIn(LeaveConstants.STATUS_PASS, DataValidity.VALID.getState(), conunsellorRollcall.getOpenTime(), studentIds);
+        }
+        Map<Long, Boolean> leaveMap = null;
+        if (leaves != null && leaves.size() > 0) {
+            leaveMap = new HashMap<>();
+            for (Leave leave : leaves) {
+                leaveMap.put(leave.getStudentId(), Boolean.TRUE);
+            }
+        }
+
         redisTokenStore.storeGroupId(conunsellorRollcall.getId(), tempGroup.getId());
-        studentSignInService.save(accessToken, conunsellorRollcall, studentIds, tempGroup.getOrgId(), tempGroup.getRollcallNum());
+        studentSignInService.save(accessToken, conunsellorRollcall, studentIds, tempGroup.getOrgId(), tempGroup.getRollcallNum(), leaveMap);
     }
 
     /**
