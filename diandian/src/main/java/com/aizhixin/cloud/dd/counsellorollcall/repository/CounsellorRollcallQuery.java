@@ -2,12 +2,14 @@ package com.aizhixin.cloud.dd.counsellorollcall.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.counsellorollcall.domain.*;
 import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallStatisticsDTO;
+import com.aizhixin.cloud.dd.counsellorollcall.entity.CounsellorRollcall;
 import com.aizhixin.cloud.dd.counsellorollcall.utils.CounsellorRollCallEnum;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,11 @@ public class CounsellorRollcallQuery {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    public void updateByStudentIdAndDate(Long stuId, String startDate, String endDate){
+        String sql = "UPDATE dd_studentsignin SET DELETE_FLAG=0 WHERE DELETE_FLAG=0 AND STUDENT_ID='\"+stuId+\"' AND COUNSERLLORROLLCALL_ID IN (SELECT dcc.ID FROM dd_counsellorrollcall dcc WHERE dcc.DELETE_FLAG=0 AND ((dcc.TEMPGROUP_ID IN (SELECT dtg.ID FROM dd_tempgroup dtg WHERE dtg.DELETE_FLAG=0 AND dtg.rollcall_num=1) AND DATE_FORMAT(dcc.open_time,'%Y-%m-%d %h:%i')>='\"+startDate+\"' AND DATE_FORMAT(dcc.open_time,'%Y-%m-%d %h:%i')<='\"+endDate+\"') OR dcc.TEMPGROUP_ID IN (SELECT dtg.ID FROM dd_tempgroup dtg LEFT JOIN dd_alarmclock da ON da.TEMPGROUP_ID=dtg.id WHERE dtg.DELETE_FLAG=0 AND dtg.rollcall_num=2 AND CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d '),da.CLOCK_TIME)>='\"+startDate+\"' AND CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d '),da.END_TIME)<='\"+endDate+\"')));";
+        jdbcTemplate.update(sql);
+    }
 
     public List<DailyStatisticsStuDomain> findDailyStatisticsStu(Long stuId, Long groupId, String date) {
         String sql = "SELECT ds.* FROM dd_studentsignin ds WHERE ds.DELETE_FLAG=0 AND ds.STUDENT_ID=" + stuId + " AND ds.COUNSERLLORROLLCALL_ID IN (SELECT dc.id FROM dd_counsellorrollcall dc WHERE dc.DELETE_FLAG=0 AND dc.TEMPGROUP_ID=" + groupId + ") AND DATE_FORMAT(ds.CREATED_DATE,'%Y-%m-%d')='" + date + "'";

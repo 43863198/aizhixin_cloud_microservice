@@ -46,4 +46,10 @@ public interface LeaveRepository extends JpaRepository<Leave, Long>, JpaSpecific
 
     @Query(value = "select t from #{#entityName} t where t.leavePublic=:leavePublic and t.status=:status and t.deleteFlag=:deleteFlag and t.startTime<=:date and t.endTime>=:date and studentId in (:ids)")
     public List<Leave> findByLeavePUblicAndStatusAndDeleteFlagAndStudentIdIn(@Param("leavePublic") Integer leavePublic, @Param("status") String status, @Param("deleteFlag") Integer deleteFlag, @Param("date") Date date, @Param("ids") Set<Long> ids);
+
+    @Query(value = "select t from #{#entityName} t where t.status=:status and t.deleteFlag=:deleteFlag and t.startTime<=:date and t.endTime>=:date and studentId in (:ids)")
+    public List<Leave> findByStatusAndDeleteFlagAndStudentIdIn(@Param("status") String status, @Param("deleteFlag") Integer deleteFlag, @Param("date") Date date, @Param("ids") Set<Long> ids);
+
+    @Query(value = "select t from #{#entityName} t where t.status=:status and t.deleteFlag=:deleteFlag and ((t.startTime<=:startDate and t.endTime>=:startDate) or (t.startTime<=:endDate and t.endTime>=:endDate)) and studentId in (:ids)")
+    public List<Leave> findByStatusAndDeleteFlagAndStudentIdIn2(@Param("status") String status, @Param("deleteFlag") Integer deleteFlag, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("ids") Set<Long> ids);
 }
