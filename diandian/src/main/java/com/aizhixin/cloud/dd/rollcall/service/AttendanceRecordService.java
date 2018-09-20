@@ -89,7 +89,7 @@ public class AttendanceRecordService {
                 sql.append(" AND rc.CREATED_DATE <= :endTime");
                 condition.put("endTime", date);
             }
-            
+
             if (StringUtils.isNotEmpty(teachingClassName)) {
                 cql.append(" AND s.TEACHINGCLASS_NAME like :teachingClassName");
                 sql.append(" AND s.TEACHINGCLASS_NAME like :teachingClassName");

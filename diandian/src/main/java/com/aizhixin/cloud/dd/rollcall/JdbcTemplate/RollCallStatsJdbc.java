@@ -43,7 +43,8 @@ public class RollCallStatsJdbc {
     }
 
     public List<Map<String, Object>> getStatsByStuIdsAndDate(String ids, String startDate, String endDate) {
-        String sql = "SELECT COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND dr.STUDENT_ID IN (" + ids + ") AND DATE_FORMAT(dr.CREATED_DATE, '%Y-%m-%d') >= '" + startDate + "' AND DATE_FORMAT(dr.CREATED_DATE,'%Y-%m-%d') <= '" + endDate + "'";
+//        String sql = "SELECT COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND dr.STUDENT_ID IN (" + ids + ") AND DATE_FORMAT(dr.CREATED_DATE, '%Y-%m-%d') >= '" + startDate + "' AND DATE_FORMAT(dr.CREATED_DATE,'%Y-%m-%d') <= '" + endDate + "'";
+        String sql = "SELECT COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND dr.STUDENT_ID IN (" + ids + ") AND dr.SCHEDULE_ROLLCALL_ID IN (SELECT dsr.ID FROM dd_schedule_rollcall dsr WHERE dsr.DELETE_FLAG=0 AND DATE_FORMAT(dsr.CREATED_DATE, '%Y-%m-%d') >= '" + startDate + "' AND DATE_FORMAT(dsr.CREATED_DATE,'%Y-%m-%d') <= '" + endDate + "')";
         return jdbcTemplate.queryForList(sql);
     }
 }
