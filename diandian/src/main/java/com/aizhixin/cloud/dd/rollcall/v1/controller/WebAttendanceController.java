@@ -68,7 +68,7 @@ public class WebAttendanceController {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(attendanceStatisticsService.allTeacherAttendanceByOrgId(account.getOrganId(), collegeId, teacherName, pageNumber, pageSize, beginDate, endDate), HttpStatus.OK);
+        return new ResponseEntity<>(attendanceStatisticsService.allTeacherAttendanceByOrgId(account.getOrganId(), collegeId, teacherName, pageSize, pageNumber, beginDate, endDate), HttpStatus.OK);
     }
 
     /**
