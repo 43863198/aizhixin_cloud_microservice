@@ -116,7 +116,7 @@ public class StudentSignInService {
         List<Long> userIds = new ArrayList<Long>();
         for (StudentDTO st : studentDTOS) {
             String type = CounsellorRollCallEnum.UnCommit.getType();
-            if(leaveMap != null && leaveMap.get(st.getStudentId())){
+            if (leaveMap != null && st.getStudentId() != null && leaveMap.get(st.getStudentId()) != null && leaveMap.get(st.getStudentId()) == true) {
                 type = CounsellorRollCallEnum.AskForLeave.getType();
             }
             if (isV2) {
@@ -148,7 +148,7 @@ public class StudentSignInService {
                 messageDTO.setContent("您有新的签到提醒！");
                 messageDTO.setFunction(PushMessageConstants.FUNCITON_STUDENT_NOTICE);
                 List<AudienceDTO> audienceList = new ArrayList<>();
-                for(StuTempGroupDomainV2 item: stuTempGroupDomainV2s){
+                for (StuTempGroupDomainV2 item : stuTempGroupDomainV2s) {
                     audienceList.add(new AudienceDTO(item.getStudentId(), item.getMessageId(), item));
                 }
                 messageDTO.setAudience(audienceList);
@@ -336,7 +336,7 @@ public class StudentSignInService {
                 log.info("缓存为空，从数据库获取签到信息再刷新缓存----------");
                 StudentSignIn studentSignIn = studentSignInRepository.findOne(reportDTO.getId());
                 if (studentSignIn == null || studentSignIn.getCounsellorRollcall() == null) {
-                   return ApiReturn.message(Boolean.FALSE, "获取信息异常", null);
+                    return ApiReturn.message(Boolean.FALSE, "获取信息异常", null);
                 }
                 counsellorRollCallId = studentSignIn.getCounsellorRollcall().getId();
             }
