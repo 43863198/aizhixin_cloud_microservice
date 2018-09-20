@@ -119,7 +119,7 @@ public class CounselorRollcallStudentService {
                         StuRollcallReportDomainV2 domainV2 = typeStuRollcallReportDomainV2(signIn, alarmClock, rollcall.getId());
                         reportList.add(domainV2);
                         if (alarmClock != null) {
-                            item.setAlarmTime(alarmClock.getClockTime());
+                            item.setAlarmTime(alarmClock.getStartEndTime());
                             item.setAlarmModel(alarmClock.getClockMode());
                             item.setFirstTime(alarmClock.getClockTime());
                             item.setLateTime(alarmClock.getLateTime());
