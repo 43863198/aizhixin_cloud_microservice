@@ -62,7 +62,7 @@ public class ProfessionalService {
      * @return
      */
     public Professional save(Professional professional) {
-        professional =  professionalRepository.save(professional);
+        professional = professionalRepository.save(professional);
         baseDataCacheService.cacheProfessional(new ProfessionnalDomain(professional));
         return professional;
     }
@@ -241,7 +241,7 @@ public class ProfessionalService {
     }
 
     public List<Professional> saveAll(List<Professional> professionals) {
-        professionals =  professionalRepository.save(professionals);
+        professionals = professionalRepository.save(professionals);
         List<ProfessionnalDomain> cacheList = new ArrayList<>();
         for (Professional p : professionals) {
             cacheList.add(new ProfessionnalDomain(p));
@@ -281,14 +281,17 @@ public class ProfessionalService {
     public List<String> findNamesByOrgIdAndCodes(Long orgId, Set<String> names) {
         return professionalRepository.findNamesByOrgIdAndCodeInAndDeleteFlag(orgId, names, DataValidity.VALID.getState());
     }
+
     @Transactional(readOnly = true)
     public List<Professional> findByOrgIdAndCodeIn(Long orgId, Set<String> codes) {
         return professionalRepository.findByOrgIdAndCodeInAndDeleteFlag(orgId, codes, DataValidity.VALID.getState());
     }
+
     @Transactional(readOnly = true)
     public List<Professional> findByOrgIdAndNameIn(Long orgId, Set<String> names) {
         return professionalRepository.findByOrgIdAndNameInAndDeleteFlag(orgId, names, DataValidity.VALID.getState());
     }
+
     @Transactional(readOnly = true)
     public List<Professional> findByOrgId(Long orgId) {
         return professionalRepository.findByOrgIdAndDeleteFlag(orgId, DataValidity.VALID.getState());
@@ -424,6 +427,14 @@ public class ProfessionalService {
         save(professional);
     }
 
+    public void deleteAll(Long userId, List<Long> idList) {
+        if (null != idList && !idList.isEmpty()) {
+            for (Long id : idList) {
+                delete(userId, id);
+            }
+        }
+    }
+
     /**
      * 根据学院、name、code查询专业信息
      *
@@ -457,7 +468,7 @@ public class ProfessionalService {
             chql.append(" and (c.name like :name or c.code like :name)");
             condition.put("name", "%" + name + "%");
         }
-        if(null != college) {
+        if (null != college) {
             hql.append(" and c.college = :college");
             chql.append(" and c.college = :college");
             condition.put("college", college);
