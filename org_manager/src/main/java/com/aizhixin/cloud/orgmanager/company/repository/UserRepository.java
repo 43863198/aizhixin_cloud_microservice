@@ -224,6 +224,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByProfessional_IdInAndDeleteFlagAndUserType(Set<Long> profIds,Integer deleteFlag,Integer userType);
     
-    @Query("select new com.aizhixin.cloud.orgmanager.classschedule.domain.TeachStudentDomain (c.id, c.name, c.jobNumber,c.college.id) from #{#entityName} c where c.id in (:ids)")
+    @Query("select new com.aizhixin.cloud.orgmanager.classschedule.domain.TeachStudentDomain (c.id, c.name, c.jobNumber,c.college.id,c.college.name,c.sex) from #{#entityName} c where c.id in (:ids)")
     List<TeachStudentDomain> findTeacherByIds(@Param(value = "ids") Set<Long> ids);
 }
