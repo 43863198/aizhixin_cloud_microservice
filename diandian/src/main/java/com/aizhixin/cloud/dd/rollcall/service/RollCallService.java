@@ -1276,13 +1276,14 @@ public class RollCallService {
         scheduleRollCall.setIsInClassroom(Boolean.FALSE);
         scheduleRollCallService.save(scheduleRollCall, scheduleId);
         Long teachingclassId = schedule.getTeachingclassId();
-        Date date = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
-        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, date);
+        Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
+        Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
+        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate);
         if (null == studentList) {
             log.info("根据教学班id获取学生列表信息为空!");
             return;
         }
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, date);
+        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
         RollCall rollCall = null;
         List list = new ArrayList();
         for (StudentDTO dto : studentList) {
