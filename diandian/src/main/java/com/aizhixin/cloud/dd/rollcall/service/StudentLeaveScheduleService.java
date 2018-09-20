@@ -49,9 +49,9 @@ public class StudentLeaveScheduleService {
         return stList;
     }
 
-    public List<Long> findStudentIdByScheduleId(Schedule schedule, Date date) {
+    public List<Long> findStudentIdByScheduleId(Schedule schedule, Date startDate, Date endDate) {
         List<Long> stList = null;
-        String day = DateFormatUtil.formatShort(date);
+        String day = DateFormatUtil.formatShort(startDate);
         List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findAllByScheduleId(schedule.getId());
         if (null != list && list.size() > 0) {
             stList = new ArrayList();
@@ -59,11 +59,11 @@ public class StudentLeaveScheduleService {
                 Leave leave = leaveRepository.findOne(sl.getLeaveId());
                 if (leave.getLeavePublic() == LeaveConstants.TYPE_PR) {
                     if (day.equals(DateFormatUtil.formatShort(leave.getStartTime()))) {
-                        if (date.getTime() >= leave.getStartTime().getTime()) {
+                        if (startDate.getTime() <= leave.getStartTime().getTime()) {
                             stList.add(sl.getStudentId());
                         }
                     } else if (day.equals(DateFormatUtil.formatShort(leave.getEndTime()))) {
-                        if (date.getTime() <= leave.getEndTime().getTime()) {
+                        if (endDate.getTime() >= leave.getEndTime().getTime()) {
                             stList.add(sl.getStudentId());
                         }
                     } else {
