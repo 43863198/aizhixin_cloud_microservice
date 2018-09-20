@@ -118,6 +118,19 @@ public class CollegeController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "DELETE", value = "删除学院信息", response = Void.class, notes = "删除学院信息<br><br><b>@author hsh</b>")
+    public ResponseEntity<Map<String, Object>> deleteAll(@ApiParam(value = "ID", required = true) @RequestParam List<Long> ids,
+                                                         @ApiParam(value = "接口调用用户ID", required = true) @RequestParam("userId") Long userId) {
+        Map<String, Object> result = new HashMap<>();
+        if (null == userId || userId <= 0) {
+            throw new NoAuthenticationException();
+        }
+        collegeService.deleteAll(userId, ids);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     /**
      * 获取学院信息
      *
