@@ -72,9 +72,16 @@ public class xgTest {
 
     @Test
     public void ttttt() {
-        Schedule schedule = scheduleRepository.findOne(203284L);
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
+        Schedule schedule = scheduleRepository.findOne(205592L);
+        Date date = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
+        Date date2 = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
+        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, date, date2);
         System.out.println(studentLeaves);
+        if (studentLeaves != null && studentLeaves.contains(182150L)) {
+            System.out.println(studentLeaves);
+        } else {
+            System.out.println(studentLeaves);
+        }
     }
 
     @Test
