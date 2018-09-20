@@ -59,11 +59,19 @@ public class StudentLeaveScheduleService {
                 Leave leave = leaveRepository.findOne(sl.getLeaveId());
                 if (leave.getLeavePublic() == LeaveConstants.TYPE_PR) {
                     if (day.equals(DateFormatUtil.formatShort(leave.getStartTime()))) {
-                        if (startDate.getTime() <= leave.getStartTime().getTime()) {
+                        if (startDate.getTime() >= leave.getStartTime().getTime()) {
                             stList.add(sl.getStudentId());
+                        } else if (endDate.getTime() >= leave.getStartTime().getTime()) {
+                            if (day.equals(DateFormatUtil.formatShort(leave.getEndTime()))) {
+                                if (endDate.getTime() <= leave.getEndTime().getTime()) {
+                                    stList.add(sl.getStudentId());
+                                }
+                            } else {
+                                stList.add(sl.getStudentId());
+                            }
                         }
                     } else if (day.equals(DateFormatUtil.formatShort(leave.getEndTime()))) {
-                        if (endDate.getTime() >= leave.getEndTime().getTime()) {
+                        if (endDate.getTime() <= leave.getEndTime().getTime()) {
                             stList.add(sl.getStudentId());
                         }
                     } else {
