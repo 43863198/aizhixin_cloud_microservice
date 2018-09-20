@@ -152,4 +152,5 @@
 	<include file="classpath:liquibase/changelog/201808111043_add_entity_CreditTempletQues.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809041414_update_entity_Leave.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809101044_update_entity_Leave.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809201730_update_entity_Questions.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
