@@ -3175,4 +3175,8 @@ public class UserService {
     public List<User> findProfIds(Set<Long> profIds) {
         return userRepository.findByProfessional_IdInAndDeleteFlagAndUserType(profIds, DataValidity.VALID.getState(), 70);
     }
+    
+    public List<TeachStudentDomain> findTeacherByIds(Set<Long> ids){
+    	return userRepository.findTeacherByIds(ids);
+    }
 }

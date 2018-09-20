@@ -45,6 +45,13 @@ public class TeachStudentDomain {
         this.name = name;
         this.jobNumber = jobNumber;
     }
+    
+    public TeachStudentDomain(Long id, String name, String jobNumber,Long collegeId) {
+        this.id = id;
+        this.name = name;
+        this.jobNumber = jobNumber;
+        this.collegeId = collegeId;
+    }
 
     public TeachStudentDomain(Long id, String name, String jobNumber, Long classesId, String classesName) {
         this(id, name, jobNumber);
