@@ -84,33 +84,12 @@ public class AttendanceRecordService {
             }
 
             if (endTime != null) {
-                Date date = DateFormatUtil.parse2(endTime+" 23:59:59", DateFormatUtil.FORMAT_LONG);
+                Date date = DateFormatUtil.parse2(endTime + " 23:59:59", DateFormatUtil.FORMAT_LONG);
                 cql.append(" AND rc.CREATED_DATE <= :endTime");
                 sql.append(" AND rc.CREATED_DATE <= :endTime");
                 condition.put("endTime", date);
             }
-
-//            if (null != startTime && null == endTime) {
-//                cql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') >= :startTime");
-//                sql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') >= :startTime");
-//                condition.put("startTime", startTime);
-//            }
-//            if (null != endTime && null == startTime) {
-//                cql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') <= :endTime");
-//                sql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') <= :endTime");
-//                condition.put("endTime", endTime);
-//            }
-//            if (null != startTime && null != endTime) {
-//                cql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') BETWEEN :startTime AND :endTime");
-//                sql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') BETWEEN :startTime AND :endTime");
-//                condition.put("startTime", startTime);
-//                condition.put("endTime", endTime);
-//            }
-//            if (null != startTime && null != endTime && startTime.equals(endTime)) {
-//                cql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') = :startTime");
-//                sql.append(" AND DATE_FORMAT(rc.CREATED_DATE,'%Y-%m-%d') = :startTime");
-//                condition.put("startTime", startTime);
-//            }
+            
             if (StringUtils.isNotEmpty(teachingClassName)) {
                 cql.append(" AND s.TEACHINGCLASS_NAME like :teachingClassName");
                 sql.append(" AND s.TEACHINGCLASS_NAME like :teachingClassName");
