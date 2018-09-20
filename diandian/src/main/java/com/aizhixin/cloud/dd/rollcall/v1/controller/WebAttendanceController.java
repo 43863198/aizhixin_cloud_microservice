@@ -55,6 +55,22 @@ public class WebAttendanceController {
     @Autowired
     private OrgManagerRemoteClient orgManagerRemoteService;
 
+    @RequestMapping(value = "/attendance/allTeacherAttendanceByOrgId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "辅导员到课率", response = Void.class, notes = "辅导员到课率<br>@author hsh")
+    public ResponseEntity<?> allTeacherAttendanceByOrgId(@RequestHeader("Authorization") String accessToken,
+                                                         @ApiParam(value = "院系id") @RequestParam(value = "collegeId", required = false) Long collegeId,
+                                                         @ApiParam(value = "辅导员姓名工号") @RequestParam(value = "teacherName", required = false) String teacherName,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") @ApiParam(value = "起始时间", required = true) @RequestParam(value = "beginDate", required = true) String beginDate,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") @ApiParam(value = "截至时间", required = true) @RequestParam(value = "endDate", required = true) String endDate,
+                                                         @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
+                                                         @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(attendanceStatisticsService.allTeacherAttendanceByOrgId(account.getOrganId(), collegeId, teacherName, pageSize, pageNumber, beginDate, endDate), HttpStatus.OK);
+    }
+
     /**
      * 教学班考勤 按老师
      *

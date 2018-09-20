@@ -100,7 +100,7 @@ public class StudentSignInService {
      * @param orgId
      */
 //    @Async
-    public void save(String accessToken, CounsellorRollcall conunsellorRollcall, Set<Long> studentIds, Long orgId, Integer rollcallNum) {
+    public void save(String accessToken, CounsellorRollcall conunsellorRollcall, Set<Long> studentIds, Long orgId, Integer rollcallNum, Map<Long, Boolean> leaveMap) {
         Long beginTime = System.currentTimeMillis();
         List<StudentDTO> studentDTOS = studentService.getStudentByIdsV2(studentIds);
         if (studentDTOS == null || studentDTOS.isEmpty()) {
@@ -115,10 +115,14 @@ public class StudentSignInService {
         List<PushMessage> messages = new ArrayList<PushMessage>();
         List<Long> userIds = new ArrayList<Long>();
         for (StudentDTO st : studentDTOS) {
+            String type = CounsellorRollCallEnum.UnCommit.getType();
+            if (leaveMap != null && st.getStudentId() != null && leaveMap.get(st.getStudentId()) != null && leaveMap.get(st.getStudentId()) == true) {
+                type = CounsellorRollCallEnum.AskForLeave.getType();
+            }
             if (isV2) {
-                studentSignIns.add(new StudentSignIn(conunsellorRollcall, st.getStudentId(), st.getStudentName(), st.getSutdentNum(), st.getClassesId(), st.getClassesName(), st.getProfessionalId(), st.getCollegeId(), orgId, semesterId, String.valueOf(CounsellorRollCallEnum.UnCommit.getType()), String.valueOf(CounsellorRollCallEnum.UnCommit.getType()), st.getTeachingYear()));
+                studentSignIns.add(new StudentSignIn(conunsellorRollcall, st.getStudentId(), st.getStudentName(), st.getSutdentNum(), st.getClassesId(), st.getClassesName(), st.getProfessionalId(), st.getCollegeId(), orgId, semesterId, type, type, st.getTeachingYear()));
             } else {
-                studentSignIns.add(new StudentSignIn(conunsellorRollcall, st.getStudentId(), st.getStudentName(), st.getSutdentNum(), st.getClassesId(), st.getClassesName(), st.getProfessionalId(), st.getCollegeId(), orgId, semesterId, String.valueOf(CounsellorRollCallEnum.UnCommit.getType()), st.getTeachingYear()));
+                studentSignIns.add(new StudentSignIn(conunsellorRollcall, st.getStudentId(), st.getStudentName(), st.getSutdentNum(), st.getClassesId(), st.getClassesName(), st.getProfessionalId(), st.getCollegeId(), orgId, semesterId, type, st.getTeachingYear()));
             }
             messages.add(new PushMessage(st.getStudentId(), "您有新的签到提醒！", "辅导员点名通知", PushMessageConstants.MODULE_RollCallEVER, PushMessageConstants.FUNCITON_STUDENT_NOTICE, Boolean.FALSE, new Date(), ""));
             userIds.add(st.getStudentId());
@@ -144,7 +148,7 @@ public class StudentSignInService {
                 messageDTO.setContent("您有新的签到提醒！");
                 messageDTO.setFunction(PushMessageConstants.FUNCITON_STUDENT_NOTICE);
                 List<AudienceDTO> audienceList = new ArrayList<>();
-                for(StuTempGroupDomainV2 item: stuTempGroupDomainV2s){
+                for (StuTempGroupDomainV2 item : stuTempGroupDomainV2s) {
                     audienceList.add(new AudienceDTO(item.getStudentId(), item.getMessageId(), item));
                 }
                 messageDTO.setAudience(audienceList);
@@ -332,7 +336,7 @@ public class StudentSignInService {
                 log.info("缓存为空，从数据库获取签到信息再刷新缓存----------");
                 StudentSignIn studentSignIn = studentSignInRepository.findOne(reportDTO.getId());
                 if (studentSignIn == null || studentSignIn.getCounsellorRollcall() == null) {
-                   return ApiReturn.message(Boolean.FALSE, "获取信息异常", null);
+                    return ApiReturn.message(Boolean.FALSE, "获取信息异常", null);
                 }
                 counsellorRollCallId = studentSignIn.getCounsellorRollcall().getId();
             }

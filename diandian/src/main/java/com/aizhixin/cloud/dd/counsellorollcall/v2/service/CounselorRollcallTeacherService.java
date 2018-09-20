@@ -21,12 +21,14 @@ import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.orgStructure.service.UserInfoService;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
+import com.aizhixin.cloud.dd.rollcall.entity.Leave;
 import com.aizhixin.cloud.dd.rollcall.service.ClassesService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -726,7 +728,7 @@ public class CounselorRollcallTeacherService {
         String alarmModel = rule.getDays();
 
         AlarmClock alarmClock = clockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
-        if(alarmClock == null){
+        if (alarmClock == null) {
             alarmClock = new AlarmClock();
             alarmClock.setTempGroup(tempGroup);
         }
@@ -1036,5 +1038,14 @@ public class CounselorRollcallTeacherService {
             result.put(ApiReturnConstants.MESSAGE, "无规则信息");
         }
         return result;
+    }
+
+    @Async("threadPool1")
+    public void updateLeaveRollCall(Leave leave) {
+        try {
+            rollcallQuery.updateByStudentIdAndDate(leave.getStudentId(), DateFormatUtil.format(leave.getStartTime(), DateFormatUtil.FORMAT_MINUTE), DateFormatUtil.format(leave.getEndTime(), DateFormatUtil.FORMAT_MINUTE));
+        } catch (Exception e) {
+            LOG.warn("updateLeaveRollCallException", e);
+        }
     }
 }

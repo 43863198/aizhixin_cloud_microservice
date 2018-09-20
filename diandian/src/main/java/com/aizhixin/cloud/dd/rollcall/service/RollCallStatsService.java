@@ -271,15 +271,20 @@ public class RollCallStatsService {
         }
     }
 
-    private void calculateRate(Map<String, Object> data, Integer type) {
-        String result = RollCallUtils.AttendanceAccount(Integer.parseInt(data.get("totalcount").toString()), Integer.parseInt(data.get("normacount").toString()), Integer.parseInt(data.get("latecount").toString()), Integer.parseInt(data.get("askforleavecount").toString()), Integer.parseInt(data.get("truancycount").toString()), type);
+    public void calculateRate(Map<String, Object> data, Integer type) {
+        Integer totalcount = data.get("totalcount") != null ? Integer.parseInt(data.get("totalcount").toString()) : 0;
+        Integer normacount = data.get("normacount") != null ? Integer.parseInt(data.get("normacount").toString()) : 0;
+        Integer latecount = data.get("latecount") != null ? Integer.parseInt(data.get("latecount").toString()) : 0;
+        Integer askforleavecount = data.get("askforleavecount") != null ? Integer.parseInt(data.get("askforleavecount").toString()) : 0;
+        Integer truancycount = data.get("truancycount") != null ? Integer.parseInt(data.get("truancycount").toString()) : 0;
+        String result = RollCallUtils.AttendanceAccount(totalcount, normacount, latecount, askforleavecount, truancycount, type);
         if (!StringUtils.isEmpty(result)) {
             result = result.replace("%", "");
         }
         data.put("attendance", result);
     }
 
-    private Integer getStatsType(Long orgId) {
+    public Integer getStatsType(Long orgId) {
         OrganSet organSet = organSetRepository.findByOrganId(orgId);
         if (organSet != null && organSet.getArithmetic() != null) {
             return organSet.getArithmetic();

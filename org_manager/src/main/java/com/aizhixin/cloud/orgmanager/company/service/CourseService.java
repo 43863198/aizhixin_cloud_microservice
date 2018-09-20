@@ -302,6 +302,15 @@ public class CourseService {
 		course.setLastModifiedDate(new Date());
 		save(course);
 	}
+
+	public void deleteAll(Long userId, List<Long> idList) {
+		if (null != idList && !idList.isEmpty()) {
+			for (Long id : idList) {
+				delete(userId, id);
+			}
+		}
+	}
+
 	/**
 	 * 按照查询条件分页查询指定学校的课程信息列表
 	 * @param r

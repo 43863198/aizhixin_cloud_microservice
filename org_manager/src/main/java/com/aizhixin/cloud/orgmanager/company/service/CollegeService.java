@@ -340,6 +340,14 @@ public class CollegeService {
         //还需要删除对应的管理员
     }
 
+    public void deleteAll(Long userId, List<Long> idList) {
+        if (null != idList && !idList.isEmpty()) {
+            for (Long id : idList) {
+                delete(userId, id);
+            }
+        }
+    }
+
     public CollegeDomain get(Long id) {
         CollegeDomain d = null;
         d = baseDataCacheService.readCollege(id);

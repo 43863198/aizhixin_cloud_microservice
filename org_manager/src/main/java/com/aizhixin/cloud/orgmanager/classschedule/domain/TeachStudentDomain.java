@@ -34,8 +34,8 @@ public class TeachStudentDomain {
 //    private String phone;
 //    @ApiModelProperty(value = "邮箱", position=6)
 //    private String email;
-//    @ApiModelProperty(value = "性别(男|女)", position=8)
-//    private String sex;
+    @ApiModelProperty(value = "性别(男|女)", position=8)
+    private String sex;
 
     public TeachStudentDomain() {
     }
@@ -44,6 +44,15 @@ public class TeachStudentDomain {
         this.id = id;
         this.name = name;
         this.jobNumber = jobNumber;
+    }
+    
+    public TeachStudentDomain(Long id, String name, String jobNumber,Long collegeId,String collegeName,String sex) {
+        this.id = id;
+        this.name = name;
+        this.jobNumber = jobNumber;
+        this.collegeId = collegeId;
+        this.collegeName = collegeName;
+        this.sex = sex;
     }
 
     public TeachStudentDomain(Long id, String name, String jobNumber, Long classesId, String classesName) {

@@ -123,6 +123,11 @@ public class UserController {
 		return userService.findUserByIds(userIds);
 	}
 
+	@RequestMapping(value = "/listbyids", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(httpMethod = "PUT", value = "根据ID列表获取用户的信息", response = Void.class, notes = "根据ID列表获取用户的信息<br><br><b>@author zhengning</b>")
+	public List<TeachStudentDomain> getUserByIds(@ApiParam(value = "userIds 用户ID列表", required = true) @RequestBody Set<Long> userIds) {
+		return userService.findTeacherByIds(userIds);
+	}
 
 	@RequestMapping(value = "/account/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(httpMethod = "GET", value = "获取登录用户基本信息", response = Void.class, notes = "获取登录用户基本信息<br><br><b>@author zhen.pan</b>")

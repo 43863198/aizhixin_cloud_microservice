@@ -7,6 +7,7 @@ import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.constant.LeaveConstants;
 import com.aizhixin.cloud.dd.constant.PushMessageConstants;
 import com.aizhixin.cloud.dd.constant.RollCallConstants;
+import com.aizhixin.cloud.dd.counsellorollcall.v2.service.CounselorRollcallTeacherService;
 import com.aizhixin.cloud.dd.messege.dto.AudienceDTO;
 import com.aizhixin.cloud.dd.messege.service.MessageService;
 import com.aizhixin.cloud.dd.messege.service.PushMessageService;
@@ -87,6 +88,8 @@ public class LeaveService {
     private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private UserInfoRepository userInfoRepository;
+    @Autowired
+    private CounselorRollcallTeacherService counselorRollcallTeacherService;
 
     public Object requestLeave(AccountDTO account, Boolean isLeaveSchoole, String requestType, Long startPeriodId, Long endPeriodId, Date startDay, Date endDay, String content,
                                Long headTeacherId, String headTeacherName, String accessToken, MultipartFile[] files) {
@@ -777,6 +780,7 @@ public class LeaveService {
                     }
                 }
             }
+            counselorRollcallTeacherService.updateLeaveRollCall(leave);
             pushMessageService.createPushMessage("请假审批结果通知", "请假审批结果通知", PushMessageConstants.FUNCTION_STUDENT_NOTICE, PushMessageConstants.MODULE_LEAVE, "请假审批结果通知", leave.getStudentId());
             ids.add(leave.getStudentId());
             pushService.listPush(accessToken, "您有一条未读的请假审批结果通知", "请假审批", "请假审批", ids);
