@@ -41,7 +41,7 @@ public class Questionnaire extends AbstractEntity {
     @Column(name = "TOTAL_SCORE")
     @Getter
     @Setter
-    private Integer totalScore;
+    private Float totalScore;
 
     /**
      * 题目数量
