@@ -50,7 +50,7 @@ public class QuestionnaireAssginUserJdbc {
                 qd.setId(rs.getLong("dqid"));
                 qd.setName(rs.getString("quesname"));
                 qd.setEnddate(rs.getDate("END_DATE"));
-                qd.setTotalScore(rs.getInt("TOTAL_SCORE"));
+                qd.setTotalScore(rs.getFloat("TOTAL_SCORE"));
                 qd.setTotalQuestions(rs.getInt("TOTAL_QUESTIONS"));
                 qd.setQuesType(rs.getInt("ques_type"));
 

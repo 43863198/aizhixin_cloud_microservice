@@ -161,4 +161,5 @@
 	<include file="classpath:liquibase/changelog/201809211040_update_entity_QuestionnaireAssginStudents.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809211045_update_entity_QuestionnaireAssgin.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809211046_update_entity_QuestionAnswerRecord.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211459_update_entity_Questionnaire.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
