@@ -50,7 +50,7 @@ public class Questions extends AbstractEntitytwo {
     @Column(name = "SCORE")
     @Getter
     @Setter
-    private Integer score;
+    private Float score;
 
     /**
      * 答题选择限制

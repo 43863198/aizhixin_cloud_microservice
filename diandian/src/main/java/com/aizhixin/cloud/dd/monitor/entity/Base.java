@@ -12,12 +12,12 @@ import java.util.Date;
  */
 @Data
 public class Base {
-    Integer successFlag;
-    String message;
-    Long useTime;
+    protected Integer successFlag;
+    protected String message;
+    protected Long useTime;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    Date date;
+    protected Date date;
 
     public Base() {}
 

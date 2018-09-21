@@ -13,8 +13,8 @@ public class PartStatisticsListDTO {
     private Integer no;
     private String questionName;
     private Integer totalCount = 0;
-    private Integer score = 0;
-    private Integer totalScore = 0;
+    private Float score = 0f;
+    private Float totalScore = 0f;
     private String avg;
     private List<PartStatisticsDTO> data;
 }

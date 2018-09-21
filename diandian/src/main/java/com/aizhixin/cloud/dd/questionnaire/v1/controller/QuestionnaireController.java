@@ -454,7 +454,7 @@ public class QuestionnaireController {
         QuestionnaireAssgin questionnaireAssgin = questionnaireService.findQuestionnaireAssginById(questionnaireAssginId);
 
         List<Questions> questions = questionnaireService.queryQuestions(questionnaireAssgin.getQuestionnaire().getId());
-        Map<Integer, Integer> quesionsMap = new HashMap();
+        Map<Integer, Float> quesionsMap = new HashMap();
         if (null != questions && questions.size() > 0) {
             for (Questions question : questions) {
                 quesionsMap.put(question.getNo(), question.getScore());

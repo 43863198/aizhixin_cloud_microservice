@@ -37,12 +37,12 @@ public class FeedbackTemplet extends AbstractEntity {
     @Column(name = "TOTAL_SCORE")
     @Getter
     @Setter
-    private Integer totalScore;
+    private Float totalScore;
 
     public FeedbackTemplet() {
     }
 
-    public FeedbackTemplet(Long orgId, Integer type, Integer quesType, Integer totalScore) {
+    public FeedbackTemplet(Long orgId, Integer type, Integer quesType, Float totalScore) {
         this.orgId = orgId;
         this.type = type;
         this.quesType = quesType;

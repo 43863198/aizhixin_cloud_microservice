@@ -18,7 +18,7 @@ public class FeedbackRecordAnswerDomain {
     private String content;
 
     @ApiModelProperty(value = "分数")
-    private Integer score;
+    private Float score;
 
     @ApiModelProperty(value = "填写答案")
     private String answer;

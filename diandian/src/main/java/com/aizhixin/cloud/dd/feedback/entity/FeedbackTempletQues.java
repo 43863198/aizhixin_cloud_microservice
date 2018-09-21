@@ -41,7 +41,7 @@ public class FeedbackTempletQues extends AbstractOnlyIdAndCreatedDateEntity {
     @Column(name = "score")
     @Getter
     @Setter
-    private Integer score;
+    private Float score;
 
     @Column(name = "tempgroup")
     @Getter
@@ -51,7 +51,7 @@ public class FeedbackTempletQues extends AbstractOnlyIdAndCreatedDateEntity {
     public FeedbackTempletQues() {
     }
 
-    public FeedbackTempletQues(FeedbackTemplet templet, String subject, String content, Integer score, Integer group) {
+    public FeedbackTempletQues(FeedbackTemplet templet, String subject, String content, Float score, Integer group) {
         this.templet = templet;
         this.subject = subject;
         this.content = content;

@@ -49,7 +49,7 @@ public class QuestionAnswerRecord extends AbstractEntitytwo implements Serializa
     @Column(name = "SCORE")
     @Getter
     @Setter
-    private Integer score;
+    private Float score;
 
     /**
      * 权重评分
