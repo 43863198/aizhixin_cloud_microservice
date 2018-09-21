@@ -53,10 +53,10 @@ public class FeedbackRecordDTO {
     private String userAvatar;
 
     @ApiModelProperty(value = "教师评价总分")
-    private Integer teachingScore;
+    private Float teachingScore;
 
     @ApiModelProperty(value = "学风评价总分")
-    private Integer studyStyleScore;
+    private Float studyStyleScore;
 
     @ApiModelProperty(value = "教师评价列表")
     private List<FeedbackRecordAnswerDTO> teacherQuesList;
@@ -71,7 +71,7 @@ public class FeedbackRecordDTO {
 
     }
 
-    public FeedbackRecordDTO(Long id, Long templetId, String teachingClassId, String teachingClassCode, String teachingClassName, String teachingClassTeacher, String teacherIds, String courseId, String courseName, String jobNum, String userName, String userAvatar, Integer teachingScore, Integer studyStyleScore) {
+    public FeedbackRecordDTO(Long id, Long templetId, String teachingClassId, String teachingClassCode, String teachingClassName, String teachingClassTeacher, String teacherIds, String courseId, String courseName, String jobNum, String userName, String userAvatar, Float teachingScore, Float studyStyleScore) {
         this.id = id;
         this.templetId = templetId;
         this.teachingClassId = teachingClassId;

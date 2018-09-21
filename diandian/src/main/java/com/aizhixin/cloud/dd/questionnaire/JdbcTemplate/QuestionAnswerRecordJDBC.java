@@ -30,7 +30,7 @@ public class QuestionAnswerRecordJDBC {
                 Questions q = new Questions();
                 q.setId(rs.getLong("QUESTIONS_ID"));
                 qd.setQuestions(q);
-                qd.setScore(rs.getInt("SCORE"));
+                qd.setScore(rs.getFloat("SCORE"));
                 qd.setAnswer(rs.getString("answer"));
                 qd.setWeightScore(rs.getFloat("weight_score"));
                 return qd;

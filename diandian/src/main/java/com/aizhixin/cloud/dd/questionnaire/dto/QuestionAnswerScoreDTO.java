@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class QuestionAnswerScoreDTO {
-	private Integer score;
+	private Float score;
 	private String answer;
 }

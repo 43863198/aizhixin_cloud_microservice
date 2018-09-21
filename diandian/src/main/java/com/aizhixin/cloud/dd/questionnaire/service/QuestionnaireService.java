@@ -1238,7 +1238,7 @@ public class QuestionnaireService {
                     QuestionAnswerScoreDTO qasd = (QuestionAnswerScoreDTO) map.get(questionDTO.getId());
                     if (null != qasd) {
                         if (qasd.getScore() == null) {
-                            questionDTO.setActualScore(0);
+                            questionDTO.setActualScore(0f);
                         } else {
                             questionDTO.setActualScore(qasd.getScore());
                         }
@@ -1273,7 +1273,7 @@ public class QuestionnaireService {
                     QuestionAnswerScoreDTO qasd = (QuestionAnswerScoreDTO) map.get(questionDTO.getId());
                     if (null != qasd) {
                         if (qasd.getScore() == null) {
-                            questionDTO.setActualScore(0);
+                            questionDTO.setActualScore(0f);
                         } else {
                             questionDTO.setActualScore(qasd.getScore());
                         }
@@ -1327,7 +1327,7 @@ public class QuestionnaireService {
                     Questions questions = new Questions();
                     questions.setId(questionDTO.getId());
                     QuestionAnswerRecord.setQuestions(questions);
-                    QuestionAnswerRecord.setScore(questionDTO.getActualScore().intValue());
+                    QuestionAnswerRecord.setScore(questionDTO.getActualScore());
                     QuestionAnswerRecord.setAnswer(questionDTO.getAnswer());
                     questionAnswerRecordRepository.save(QuestionAnswerRecord);
                 }
@@ -1357,7 +1357,7 @@ public class QuestionnaireService {
                     Questions questions = new Questions();
                     questions.setId(questionDTO.getId());
                     record.setQuestions(questions);
-                    record.setScore(questionDTO.getActualScore().intValue());
+                    record.setScore(questionDTO.getActualScore());
                     if (weight > 0) {
                         record.setWeightScore(record.getScore().intValue() * weight / 100);
                     } else {

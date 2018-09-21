@@ -91,7 +91,7 @@ public class QuestionnaireAssignUser extends AbstractOnlyIdAndCreatedDateEntity 
     @Column(name = "score")
     @Getter
     @Setter
-    private Integer score;
+    private Float score;
     /**
      * 状态
      */
