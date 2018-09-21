@@ -68,7 +68,7 @@ public class LeaveServiceV2 {
                 if (stu != null) {
                     leave.setOrgId(stu.getOrgId());
                 }
-                if(leave.getEndTime() == null && leave.getRequestType().equals(LeaveConstants.TYPE_PERIOD)){
+                if (leave.getEndTime() == null && leave.getRequestType().equals(LeaveConstants.TYPE_PERIOD)) {
                     Map<String, Object> endp = getPeriod(periodMap, leave.getEndPeriodId());
                     if (endp != null) {
                         leave.setEndTime(DateFormatUtil.parse2(DateFormatUtil.formatShort(leave.getStartDate()) + " " + endp.get("endTime"), DateFormatUtil.FORMAT_MINUTE));
@@ -236,10 +236,10 @@ public class LeaveServiceV2 {
         List<Long> ids = new ArrayList<Long>();
         List<AudienceDTO> audiences = new ArrayList<>();
         UserInfo stu = userInfoRepository.findByUserId(account.getId());
-        List<PeriodDTO> startPeriods =  getStartPeriodList(account.getId(), account.getOrganId(), startTime);
-        List<PeriodDTO> endPeriods =  getEndPeriodList(account.getId(), account.getOrganId(), endTime);
-        Long startPeriodId = getStartPeriodId(startTime, startPeriods);
-        Long endPeriodId = getEndPeriodId(endTime, endPeriods);
+        List<PeriodDTO> startPeriods = getStartPeriodList(account.getId(), account.getOrganId(), startTime);
+        List<PeriodDTO> endPeriods = getEndPeriodList(account.getId(), account.getOrganId(), endTime);
+        Long startPeriodId = getStartPeriodId2(account.getId(), startTime, startPeriods);
+        Long endPeriodId = getEndPeriodId2(account.getId(), endTime, endPeriods);
         // 由班主任照常请
         if (headTeacherId != null) {
             UserInfo teacher = userInfoRepository.findByUserId(headTeacherId);
@@ -369,8 +369,7 @@ public class LeaveServiceV2 {
                 }
             } else {
                 Map map = getBetweenStartAndEndPeriodId(account.getOrganId(), startPeriodId, endPeriodId);
-                List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(account.getId(), null);
-                Date date = new Date();
+                List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(account.getId(), DateFormatUtil.formatShort(startTime));
                 for (DianDianDaySchoolTimeTableDomain ddds : ddt) {
                     if (map.containsKey(ddds.getPeriodId())) {
                         List<IdNameDomain> idNameDomains = InitScheduleService.parseTeacherList(ddds.getTeachers());
@@ -405,7 +404,6 @@ public class LeaveServiceV2 {
                             l.setLeaveType(laveType);
                             l.setLeavePublic(leavePublic);
                             l.setLeavePictureUrls(leavePictureUrls);
-                            l.setCreatedDate(date);
                             l = leaveRepository.save(l);
                             ids.add(teacherId);
                             pushMessageService.createPushMessage("请假审批通知", "请假审批通知", PushMessageConstants.FUNCTION_TEACHER_APPROVAL, PushMessageConstants.MODULE_LEAVE, "请假审批通知", teacherId);
@@ -530,5 +528,57 @@ public class LeaveServiceV2 {
             }
         }
         return null;
+    }
+
+    private Long getStartPeriodId2(Long stuId, Date startTime, List<PeriodDTO> list) {
+        List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(stuId, DateFormatUtil.formatShort(startTime));
+        if (ddt != null && ddt.size() > 0) {
+            long start = startTime.getTime();
+            String dayStr = DateFormatUtil.formatShort(startTime);
+            for (DianDianDaySchoolTimeTableDomain d : ddt) {
+                Date date = DateFormatUtil.parse2(dayStr + " " + d.getPeriodStarttime(), "yyyy-MM-dd HH:mm");
+                if (date != null) {
+                    if (date.getTime() >= start) {
+                        return d.getPeriodId();
+                    } else {
+                        Date edate = DateFormatUtil.parse2(dayStr + " " + d.getPeriodEndtime(), "yyyy-MM-dd HH:mm");
+                        if (edate != null) {
+                            if (edate.getTime() >= start) {
+                                return d.getPeriodId();
+                            }
+                        }
+                    }
+                }
+            }
+            return getStartPeriodId(startTime, list);
+        } else {
+            return getStartPeriodId(startTime, list);
+        }
+    }
+
+    private Long getEndPeriodId2(Long stuId, Date endTime, List<PeriodDTO> list) {
+        List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(stuId, DateFormatUtil.formatShort(endTime));
+        if (ddt != null && ddt.size() > 0) {
+            long end = endTime.getTime();
+            String dayStr = DateFormatUtil.formatShort(endTime);
+            for (DianDianDaySchoolTimeTableDomain d : ddt) {
+                Date date = DateFormatUtil.parse2(dayStr + " " + d.getPeriodStarttime(), "yyyy-MM-dd HH:mm");
+                if (date != null) {
+                    if (end >= date.getTime()) {
+                        return d.getPeriodId();
+                    } else {
+                        Date edate = DateFormatUtil.parse2(dayStr + " " + d.getPeriodEndtime(), "yyyy-MM-dd HH:mm");
+                        if (edate != null) {
+                            if (end >= edate.getTime()) {
+                                return d.getPeriodId();
+                            }
+                        }
+                    }
+                }
+            }
+            return getEndPeriodId(endTime, list);
+        } else {
+            return getEndPeriodId(endTime, list);
+        }
     }
 }
