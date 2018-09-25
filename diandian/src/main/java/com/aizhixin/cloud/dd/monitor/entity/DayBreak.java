@@ -19,33 +19,34 @@ public class DayBreak extends Base {
     @Id
     protected String id;
     @Indexed
-    Long orgId;
+    protected Long orgId;
     @Indexed
-    String orgName;
+    protected String orgName;
     @Indexed
-    Long scheduleId;
+    protected Long scheduleId;
     @Indexed
-    String teachDate;
-    Long teachingclassId;
-    String teachingclassName;
-    Long courseId;
-    String courseName;
-    Long teacherId;
-    String teacherName;
-    Integer periodNo;
-    Integer perioidNum;
-    String startTime;
-    String endTime;
-    Boolean compareflag;
+    protected String teachDate;
+    protected Long teachingclassId;
+    protected String teachingclassName;
+    protected Long courseId;
+    protected String courseName;
+    protected Long teacherId;
+    protected String teacherName;
+    protected Integer periodNo;
+    protected Integer perioidNum;
+    protected String startTime;
+    protected String endTime;
+    protected Boolean compareflag;
 
-    public DayBreak() {}
+    public DayBreak() {
+    }
 
     public DayBreak(Integer successFlag, String message, Long useTime, Date date) {
         super(successFlag, message, useTime, date);
     }
 
     public DayBreak(Long orgId, String orgName, Long scheduleId, String teachDate, Long teachingclassId, String teachingclassName, Long courseId, String courseName, Long teacherId,
-        String teacherName, Integer periodNo, Integer perioidNum, String startTime, String endTime, Integer successFlag, String message, Long useTime, Date date) {
+                    String teacherName, Integer periodNo, Integer perioidNum, String startTime, String endTime, Integer successFlag, String message, Long useTime, Date date) {
         super(successFlag, message, useTime, date);
         this.orgId = orgId;
         this.orgName = orgName;
@@ -64,8 +65,8 @@ public class DayBreak extends Base {
     }
 
     public DayBreak(Long orgId, String orgName, Long scheduleId, String teachDate, Long teachingclassId, String teachingclassName, Long courseId, String courseName, Long teacherId,
-        String teacherName, Integer periodNo, Integer perioidNum, String startTime, String endTime, Boolean compareflag, Integer successFlag, String message, Long useTime,
-        Date date) {
+                    String teacherName, Integer periodNo, Integer perioidNum, String startTime, String endTime, Boolean compareflag, Integer successFlag, String message, Long useTime,
+                    Date date) {
         super(successFlag, message, useTime, date);
         this.orgId = orgId;
         this.orgName = orgName;

@@ -38,11 +38,11 @@ public interface QuestionnaireAssginRepository extends JpaRepository<Questionnai
 
     @Modifying
     @Query("update #{#entityName} q set q.score = ?2 , q.weightScore = ?6, q.commitStatus= ?3 , q.commitDate = ?4 ,q.comment= ?5 where q.id = ?1")
-    public int updateScore(Long id, int totalActualScore, int status, Date commitDate, String comment, float totalWeight);
+    public int updateScore(Long id, float totalActualScore, int status, Date commitDate, String comment, float totalWeight);
 
     @Modifying
     @Query("update #{#entityName} q set q.score = ?2 , q.weightScore = ?5, q.commitStatus= ?3 , q.commitDate = ?4 where q.id = ?1")
-    public int updateScore(Long id, int totalActualScore, int status, Date commitDate, float totalWeight);
+    public int updateScore(Long id, float totalActualScore, int status, Date commitDate, float totalWeight);
 
     @Modifying
     @Query("update #{#entityName} q set q.deleteFlag=1  where q.questionnaire.id = ?1 and q.createdBy = ?2")

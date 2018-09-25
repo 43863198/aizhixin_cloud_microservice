@@ -504,8 +504,8 @@ public class QuestionnaireController {
                     Collections.sort(data, new Comparator<PartStatisticsDTO>() {
                         @Override
                         public int compare(PartStatisticsDTO o1, PartStatisticsDTO o2) {
-                            int score1 = o1.getScore() == null ? 0 : o1.getScore();
-                            int score2 = o2.getScore() == null ? 0 : o2.getScore();
+                            float score1 = o1.getScore() == null ? 0 : o1.getScore();
+                            float score2 = o2.getScore() == null ? 0 : o2.getScore();
                             if (score1 > score2) {
                                 return 1;
                             } else if (score1 < score2) {
