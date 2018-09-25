@@ -32,6 +32,11 @@ public class RollCallStatsJdbc {
         return jdbcTemplate.queryForList(sql);
     }
 
+    public List<Map<String, Object>> getStuTeachingClassStatsByTeachingClassId(Long orgId, Long semesterId, Long teachingClassId) {
+        String sql = "SELECT TEACHINGCLASS_ID, STUDENT_ID, STUDENT_NUM, STUDENT_NAME, MIN(CREATED_DATE) startdate, COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount  FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND org_id=" + orgId + " AND SEMESTER_ID=" + semesterId + " AND TEACHINGCLASS_ID=" + teachingClassId;
+        return jdbcTemplate.queryForList(sql);
+    }
+
     public List<Map<String, Object>> getTeachingClassStats(Long orgId, Long semesterId) {
         String sql = "SELECT TEACHINGCLASS_ID, COUNT(*) totalcount, SUM(IF(TYPE=1, 1, 0)) normacount, SUM(IF(TYPE=2, 1, 0)) truancycount, SUM(IF(TYPE=3, 1, 0)) latecount, SUM(IF(TYPE=4, 1, 0)) askforleavecount, SUM(IF(TYPE=5, 1, 0)) leavecount FROM dd_rollcall dr WHERE dr.DELETE_FLAG=0 AND org_id=" + orgId + " AND SEMESTER_ID=" + semesterId + " GROUP BY TEACHINGCLASS_ID";
         return jdbcTemplate.queryForList(sql);
