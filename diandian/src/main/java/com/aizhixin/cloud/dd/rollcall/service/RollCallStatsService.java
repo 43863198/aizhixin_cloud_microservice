@@ -129,7 +129,7 @@ public class RollCallStatsService {
         List<RollCall> rollCallList = rollCallRepository.findByIdIn(rollCallIds);
         if (rollCallList != null && rollCallList.size() > 0) {
             RollCall rollCall = rollCallList.get(0);
-            statsStuByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
+            statsStuTeachingClassByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
             statsStuAllByRollCallList(rollCallList);
         }
     }
@@ -192,12 +192,28 @@ public class RollCallStatsService {
     }
 
     @Async
-    public void statsStuByTeachingClass(Long orgId, Long semesterId, Long teachingClassId) {
+    public void statsStuAllByTeachingClass(Long orgId, Long semesterId, Long teachingClassId) {
         try {
-            List<Map<String, Object>> list = rollCallStatsJdbc.getStuStatsByTeachingClassId(orgId, semesterId, teachingClassId);
+            List<TeachingClassStudent> students = studentRepository.findByTeachingClassId(teachingClassId);
+            if (students != null && students.size() > 0) {
+                for (TeachingClassStudent item : students) {
+                    statsStuAllByStuId(orgId, semesterId, item.getStuId());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("statsStuByTeachingClassException", e);
+        }
+    }
+
+    @Async
+    public void statsStuTeachingClassByTeachingClass(Long orgId, Long semesterId, Long teachingClassId) {
+        try {
+            Integer type = getStatsType(orgId);
+            List<Map<String, Object>> list = rollCallStatsJdbc.getStuTeachingClassStatsByTeachingClassId(orgId,semesterId, teachingClassId);
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> item : list) {
-                    redisTokenStore.setStudentRollCallStatsAll(Long.parseLong(item.get("STUDENT_ID").toString()), item);
+                    calculateRate(item, type);
+                    redisTokenStore.setStudentRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString() + item.get("STUDENT_ID"), item);
                 }
             }
         } catch (Exception e) {

@@ -834,7 +834,7 @@ public class RollCallService {
 
             //更新统计
             rollCallStatsService.statsStuAllByStuId(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getStudentId());
-            rollCallStatsService.statsStuByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
+            rollCallStatsService.statsStuTeachingClassByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
         }
 
     }

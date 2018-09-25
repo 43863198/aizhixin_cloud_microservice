@@ -752,7 +752,7 @@ public class ScheduleService {
             deleteRedisRollCallIng(schedule.getOrganId(), scheduleRollCall.getId());
             //统计学生累计考勤
             log.info("统计学生累计考勤...", schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
-            rollCallStatsService.statsStuByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
+            rollCallStatsService.statsStuTeachingClassByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
             rollCallStatsService.statsStuAllByScheduleRollCallId(scheduleRollCall.getId());
         } catch (Exception e) {
             e.printStackTrace();
