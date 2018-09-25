@@ -12,7 +12,7 @@ public class QuestionsDTO {
     private Long questionnaireId;
     private Long questionnaireAssginId;
     private Long questionnaireAssginStudentId;
-    private Integer totalActualScore;
+    private Float totalActualScore;
     private String levelName;
     private List<QuestionDTO> questions;
     private String comment;

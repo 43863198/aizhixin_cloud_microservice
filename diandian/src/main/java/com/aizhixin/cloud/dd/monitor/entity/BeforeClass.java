@@ -17,24 +17,24 @@ public class BeforeClass extends Base {
     @Id
     protected String id;
     @Indexed
-    Long orgId;
+    protected Long orgId;
     @Indexed
-    String orgName;
+    protected String orgName;
     @Indexed
-    Long scheduleId;
+    protected Long scheduleId;
     @Indexed
-    String teachDate;
-    Long teachingclassId;
-    String teachingclassName;
-    Long courseId;
-    String courseName;
-    Long teacherId;
-    String teacherName;
-    Integer periodNo;
-    Integer perioidNum;
-    String startTime;
-    String endTime;
-    String status;
+    protected String teachDate;
+    protected Long teachingclassId;
+    protected String teachingclassName;
+    protected Long courseId;
+    protected String courseName;
+    protected Long teacherId;
+    protected String teacherName;
+    protected Integer periodNo;
+    protected Integer perioidNum;
+    protected String startTime;
+    protected String endTime;
+    protected String status;
 
     public BeforeClass() {}
 

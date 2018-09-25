@@ -151,7 +151,7 @@ public class QuestionnairAssignQuery {
                 item.setQuestionId(rs.getLong("id"));
                 item.setNo(rs.getInt("no"));
                 item.setQuestionName(rs.getString("name"));
-                item.setScore(rs.getInt("score"));
+                item.setScore(rs.getFloat("score"));
                 item.setCount(rs.getInt("countNum"));
                 return item;
             }

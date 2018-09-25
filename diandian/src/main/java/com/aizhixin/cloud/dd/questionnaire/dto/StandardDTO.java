@@ -2,10 +2,11 @@ package com.aizhixin.cloud.dd.questionnaire.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 @Data
 public class StandardDTO {
 
-    private Long    id;
+    private Long id;
     /**
      * 序号
      */
@@ -16,7 +17,7 @@ public class StandardDTO {
      * 等级名称
      */
     @ApiModelProperty(value = "等级名称", required = false)
-    private String  levelName;
+    private String levelName;
     /**
      * 分数段小值
      */
@@ -28,7 +29,8 @@ public class StandardDTO {
     @ApiModelProperty(value = "分数段大值", required = false)
     private Integer maxScore;
 
-    public StandardDTO() {}
+    public StandardDTO() {
+    }
 
     public StandardDTO(Long id, Integer no, String levelName, Integer mixScore, Integer maxScore) {
         super();
