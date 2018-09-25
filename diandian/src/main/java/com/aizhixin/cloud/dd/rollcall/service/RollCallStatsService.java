@@ -124,6 +124,7 @@ public class RollCallStatsService {
         log.info("完成考勤统计:" + orgId);
     }
 
+    @Async("threadPool1")
     public void initStatsDateByRollCallIds(Set<Long> rollCallIds) {
         List<RollCall> rollCallList = rollCallRepository.findByIdIn(rollCallIds);
         if (rollCallList != null && rollCallList.size() > 0) {
