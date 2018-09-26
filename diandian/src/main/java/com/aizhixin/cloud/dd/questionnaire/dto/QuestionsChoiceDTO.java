@@ -15,6 +15,8 @@ public class QuestionsChoiceDTO {
 	private String content;
 	@ApiModelProperty(value="选项分值",required=false)
 	private String score;
+	@ApiModelProperty(value="选项分值",required=false)
+	private String score2;
 	public QuestionsChoiceDTO(){}
 	public QuestionsChoiceDTO(Long id, String choice, String content, String score,Long questionId) {
 		super();

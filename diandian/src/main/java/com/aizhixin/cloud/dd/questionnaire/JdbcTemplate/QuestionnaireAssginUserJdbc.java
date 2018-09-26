@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -50,7 +51,8 @@ public class QuestionnaireAssginUserJdbc {
                 qd.setId(rs.getLong("dqid"));
                 qd.setName(rs.getString("quesname"));
                 qd.setEnddate(rs.getDate("END_DATE"));
-                qd.setTotalScore(rs.getFloat("TOTAL_SCORE"));
+                qd.setTotalScore2(rs.getFloat("TOTAL_SCORE"));
+                qd.setTotalScore(new BigDecimal(qd.getTotalScore2()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                 qd.setTotalQuestions(rs.getInt("TOTAL_QUESTIONS"));
                 qd.setQuesType(rs.getInt("ques_type"));
 
