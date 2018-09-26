@@ -584,6 +584,11 @@ public class QuestionnaireService {
                             BeanUtils.copyProperties(questionsChoiceDTO, qc);
                             qc.setId(null);
                             qc.setQuestions(question);
+                            if(StringUtils.isNotEmpty(questionsChoiceDTO.getScore2())){
+                                qc.setScore(questionsChoiceDTO.getScore2());
+                            } else {
+                                qc.setScore(questionsChoiceDTO.getScore());
+                            }
                             qcl.add(qc);
                         }
                     }
@@ -663,6 +668,8 @@ public class QuestionnaireService {
                 for (Questionnaire questionnaire : content) {
                     dto = new QuestionnaireDTO();
                     BeanUtils.copyProperties(questionnaire, dto);
+                    dto.setTotalScore2(questionnaire.getTotalScore());
+                    dto.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                     dto.setCreateDate(questionnaire.getCreatedDate());
                     dto.setQuestions(null);
                     dto.setTeachingNum(questionnaireMap.get(questionnaire.getId()) == null ? 0
@@ -712,10 +719,14 @@ public class QuestionnaireService {
                             QuestionsChoiceDTO qcd = new QuestionsChoiceDTO();
                             qcd.setChoice(questionsChoice.getChoice());
                             qcd.setContent(questionsChoice.getContent());
-                            qcd.setScore(questionsChoice.getScore());
+                            qcd.setScore2(questionsChoice.getScore());
+                            if (StringUtils.isNotEmpty(questionsChoice.getScore())) {
+                                qcd.setScore(new BigDecimal(questionsChoice.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue() + "");
+                            } else {
+                                qcd.setScore("0");
+                            }
                             qcd.setId(questionsChoice.getId());
                             qcdl.add(qcd);
-                            // BeanUtils.copyProperties(questionsChoice, qcd);
                         }
                         questionDTO.setQuestionChioce(qcdl);
                         questionDtos.add(questionDTO);
