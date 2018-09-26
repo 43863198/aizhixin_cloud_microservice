@@ -699,6 +699,8 @@ public class QuestionnaireService {
         Questionnaire questionnaire = questionnaireRepository.findOne(questionnaireID);
         if (questionnaire != null) {
             BeanUtils.copyProperties(questionnaire, questionnaireDTO);
+            questionnaireDTO.setTotalScore2(questionnaire.getTotalScore());
+            questionnaireDTO.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             questionnaireDTO.setCreateDate(questionnaire.getCreatedDate());
             questionnaireDTO.setQcomment(questionnaire.isQComment());
             List<Questions> questions = questionsRepository.findAllByQuestionnaireId(questionnaireID);
