@@ -52,10 +52,16 @@ public class FeedbackRecordDomain {
     private String userAvatar;
 
     @ApiModelProperty(value = "教师评价总分")
-    private Float teachingScore;
+    private Integer teachingScore;
+
+    @ApiModelProperty(value = "教师评价总分")
+    private Float teachingScore2;
 
     @ApiModelProperty(value = "学风评价总分")
-    private Float studyStyleScore;
+    private Integer studyStyleScore;
+
+    @ApiModelProperty(value = "学风评价总分")
+    private Float studyStyleScore2;
 
     @ApiModelProperty(value = "创建时间")
     private Date createDate;
@@ -89,7 +95,7 @@ public class FeedbackRecordDomain {
         this.jobNum = jobNum;
         this.userName = userName;
         this.userAvatar = userAvatar;
-        this.teachingScore = teachingScore;
-        this.studyStyleScore = studyStyleScore;
+        this.teachingScore2 = teachingScore;
+        this.studyStyleScore2 = studyStyleScore;
     }
 }

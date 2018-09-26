@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -437,8 +438,20 @@ public class RecordService {
             record.setJobNum(item.getJobNum());
             record.setUserName(item.getUserName());
             record.setUserAvatar(item.getUserAvatar());
-            record.setTeachingScore(item.getTeachingScore());
-            record.setStudyStyleScore(item.getStudyStyleScore());
+            if (item.getTeachingScore2() != null && item.getTeachingScore2() > 0) {
+                record.setTeachingScore(item.getTeachingScore2());
+            } else if (item.getTeachingScore() != null) {
+                record.setTeachingScore(Float.parseFloat(item.getTeachingScore().toString()));
+            } else {
+                record.setTeachingScore(0f);
+            }
+            if (item.getStudyStyleScore2() != null && item.getStudyStyleScore2() > 0) {
+                record.setStudyStyleScore(item.getStudyStyleScore2());
+            } else if (item.getStudyStyleScore() != null) {
+                record.setStudyStyleScore(Float.parseFloat(item.getStudyStyleScore().toString()));
+            } else {
+                record.setStudyStyleScore(0f);
+            }
         }
         return record;
     }
@@ -467,7 +480,8 @@ public class RecordService {
             FeedbackRecordAnswerDomain d = new FeedbackRecordAnswerDomain();
             d.setSubject(item.getTempletQues().getSubject());
             d.setContent(item.getTempletQues().getContent());
-            d.setScore(item.getTempletQues().getScore());
+            d.setScore2(item.getTempletQues().getScore());
+            d.setScore(new BigDecimal(item.getTempletQues().getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             d.setAnswer(item.getAnswer());
             if (item.getTempletQues().getTemplet().getQuesType() == FeedbackQuesType.XUANXIANG.getType()) {
                 List<FeedbackTempletOptionsDTO> optionsDTOS = optionsRespository.findByQuesId(item.getTempletQues().getId());
@@ -528,8 +542,10 @@ public class RecordService {
             d.setJobNum(item.getJobNum());
             d.setUserName(item.getUserName());
             d.setUserAvatar(item.getUserAvatar());
-            d.setTeachingScore(item.getTeachingScore());
-            d.setStudyStyleScore(item.getStudyStyleScore());
+            d.setTeachingScore2(item.getTeachingScore());
+            d.setTeachingScore(new BigDecimal(item.getTeachingScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            d.setStudyStyleScore2(item.getStudyStyleScore());
+            d.setStudyStyleScore(new BigDecimal(item.getStudyStyleScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             d.setCreateDate(item.getCreatedDate());
             d.setQuesType(item.getTemplet().getQuesType());
             return d;

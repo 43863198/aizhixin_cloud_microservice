@@ -26,7 +26,10 @@ public class FeedbackTempletDTO {
     private Integer quesType;
 
     @ApiModelProperty(value = "打分题总分")
-    private Float totalScore;
+    private Integer totalScore;
+
+    @ApiModelProperty(value = "打分题总分")
+    private Float totalScore2;
 
     @ApiModelProperty(value = "教师评价列表")
     private List<FeedbackTempletQuesDTO> teacherQuesList;
@@ -45,6 +48,6 @@ public class FeedbackTempletDTO {
         this.id = id;
         this.orgId = orgId;
         this.quesType = quesType;
-        this.totalScore = totalScore;
+        this.totalScore2 = totalScore;
     }
 }
