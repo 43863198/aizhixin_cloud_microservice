@@ -237,20 +237,21 @@ public class StudentPhoneController {
     @ApiOperation(httpMethod = "POST", value = "GPS信息保存", response = Void.class, notes = "GPS信息保存  <br>@author HUM")
     public ResponseEntity<?> save(@ApiParam(value = "electricFenceBase GPS信息") @RequestBody ElectricFenceBaseDTO electricFenceBaseDTO,
                                   @RequestHeader("Authorization") String accessToken) {
-        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
-        if (account == null) {
-            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
-        } else {
-            electricFenceBaseDTO.setOrganId(account.getOrganId());
-            electricFenceBaseDTO.setUserId(account.getId());
-        }
+//        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+//        if (account == null) {
+//            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+//        } else {
+//            electricFenceBaseDTO.setOrganId(account.getOrganId());
+//            electricFenceBaseDTO.setUserId(account.getId());
+//        }
         Map<String, Object> result = new HashMap<>();
-        try {
-            result = orgManagerRemoteService.saveBase(electricFenceBaseDTO);// 获取用户id:account.getId();
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = new HashMap<>();
-        }
+//        try {
+//            result = orgManagerRemoteService.saveBase(electricFenceBaseDTO);// 获取用户id:account.getId();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            result = new HashMap<>();
+//        }
+        result.put("falseMSG", true);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
