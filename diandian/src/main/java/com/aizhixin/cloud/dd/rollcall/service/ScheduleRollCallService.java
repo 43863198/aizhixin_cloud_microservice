@@ -354,6 +354,7 @@ public class ScheduleRollCallService {
                     set.add(dianDianDaySchoolTimeTableDomain.getTeachingClassId());
                 }
                 teachingClassIdsStr = StringUtils.join(set.toArray(), ",");
+                stringRedisTemplate.opsForValue().set(currentDate + "_" + studentId, teachingClassIdsStr, 1, TimeUnit.DAYS);
             }
             if (StringUtils.isNotBlank(teachingClassIdsStr)) {
                 Set<Long> teachingClassIds = new HashSet();

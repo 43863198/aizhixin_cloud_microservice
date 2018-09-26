@@ -1,6 +1,7 @@
 package com.aizhixin.cloud.dd.questionnaire.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -547,7 +548,11 @@ public class QuestionnaireService {
             questionnaire.setId(dto.getId());
             questionnaire.setName(dto.getName());
             questionnaire.setTotalQuestions(dto.getQuestions().size());
-            questionnaire.setTotalScore(dto.getTotalScore());
+            if (dto.getTotalScore2() != null && dto.getTotalScore2() > 0) {
+                questionnaire.setTotalScore(dto.getTotalScore2());
+            } else {
+                questionnaire.setTotalScore(Float.parseFloat(dto.getTotalScore().toString()));
+            }
             questionnaire.setStatus(QuestionnaireStatus.QUESTION_STATUS_INIT);
             questionnaire.setDeleteFlag(DataValidity.VALID.getState());
             questionnaire.setOrganId(organId);
@@ -760,7 +765,11 @@ public class QuestionnaireService {
             questionnaire.setId(null);
             questionnaire.setName(dto.getName());
             questionnaire.setTotalQuestions(dto.getQuestions().size());
-            questionnaire.setTotalScore(dto.getTotalScore());
+            if (dto.getTotalScore2() != null && dto.getTotalScore2() > 0) {
+                questionnaire.setTotalScore(dto.getTotalScore2());
+            } else {
+                questionnaire.setTotalScore(Float.parseFloat(dto.getTotalScore().toString()));
+            }
             questionnaire.setStatus(QuestionnaireStatus.QUESTION_STATUS_INIT);
             questionnaire.setEndDate(dto.getEndDate());
             questionnaire.setDeleteFlag(QuestionnaireStatus.QUESTION_DELETEFLAG_NORMAL);
@@ -815,10 +824,7 @@ public class QuestionnaireService {
         return result;
     }
 
-    public QuestionnaireDetailDTO findStudentInfo(
-            QuestionnaireDetailDTO questionnaireDetailDTO,
-            QuestionnaireAssgin questionnaireAssgin,
-            QuestionnaireAssginStudents questionnaireAssginStudents)
+    public QuestionnaireDetailDTO findStudentInfo(QuestionnaireDetailDTO questionnaireDetailDTO, QuestionnaireAssgin questionnaireAssgin, QuestionnaireAssginStudents questionnaireAssginStudents)
             throws JsonParseException, JsonMappingException, IOException {
         String json = orgManagerRemoteClient.findByStudentId(questionnaireAssginStudents.getStudentId());
         Map<String, Object> map = JsonUtil.Json2Object(json);
@@ -1238,11 +1244,12 @@ public class QuestionnaireService {
                     QuestionAnswerScoreDTO qasd = (QuestionAnswerScoreDTO) map.get(questionDTO.getId());
                     if (null != qasd) {
                         if (qasd.getScore() == null) {
-                            questionDTO.setActualScore(0f);
+                            questionDTO.setActualScore(0);
+                            questionDTO.setActualScore2(0f);
                         } else {
-                            questionDTO.setActualScore(qasd.getScore());
+                            questionDTO.setActualScore2(qasd.getScore());
+                            questionDTO.setActualScore(new BigDecimal(qasd.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                         }
-
                         questionDTO.setAnswer(qasd.getAnswer());
                     }
                 }
@@ -1273,11 +1280,12 @@ public class QuestionnaireService {
                     QuestionAnswerScoreDTO qasd = (QuestionAnswerScoreDTO) map.get(questionDTO.getId());
                     if (null != qasd) {
                         if (qasd.getScore() == null) {
-                            questionDTO.setActualScore(0f);
+                            questionDTO.setActualScore(0);
+                            questionDTO.setActualScore2(0f);
                         } else {
-                            questionDTO.setActualScore(qasd.getScore());
+                            questionDTO.setActualScore2(qasd.getScore());
+                            questionDTO.setActualScore(new BigDecimal(qasd.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                         }
-
                         questionDTO.setAnswer(qasd.getAnswer());
                     }
                 }
@@ -1327,7 +1335,11 @@ public class QuestionnaireService {
                     Questions questions = new Questions();
                     questions.setId(questionDTO.getId());
                     QuestionAnswerRecord.setQuestions(questions);
-                    QuestionAnswerRecord.setScore(questionDTO.getActualScore());
+                    if (questionDTO.getActualScore2() != null && questionDTO.getActualScore2() > 0) {
+                        QuestionAnswerRecord.setScore(questionDTO.getActualScore2());
+                    } else {
+                        QuestionAnswerRecord.setScore(Float.parseFloat(questionDTO.getActualScore().toString()));
+                    }
                     QuestionAnswerRecord.setAnswer(questionDTO.getAnswer());
                     questionAnswerRecordRepository.save(QuestionAnswerRecord);
                 }
@@ -1357,7 +1369,11 @@ public class QuestionnaireService {
                     Questions questions = new Questions();
                     questions.setId(questionDTO.getId());
                     record.setQuestions(questions);
-                    record.setScore(questionDTO.getActualScore());
+                    if (questionDTO.getActualScore2() != null && questionDTO.getActualScore2() > 0) {
+                        record.setScore(questionDTO.getActualScore2());
+                    } else {
+                        record.setScore(Float.parseFloat(questionDTO.getActualScore().toString()));
+                    }
                     if (weight > 0) {
                         record.setWeightScore(record.getScore().intValue() * weight / 100);
                     } else {
@@ -1368,16 +1384,11 @@ public class QuestionnaireService {
                     questionAnswerRecordRepository.save(record);
                 }
                 if (!org.springframework.util.StringUtils.isEmpty(questionsDTO.getComment())) {
-                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date(), questionsDTO.getComment(), totalWeight);
+                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), questionsDTO.getComment(), totalWeight);
                 } else {
-                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date(), totalWeight);
+                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), totalWeight);
                 }
             }
-
             result.put("trueMSG", true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1394,13 +1405,10 @@ public class QuestionnaireService {
         return questionnairAssignQuery.queryAssign(offset, limit, courseName, teacherName, id, assginId, collegeId);
     }
 
-    public PageData<QuestionnaireAssginStudents> regularStatistics(Long assginId, Integer pageNumber,
-                                                                   Integer pageSize) {
-        Pageable pageable = PageUtil.createNoErrorPageRequestAndSort(pageNumber, pageSize,
-                new Sort(new Sort.Order(Sort.Direction.ASC, "studentId")));
+    public PageData<QuestionnaireAssginStudents> regularStatistics(Long assginId, Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageUtil.createNoErrorPageRequestAndSort(pageNumber, pageSize, new Sort(new Sort.Order(Sort.Direction.ASC, "studentId")));
         PageData<QuestionnaireAssginStudents> pageData = PageData.getPageData(pageable);
-        Page<QuestionnaireAssginStudents> page = assginStudentsRepository
-                .findByQuestionnaireAssgin_Id(assginId, pageable);
+        Page<QuestionnaireAssginStudents> page = assginStudentsRepository.findByQuestionnaireAssgin_Id(assginId, pageable);
         pageData.setData(page.getContent());
         PageData.setPageData(pageData, page.getTotalElements(), page.getTotalPages());
         return pageData;

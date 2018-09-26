@@ -30,7 +30,11 @@ public class QuestionnaireDTO implements Serializable {
 
     @NotNull
     @ApiModelProperty(value = "问卷总分", required = true)
-    protected Float totalScore;
+    protected Integer totalScore;
+
+    @NotNull
+    @ApiModelProperty(value = "问卷总分小数", required = true)
+    protected Float totalScore2;
 
     @ApiModelProperty(value = "创建时间", required = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

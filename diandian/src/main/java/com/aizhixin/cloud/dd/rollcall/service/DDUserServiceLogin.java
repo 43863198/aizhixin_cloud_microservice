@@ -106,7 +106,7 @@ public class DDUserServiceLogin {
             log.warn("token认证异常,token:" + authorization, e);
         }
         if (redisTemplate.opsForValue().setIfAbsent(authorization, account)) {
-            redisTemplate.expire(authorization, 1, TimeUnit.HOURS);
+            redisTemplate.expire(authorization, 10, TimeUnit.HOURS);
         }
 
         TokenUtil.accessToken = authorization;
