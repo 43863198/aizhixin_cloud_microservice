@@ -23,7 +23,7 @@ public class QuestionsChoiceDTO {
 		this.id = id;
 		this.choice = choice;
 		this.content = content;
-		this.score = score;
+		this.score2 = score;
 		this.questionId=questionId;
 	}
 	
