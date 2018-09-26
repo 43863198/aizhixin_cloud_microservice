@@ -23,7 +23,10 @@ public class FeedbackTempletQuesDTO {
     private String content;
 
     @ApiModelProperty(value = "分数")
-    private Float score;
+    private Integer score;
+
+    @ApiModelProperty(value = "分数")
+    private Float score2;
 
     @ApiModelProperty(value = "选项列表")
     private List<FeedbackTempletOptionsDTO> optionList;
@@ -36,6 +39,6 @@ public class FeedbackTempletQuesDTO {
         this.id = id;
         this.subject = subject;
         this.content = content;
-        this.score = score;
+        this.score2 = score;
     }
 }
