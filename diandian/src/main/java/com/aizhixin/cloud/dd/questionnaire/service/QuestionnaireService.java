@@ -29,11 +29,14 @@ import com.aizhixin.cloud.dd.questionnaire.repository.*;
 import com.aizhixin.cloud.dd.questionnaire.utils.QuestionnaireType;
 import com.aizhixin.cloud.dd.remote.*;
 import com.aizhixin.cloud.dd.messege.service.PushService;
+import com.aizhixin.cloud.dd.rollcall.service.AnnouncementService;
 import com.aizhixin.cloud.dd.rollcall.service.SemesterService;
 import com.aizhixin.cloud.dd.rollcall.service.StudentService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +79,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @Service
 @Transactional
 public class QuestionnaireService {
+    private Logger log = LoggerFactory.getLogger(QuestionnaireService.class);
     @Autowired
     private QuestionnaireRepository questionnaireRepository;
     @Autowired
@@ -1466,7 +1470,7 @@ public class QuestionnaireService {
             }
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("saveQuestionsException", e);
             result.put("trueMSG", false);
         }
         return result;
