@@ -726,6 +726,12 @@ public class QuestionnaireService {
                     for (Questions question : questions) {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
+                        questionDTO.setScore2(question.getScore());
+                        if(question.getScore()!= null){
+                            questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+                        } else {
+                            questionDTO.setScore(0);
+                        }
                         List<QuestionsChoiceDTO> qcdl = new ArrayList<>();
                         for (QuestionsChoice questionsChoice : question.getQuestionsChoice()) {
                             QuestionsChoiceDTO qcd = new QuestionsChoiceDTO();
