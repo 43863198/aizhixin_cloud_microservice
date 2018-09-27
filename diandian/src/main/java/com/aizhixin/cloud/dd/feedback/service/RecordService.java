@@ -543,9 +543,17 @@ public class RecordService {
             d.setUserName(item.getUserName());
             d.setUserAvatar(item.getUserAvatar());
             d.setTeachingScore2(item.getTeachingScore());
-            d.setTeachingScore(new BigDecimal(item.getTeachingScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            if (d.getTeachingScore2() != null) {
+                d.setTeachingScore(new BigDecimal(item.getTeachingScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                d.setTeachingScore(0);
+            }
             d.setStudyStyleScore2(item.getStudyStyleScore());
-            d.setStudyStyleScore(new BigDecimal(item.getStudyStyleScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            if (d.getStudyStyleScore2() != null) {
+                d.setStudyStyleScore(new BigDecimal(item.getStudyStyleScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                d.setStudyStyleScore(0);
+            }
             d.setCreateDate(item.getCreatedDate());
             d.setQuesType(item.getTemplet().getQuesType());
             return d;
