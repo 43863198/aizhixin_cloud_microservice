@@ -550,8 +550,10 @@ public class QuestionnaireService {
             questionnaire.setTotalQuestions(dto.getQuestions().size());
             if (dto.getTotalScore2() != null && dto.getTotalScore2() > 0) {
                 questionnaire.setTotalScore(dto.getTotalScore2());
-            } else {
+            } else if(dto.getTotalScore() != null) {
                 questionnaire.setTotalScore(Float.parseFloat(dto.getTotalScore().toString()));
+            } else {
+                questionnaire.setTotalScore(0f);
             }
             questionnaire.setStatus(QuestionnaireStatus.QUESTION_STATUS_INIT);
             questionnaire.setDeleteFlag(DataValidity.VALID.getState());
@@ -559,8 +561,7 @@ public class QuestionnaireService {
             questionnaire.setQComment(dto.isQcomment());
             questionnaire.setChoiceQuestion(dto.isChoiceQuestion());
             questionnaire.setQuantification(dto.isQuantification());
-            questionnaire.setEndDate(DateFormatUtil.parse((DateFormatUtil.formatShort(dto.getEndDate()) + " 23:59:59"),
-                    DateFormatUtil.FORMAT_LONG));
+            questionnaire.setEndDate(DateFormatUtil.parse((DateFormatUtil.formatShort(dto.getEndDate()) + " 23:59:59"), DateFormatUtil.FORMAT_LONG));
             //默认学生评教
             if (dto.getQuesType() == null || dto.getQuesType() < 1) {
                 dto.setQuesType(QuestionnaireType.STUDENT.getType());
@@ -574,6 +575,13 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if(questionDto.getScore2() != null){
+                        question.setScore(questionDto.getScore2());
+                    } else if(questionDto.getScore() != null){
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     question.setQuestionsChoice(null);
                     question.setId(null);
@@ -601,6 +609,13 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if(questionDto.getScore2() != null){
+                        question.setScore(questionDto.getScore2());
+                    } else if(questionDto.getScore() != null){
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     ql.add(question);
                 }
@@ -726,6 +741,12 @@ public class QuestionnaireService {
                     for (Questions question : questions) {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
+                        questionDTO.setScore2(question.getScore());
+                        if(question.getScore()!= null){
+                            questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+                        } else {
+                            questionDTO.setScore(0);
+                        }
                         List<QuestionsChoiceDTO> qcdl = new ArrayList<>();
                         for (QuestionsChoice questionsChoice : question.getQuestionsChoice()) {
                             QuestionsChoiceDTO qcd = new QuestionsChoiceDTO();
