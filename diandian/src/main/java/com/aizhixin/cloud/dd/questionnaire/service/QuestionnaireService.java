@@ -584,7 +584,7 @@ public class QuestionnaireService {
                             BeanUtils.copyProperties(questionsChoiceDTO, qc);
                             qc.setId(null);
                             qc.setQuestions(question);
-                            if(StringUtils.isNotEmpty(questionsChoiceDTO.getScore2())){
+                            if (StringUtils.isNotEmpty(questionsChoiceDTO.getScore2())) {
                                 qc.setScore(questionsChoiceDTO.getScore2());
                             } else {
                                 qc.setScore(questionsChoiceDTO.getScore());
@@ -942,8 +942,7 @@ public class QuestionnaireService {
                             questionnaireAssginStudents.setStudentName(studentDTO.getStudentName());
                             questionnaireAssginStudents.setClassesId(studentDTO.getClassesId());
                             questionnaireAssginStudents.setClassesName(studentDTO.getClassesName());
-                            questionnaireAssginStudents
-                                    .setStatus(QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_INIT);
+                            questionnaireAssginStudents.setStatus(QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_INIT);
                             qasList.add(questionnaireAssginStudents);
                             PushMessage message = new PushMessage();
                             message.setContent("您有新的调查问卷。");
@@ -1272,7 +1271,12 @@ public class QuestionnaireService {
             result.setQcomment(questionnaireDTO.isQcomment());
             result.setQuestionnaireAssginId(questionnaireAssginId);
             result.setQuestionnaireAssginStudentId(questionnaireAssginStudentId);
-            result.setTotalActualScore(questionnaireAssginStudents.getScore() == null ? 0 : questionnaireAssginStudents.getScore());
+            result.setTotalActualScore2(questionnaireAssginStudents.getScore() == null ? 0 : questionnaireAssginStudents.getScore());
+            if (result.getTotalActualScore2() != null && result.getTotalActualScore2() > 0) {
+                result.setTotalActualScore(new BigDecimal(result.getTotalActualScore2()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                result.setTotalActualScore(0);
+            }
             result.setCourseName(questionnaireAssgin.getCourseName());
             result.setTeacherName(questionnaireAssgin.getTeacherName());
             result.setComment(questionnaireAssginStudents.getComment());
@@ -1308,7 +1312,12 @@ public class QuestionnaireService {
             result.setQcomment(questionnaireDTO.isQcomment());
             result.setQuestionnaireAssginId(questionnaireAssginId);
             result.setQuestionnaireAssginStudentId(questionnaireAssginStudentId);
-            result.setTotalActualScore(questionnaireAssgin.getScore() == null ? 0 : questionnaireAssgin.getScore());
+            result.setTotalActualScore2(questionnaireAssgin.getScore() == null ? 0 : questionnaireAssgin.getScore());
+            if (result.getTotalActualScore2() != null && result.getTotalActualScore2() > 0) {
+                result.setTotalActualScore(new BigDecimal(result.getTotalActualScore2()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                result.setTotalActualScore(0);
+            }
             result.setCourseName(questionnaireAssgin.getCourseName());
             result.setTeacherName(questionnaireAssgin.getTeacherName());
             result.setComment(questionnaireAssgin.getComment());
