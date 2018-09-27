@@ -700,7 +700,11 @@ public class QuestionnaireService {
         if (questionnaire != null) {
             BeanUtils.copyProperties(questionnaire, questionnaireDTO);
             questionnaireDTO.setTotalScore2(questionnaire.getTotalScore());
-            questionnaireDTO.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            if(questionnaire.getTotalScore()!= null){
+                questionnaireDTO.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else{
+                questionnaireDTO.setTotalScore(0);
+            }
             questionnaireDTO.setCreateDate(questionnaire.getCreatedDate());
             questionnaireDTO.setQcomment(questionnaire.isQComment());
             List<Questions> questions = questionsRepository.findAllByQuestionnaireId(questionnaireID);
@@ -710,6 +714,12 @@ public class QuestionnaireService {
                     for (Questions question : questions) {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
+                        questionDTO.setScore2(question.getScore());
+                        if(question.getScore()!= null){
+                            questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+                        } else {
+                            questionDTO.setScore(0);
+                        }
                         questionDtos.add(questionDTO);
                     }
                 } else {
