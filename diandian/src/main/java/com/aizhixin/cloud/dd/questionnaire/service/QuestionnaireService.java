@@ -1405,6 +1405,8 @@ public class QuestionnaireService {
             if (questionsDTO.getTotalActualScore2() == null || questionsDTO.getTotalActualScore2() < 1) {
                 if (questionsDTO.getTotalActualScore() != null && questionsDTO.getTotalActualScore() > 0) {
                     questionsDTO.setTotalActualScore2(Float.parseFloat(questionsDTO.getTotalActualScore().toString()));
+                } else {
+                    questionsDTO.setTotalActualScore2(0f);
                 }
             }
             Questionnaire questionnaire = questionnaireRepository.findOne(id);
