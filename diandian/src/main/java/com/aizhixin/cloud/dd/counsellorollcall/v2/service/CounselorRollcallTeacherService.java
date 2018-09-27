@@ -379,7 +379,7 @@ public class CounselorRollcallTeacherService {
                     // 创建默认分组
                     Set<Long> allStudentIds = new HashSet<>();
                     for (IdNameDomain idNameDomain : classesInfo) {
-                        Set<Long> studentIds = classesService.getStudentIdsNotIncludeException(idNameDomain.getId());
+                        Set<Long> studentIds = classesService.getStudentIdsByClassId(idNameDomain.getId());
                         if (studentIds == null || studentIds.isEmpty()) {
                             continue;
                         }
