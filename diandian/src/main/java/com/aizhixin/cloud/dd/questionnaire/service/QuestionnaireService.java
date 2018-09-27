@@ -550,7 +550,7 @@ public class QuestionnaireService {
             questionnaire.setTotalQuestions(dto.getQuestions().size());
             if (dto.getTotalScore2() != null && dto.getTotalScore2() > 0) {
                 questionnaire.setTotalScore(dto.getTotalScore2());
-            } else if(dto.getTotalScore() != null) {
+            } else if (dto.getTotalScore() != null) {
                 questionnaire.setTotalScore(Float.parseFloat(dto.getTotalScore().toString()));
             } else {
                 questionnaire.setTotalScore(0f);
@@ -575,9 +575,9 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
-                    if(questionDto.getScore2() != null){
+                    if (questionDto.getScore2() != null) {
                         question.setScore(questionDto.getScore2());
-                    } else if(questionDto.getScore() != null){
+                    } else if (questionDto.getScore() != null) {
                         question.setScore(Float.parseFloat(questionDto.getScore().toString()));
                     } else {
                         question.setScore(0f);
@@ -609,9 +609,9 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
-                    if(questionDto.getScore2() != null){
+                    if (questionDto.getScore2() != null) {
                         question.setScore(questionDto.getScore2());
-                    } else if(questionDto.getScore() != null){
+                    } else if (questionDto.getScore() != null) {
                         question.setScore(Float.parseFloat(questionDto.getScore().toString()));
                     } else {
                         question.setScore(0f);
@@ -715,9 +715,9 @@ public class QuestionnaireService {
         if (questionnaire != null) {
             BeanUtils.copyProperties(questionnaire, questionnaireDTO);
             questionnaireDTO.setTotalScore2(questionnaire.getTotalScore());
-            if(questionnaire.getTotalScore()!= null){
+            if (questionnaire.getTotalScore() != null) {
                 questionnaireDTO.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
-            } else{
+            } else {
                 questionnaireDTO.setTotalScore(0);
             }
             questionnaireDTO.setCreateDate(questionnaire.getCreatedDate());
@@ -730,7 +730,7 @@ public class QuestionnaireService {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
                         questionDTO.setScore2(question.getScore());
-                        if(question.getScore()!= null){
+                        if (question.getScore() != null) {
                             questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                         } else {
                             questionDTO.setScore(0);
@@ -742,7 +742,7 @@ public class QuestionnaireService {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
                         questionDTO.setScore2(question.getScore());
-                        if(question.getScore()!= null){
+                        if (question.getScore() != null) {
                             questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                         } else {
                             questionDTO.setScore(0);
@@ -833,6 +833,14 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if (questionDto.getScore2() != null) {
+                        question.setScore(questionDto.getScore2());
+                    }
+                    if (questionDto.getScore() != null) {
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     question.setQuestionsChoice(null);
                     question.setId(null);
@@ -841,6 +849,11 @@ public class QuestionnaireService {
                             QuestionsChoice qc = new QuestionsChoice();
                             qc.setId(null);
                             BeanUtils.copyProperties(questionsChoiceDTO, qc);
+                            if (questionsChoiceDTO.getScore2() != null) {
+                                qc.setScore(questionsChoiceDTO.getScore2());
+                            } else if (questionsChoiceDTO.getScore() != null) {
+                                qc.setScore(questionsChoiceDTO.getScore());
+                            }
                             qc.setId(null);
                             qc.setQuestions(question);
                             qcl.add(qc);
@@ -855,6 +868,14 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if (questionDto.getScore2() != null) {
+                        question.setScore(questionDto.getScore2());
+                    }
+                    if (questionDto.getScore() != null) {
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     ql.add(question);
                 }
@@ -1377,6 +1398,11 @@ public class QuestionnaireService {
             if (id == null || id < 1) {
                 id = questionsDTO.getQuestionnaireId();
             }
+            if (questionsDTO.getTotalActualScore2() == null || questionsDTO.getTotalActualScore2() < 1) {
+                if (questionsDTO.getTotalActualScore() != null && questionsDTO.getTotalActualScore() > 0) {
+                    questionsDTO.setTotalActualScore2(Float.parseFloat(questionsDTO.getTotalActualScore().toString()));
+                }
+            }
             Questionnaire questionnaire = questionnaireRepository.findOne(id);
             List<QuestionDTO> questionDTOs = questionsDTO.getQuestions();
             if (questionnaire.getQuesType().intValue() == QuestionnaireType.STUDENT.getType()) {
@@ -1397,13 +1423,9 @@ public class QuestionnaireService {
                     questionAnswerRecordRepository.save(QuestionAnswerRecord);
                 }
                 if (!org.springframework.util.StringUtils.isEmpty(questionsDTO.getComment())) {
-                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date(), questionsDTO.getComment());
+                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), questionsDTO.getComment());
                 } else {
-                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date());
+                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date());
                 }
             } else {
                 float weight = 0;
@@ -1428,7 +1450,7 @@ public class QuestionnaireService {
                         record.setScore(Float.parseFloat(questionDTO.getActualScore().toString()));
                     }
                     if (weight > 0) {
-                        record.setWeightScore(record.getScore().intValue() * weight / 100);
+                        record.setWeightScore(new BigDecimal((record.getScore().floatValue() * weight / 100) + "").setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                     } else {
                         record.setWeightScore(record.getScore().floatValue());
                     }
@@ -1437,9 +1459,9 @@ public class QuestionnaireService {
                     questionAnswerRecordRepository.save(record);
                 }
                 if (!org.springframework.util.StringUtils.isEmpty(questionsDTO.getComment())) {
-                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), questionsDTO.getComment(), totalWeight);
+                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), questionsDTO.getComment(), totalWeight);
                 } else {
-                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), totalWeight);
+                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), totalWeight);
                 }
             }
             result.put("trueMSG", true);
