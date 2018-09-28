@@ -258,7 +258,7 @@ public class StudentSignInService {
                 }
             }
         } catch (Exception e) {
-            log.debug("Exception", e);
+            log.info("Exception", e);
         }
 
     }
@@ -356,7 +356,7 @@ public class StudentSignInService {
                     groupId = rollcall.getTempGroup().getId();
                 }
             }
-            log.debug("groupIdV2:" + groupId);
+            log.info("groupIdV2:" + groupId);
 
             CounsellorRollcallRule rule = null;
             if (groupId != null && groupId.longValue() > 0) {
@@ -625,7 +625,7 @@ public class StudentSignInService {
         try {
             Object stuId = stringRedisTemplate.opsForHash().get(RedisUtil.getCounslorAntiCheatingKey(counsellorId), deviceToken);
             if (log.isDebugEnabled()) {
-                log.debug("辅导员点名:antiCheating--> counsellorId:" + counsellorId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
+                log.info("辅导员点名:antiCheating--> counsellorId:" + counsellorId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
             }
 
             if (null == stuId) {
@@ -633,7 +633,7 @@ public class StudentSignInService {
             } else {
                 Long stuIdL = Long.valueOf((String) stuId);
                 if (log.isDebugEnabled()) {
-                    log.debug("辅导员点名:studentId:" + studentId + ",studIdL" + stuIdL);
+                    log.info("辅导员点名:studentId:" + studentId + ",studIdL" + stuIdL);
                 }
                 if (!stuIdL.equals(studentId)) {
                     return false;

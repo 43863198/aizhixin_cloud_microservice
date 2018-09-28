@@ -327,7 +327,7 @@ public class CounsellorRedisService {
                 thread.start();
             }
         } catch (Exception e) {
-            LOG.debug("delCacheByDelTempGroupV2", e);
+            LOG.info("delCacheByDelTempGroupV2", e);
         }
     }
 
@@ -376,7 +376,7 @@ public class CounsellorRedisService {
         // c.signTime,n.openTime,c.haveReport,c.status,c.haveRead,n.status
         List<StuTempGroupDomainV2> list = getRollcallByStuIdV2(stuId);
         if (list != null && list.size() > 0) {
-            LOG.debug("updateRollcallStatusV2:" + list.toString());
+            LOG.info("updateRollcallStatusV2:" + list.toString());
             for (StuTempGroupDomainV2 item : list) {
                 if (item != null && item.getGroupId().longValue() == groupId.longValue()) {
                     List<StuRollcallReportDomainV2> reportList = item.getReportList();
@@ -438,10 +438,6 @@ public class CounsellorRedisService {
             }
             if (isUpdate) {
                 redisTokenStore.storeRedisData(stuId, rollcallReportDomains);
-//                UpdateRollcallReportDomain data = new UpdateRollcallReportDomain();
-//                data.setStuId(stuId);
-//                data.setList(rollcallReportDomains);
-//                UpdateRollcallCacheThread.add(data);
             }
         }
         return rollcallReportDomains;

@@ -23,7 +23,7 @@
 //    public void execute(JobExecutionContext core)
 //            throws JobExecutionException {
 //
-//    	log.debug("每天晚上初始化当天学生和教学班对应关系到redis定时任务开始执行");
+//    	log.info("每天晚上初始化当天学生和教学班对应关系到redis定时任务开始执行");
 //    	StuTeachClassService stuTeachClassService = (StuTeachClassService) SpringContextUtil
 //                .getBean("stuTeachClassService");
 //    	stuTeachClassService.saveStuTeachClassIds();;

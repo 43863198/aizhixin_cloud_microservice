@@ -741,7 +741,7 @@ public class ScheduleRollCallService {
                         }
                     }
                 } else {
-                    log.debug("根据该排课ID:" + scheduleId + ",未找到班级信息！");
+                    log.info("根据该排课ID:" + scheduleId + ",未找到班级信息！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

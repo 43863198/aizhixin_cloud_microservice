@@ -117,19 +117,18 @@ public class UpdateRollcallMessageThread extends Thread {
             if (concurrentLinkedQueue.size() > 0) {
                 try {
                     int size = concurrentLinkedQueue.size();
-                    log.debug("更新点名消息队列有数据:" + size);
+                    log.info("更新点名消息队列有数据:" + size);
                     for (int i = 0; i < size; i++) {
                         MessageDTO data = concurrentLinkedQueue.poll();
                         if (data != null) {
                             messageService.push(data);
                         }
                     }
-                    log.debug("更新点名消息完成:" + size);
+                    log.info("更新点名消息完成:" + size);
                 } catch (Exception e) {
-                    log.debug("UpdateRollcallCacheThreadException", e);
+                    log.info("UpdateRollcallCacheThreadException", e);
                 }
             } else {
-//                log.debug("更新点名消息队列无数据");
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
