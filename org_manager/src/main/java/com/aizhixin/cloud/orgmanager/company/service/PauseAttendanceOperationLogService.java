@@ -6,7 +6,10 @@ import com.aizhixin.cloud.orgmanager.company.dto.StudentRollcallSetLogDTO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -22,13 +25,40 @@ import java.util.*;
 public class PauseAttendanceOperationLogService {
     @Autowired
     private EntityManager em;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Async
+    @Transactional
+    public void initLogStatus() {
+        String sql = "UPDATE t_student_rollcall_set SET is_last=0;";
+        jdbcTemplate.execute(sql);
+        sql = "SELECT MAX(ID) ID, STUDENT_ID FROM t_student_rollcall_set GROUP BY STUDENT_ID";
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+        if (list != null && list.size() > 0) {
+            String ids = "";
+            for (Map<String, Object> item : list) {
+                if (StringUtils.isNotEmpty(ids)) {
+                    ids += ",";
+                }
+                ids += item.get("ID");
+            }
+            sql = "UPDATE t_student_rollcall_set SET is_last=1 WHERE ID IN (" + ids + ");";
+            jdbcTemplate.execute(sql);
+        }
+    }
+
+    public void setLogStatus(Long stuId, Integer status) {
+        String sql = "UPDATE t_student_rollcall_set SET is_last=" + status + " WHERE STUDENT_ID=" + stuId + ";";
+        jdbcTemplate.execute(sql);
+    }
 
     public PageData<StudentRollcallSetLogDTO> getPauseAttendanceLogBywhere(Long orgId, Long collegeId, Integer opt, String criteria, String startTime, String endTime, Pageable pageable) {
         PageData<StudentRollcallSetLogDTO> p = new PageData<>();
         Long count = 0L;
         Map<String, Object> condition = new HashMap<>();
         StringBuilder cql = new StringBuilder("SELECT count(1) FROM t_student_rollcall_set srs LEFT JOIN t_user u ON srs.STUDENT_ID = u.ID WHERE 1=1");
-        StringBuilder sql = new StringBuilder("SELECT srs.CREATED_DATE, srs.OPERATOR, srs.OPT, srs.MSG, srs.STU_JOB_NUMBER, srs.STU_NAME, srs.STU_CLASSES_NAME, srs.STU_CLASSES_YEAR, srs.STU_PROFESSIONAL_NAME, srs.STU_COLLEGE_NAME, srs.STUDENT_ID FROM " +
+        StringBuilder sql = new StringBuilder("SELECT srs.CREATED_DATE, srs.OPERATOR, srs.OPT, srs.MSG, srs.STU_JOB_NUMBER, srs.STU_NAME, srs.STU_CLASSES_NAME, srs.STU_CLASSES_YEAR, srs.STU_PROFESSIONAL_NAME, srs.STU_COLLEGE_NAME, srs.STUDENT_ID, srs.is_last FROM " +
                 "t_student_rollcall_set srs LEFT JOIN t_user u ON srs.STUDENT_ID = u.ID WHERE 1=1");
         if (null != orgId) {
             cql.append(" AND srs.ORG_ID = :orgId");
@@ -129,6 +159,9 @@ public class PauseAttendanceOperationLogService {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }
+                    if (null != data[11]) {
+                        studentRollcallSetLogDTO.setIsLast((Boolean) data[11]);
                     }
                     attendanceRecordDTOList.add(studentRollcallSetLogDTO);
                 }

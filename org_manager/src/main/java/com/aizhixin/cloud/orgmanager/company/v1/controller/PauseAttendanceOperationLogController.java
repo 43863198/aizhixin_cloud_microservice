@@ -1,6 +1,7 @@
 package com.aizhixin.cloud.orgmanager.company.v1.controller;
 
 import com.aizhixin.cloud.orgmanager.common.PageData;
+import com.aizhixin.cloud.orgmanager.common.core.ApiReturnConstants;
 import com.aizhixin.cloud.orgmanager.common.core.PageUtil;
 import com.aizhixin.cloud.orgmanager.company.domain.UserDomain;
 import com.aizhixin.cloud.orgmanager.company.dto.StudentRollcallSetLogDTO;
@@ -13,13 +14,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Created by jianwei.wu
@@ -31,14 +36,26 @@ import java.util.List;
 @Api(description = "暂停考勤操作的记录日志API")
 public class PauseAttendanceOperationLogController {
     @Autowired
-   private PauseAttendanceOperationLogService pauseAttendanceOperationLogService;
+    private PauseAttendanceOperationLogService pauseAttendanceOperationLogService;
     @Autowired
     private UserRoleService userRoleService;
     @Autowired
     private UserService userService;
-//    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    @GetMapping(value = "/initLogStatus", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "初始化日志状态", response = Void.class, notes = "初始化日志状态 1qaz2wsx3edc <br><br><b>@hsh</b>")
+    public ResponseEntity<Map<String, Object>> initLogStatus(@ApiParam(value = "password", required = true) @RequestParam(value = "password") String password) {
+        if ("1qaz2wsx3edc".equals(password)) {
+            pauseAttendanceOperationLogService.initLogStatus();
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put(ApiReturnConstants.RESULT, Boolean.TRUE);
+        return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
     /**
      * 根据条件查询暂停考勤操作记录日志
+     *
      * @param orgId
      * @param criteria
      * @param startTime
@@ -62,25 +79,25 @@ public class PauseAttendanceOperationLogController {
         List<String> userRoles = userRoleService.findByUser(managerId);
         if (isCollegeManager(userRoles)) {
             UserDomain userInfo = userService.getUser(managerId);
-            if (null!=userInfo) {
-                collegeId  = userInfo.getCollegeId();
+            if (null != userInfo) {
+                collegeId = userInfo.getCollegeId();
             }
         }
-        return pauseAttendanceOperationLogService.getPauseAttendanceLogBywhere(orgId,collegeId,opt,criteria,startTime,endTime,PageUtil.createNoErrorPageRequest(pageNumber, pageSize));
-    }
-    //判断是否是院级管理  （权限数筛选时使用）
-    private boolean isCollegeManager(List<String> roles){
-        if(roles.contains("ROLE_COLLEGE_ADMIN")){
-            return true;
-        } else if(roles.contains("ROLE_COLLEG_DATAVIEW")){
-            return true;
-        }else if(roles.contains("ROLE_COLLEG_EDUCATIONALMANAGER")){
-            return true;
-        }else {
-            return  false;
-        }
+        return pauseAttendanceOperationLogService.getPauseAttendanceLogBywhere(orgId, collegeId, opt, criteria, startTime, endTime, PageUtil.createNoErrorPageRequest(pageNumber, pageSize));
     }
 
+    //判断是否是院级管理  （权限数筛选时使用）
+    private boolean isCollegeManager(List<String> roles) {
+        if (roles.contains("ROLE_COLLEGE_ADMIN")) {
+            return true;
+        } else if (roles.contains("ROLE_COLLEG_DATAVIEW")) {
+            return true;
+        } else if (roles.contains("ROLE_COLLEG_EDUCATIONALMANAGER")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
 }

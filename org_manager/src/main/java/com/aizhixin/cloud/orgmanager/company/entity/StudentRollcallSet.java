@@ -72,4 +72,7 @@ public class StudentRollcallSet extends AbstractEntity {
     @NotNull
     @Column(name = "ORG_ID")
     @Getter @Setter private Long orgId;
+
+    @Column(name = "is_last")
+    @Getter @Setter private Boolean isLast;
 }
