@@ -248,7 +248,7 @@ public class AttendanceStatisticsExeclQuery {
                 int askForLeave = rs.getInt("askForLeave");
                 int leave = rs.getInt("leaveEarly");
                 int truancy = rs.getInt("truant");
-                int total = normal + later + askForLeave + leave + truancy;
+                int total = rs.getInt("total");
                 item.setTotal(total);
                 item.setNormal(normal);
                 item.setLater(later);
