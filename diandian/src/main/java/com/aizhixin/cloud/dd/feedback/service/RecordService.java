@@ -385,7 +385,11 @@ public class RecordService {
                 d.setRecord(record);
                 FeedbackTempletQues templetQues = templetQuesRespository.findOne(item.getQuesId());
                 d.setTempletQues(templetQues);
-                d.setAnswer(item.getAnswer());
+                if (item.getAnswer2() != null) {
+                    d.setAnswer(item.getAnswer2());
+                } else {
+                    d.setAnswer(item.getAnswer());
+                }
                 savelist.add(d);
             }
         }
@@ -489,7 +493,7 @@ public class RecordService {
             d.setScore2(item.getTempletQues().getScore());
             d.setScore(new BigDecimal(item.getTempletQues().getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
             d.setAnswer2(item.getAnswer());
-            if (isInteger(item.getAnswer())) {
+            if (item.getAnswer() != null && isInteger(item.getAnswer())) {
                 d.setAnswer(new BigDecimal(item.getAnswer()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue() + "");
             } else {
                 d.setAnswer(item.getAnswer());
