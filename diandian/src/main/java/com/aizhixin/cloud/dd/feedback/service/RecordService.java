@@ -34,6 +34,7 @@ import org.springframework.util.StringUtils;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -475,6 +476,11 @@ public class RecordService {
         return null;
     }
 
+    private boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
+    }
+
     private FeedbackRecordAnswerDomain typeFeedbackRecordAnswerDomain(FeedbackRecordAnswer item) {
         if (item != null) {
             FeedbackRecordAnswerDomain d = new FeedbackRecordAnswerDomain();
@@ -482,7 +488,12 @@ public class RecordService {
             d.setContent(item.getTempletQues().getContent());
             d.setScore2(item.getTempletQues().getScore());
             d.setScore(new BigDecimal(item.getTempletQues().getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
-            d.setAnswer(item.getAnswer());
+            d.setAnswer2(item.getAnswer());
+            if (isInteger(item.getAnswer())) {
+                d.setAnswer(new BigDecimal(item.getAnswer()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue() + "");
+            } else {
+                d.setAnswer(item.getAnswer());
+            }
             if (item.getTempletQues().getTemplet().getQuesType() == FeedbackQuesType.XUANXIANG.getType()) {
                 List<FeedbackTempletOptionsDTO> optionsDTOS = optionsRespository.findByQuesId(item.getTempletQues().getId());
                 d.setOptionList(typeListFeedbackTempletOptionsDomain(optionsDTOS));
