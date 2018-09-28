@@ -173,8 +173,10 @@ public class TempletService {
         newTemplet.setQuesType(templet.getQuesType());
         if (templet.getTotalScore2() != null && templet.getTotalScore2() > 0) {
             newTemplet.setTotalScore(templet.getTotalScore2());
-        } else {
+        } else if (templet.getTotalScore() != null) {
             newTemplet.setTotalScore(Float.parseFloat(templet.getTotalScore().toString()));
+        } else {
+            newTemplet.setTotalScore(0f);
         }
         newTemplet.setType(type);
         newTemplet.setCreatedDate(new Date());
