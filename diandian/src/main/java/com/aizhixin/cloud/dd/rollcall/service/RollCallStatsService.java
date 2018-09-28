@@ -192,20 +192,6 @@ public class RollCallStatsService {
     }
 
     @Async
-    public void statsStuAllByTeachingClass(Long orgId, Long semesterId, Long teachingClassId) {
-        try {
-            List<TeachingClassStudent> students = studentRepository.findByTeachingClassId(teachingClassId);
-            if (students != null && students.size() > 0) {
-                for (TeachingClassStudent item : students) {
-                    statsStuAllByStuId(orgId, semesterId, item.getStuId());
-                }
-            }
-        } catch (Exception e) {
-            log.warn("statsStuByTeachingClassException", e);
-        }
-    }
-
-    @Async
     public void statsStuTeachingClassByTeachingClass(Long orgId, Long semesterId, Long teachingClassId) {
         try {
             Integer type = getStatsType(orgId);
