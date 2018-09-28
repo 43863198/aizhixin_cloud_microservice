@@ -34,7 +34,7 @@ public class AspectLog {
             long starttime = System.currentTimeMillis();
             Object result = joinPoint.proceed();
             if (LOG.isDebugEnabled()) {
-                LOG.debug("{} {} Params[{}] Response[{}] speed time:[{}]ms", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName(),
+                LOG.info("{} {} Params[{}] Response[{}] speed time:[{}]ms", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName(),
                     Arrays.toString(joinPoint.getArgs()), result, (System.currentTimeMillis() - starttime));
             }
             return result;

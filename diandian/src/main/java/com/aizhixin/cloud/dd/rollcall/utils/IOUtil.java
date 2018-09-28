@@ -58,7 +58,7 @@ public class IOUtil {
             switch (post.getStatusCode()) {
                 case 200:
                 case 201:
-                    log.debug("update image file success.");
+                    log.info("update image file success.");
                     JSONObject jsonObj = JSONObject.fromString(response);
                     Map<String, Class> keys = new HashMap<String, Class>();
                     IODTO ioDTO = new IODTO();

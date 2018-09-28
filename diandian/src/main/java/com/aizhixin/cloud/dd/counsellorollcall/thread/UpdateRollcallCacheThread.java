@@ -34,19 +34,19 @@ public class UpdateRollcallCacheThread extends Thread {
             if (concurrentLinkedQueue.size() > 0) {
                 try {
                     int size = concurrentLinkedQueue.size();
-                    log.debug("更新点名缓存队列有数据:" + size);
+                    log.info("更新点名缓存队列有数据:" + size);
                     for (int i = 0; i < size; i++) {
                         UpdateRollcallReportDomain data = concurrentLinkedQueue.poll();
                         if (data != null) {
                             redisTokenStore.storeRedisData(data.getStuId(), data.getList());
                         }
                     }
-                    log.debug("更新点名缓存完成:" + size);
+                    log.info("更新点名缓存完成:" + size);
                 } catch (Exception e) {
-                    log.debug("UpdateRollcallCacheThreadException", e);
+                    log.info("UpdateRollcallCacheThreadException", e);
                 }
             } else {
-                log.debug("更新点名缓存队列无数据");
+                log.info("更新点名缓存队列无数据");
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException e) {

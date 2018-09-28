@@ -185,7 +185,7 @@ public class CounsellorRollcallService {
             Thread thread = new Thread(myRunnable);
             thread.start();
         } catch (Exception e) {
-            LOG.debug("closeConunsellorRollcallAsyn-1", e);
+            LOG.info("closeConunsellorRollcallAsyn-1", e);
         }
 
     }

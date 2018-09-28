@@ -286,7 +286,7 @@ public class RollCallService {
     }
 
     public List<RollCallClassDTO> getRollCallNum(Long teacher_id, Long scheduleId, String type, String name) {
-        log.debug("获取点名信息:" + scheduleId);
+        log.info("获取点名信息:" + scheduleId);
         Schedule schedule = scheduleService.findOne(scheduleId);
         if (null == schedule) {
             return null;
@@ -562,7 +562,7 @@ public class RollCallService {
                 resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_ASKFORLEAVE);
                 resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
                 if (log.isDebugEnabled()) {
-                    log.debug("this student is ASK_FOR_LEAVE,studentId:" + rollCall.getStudentId());
+                    log.info("this student is ASK_FOR_LEAVE,studentId:" + rollCall.getStudentId());
                 }
                 return resBody;
             }
@@ -675,7 +675,7 @@ public class RollCallService {
         try {
             Object stuId = stringRedisTemplate.opsForHash().get(RedisUtil.getAntiCheatingKey(scheduleRollCallId), deviceToken);
             if (log.isDebugEnabled()) {
-                log.debug("antiCheating--> scheduleRollCallId:" + scheduleRollCallId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
+                log.info("antiCheating--> scheduleRollCallId:" + scheduleRollCallId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
             }
 
             if (null == stuId) {
@@ -683,7 +683,7 @@ public class RollCallService {
             } else {
                 Long stuIdL = Long.valueOf((String) stuId);
                 if (log.isDebugEnabled()) {
-                    log.debug("studentId:" + studentId + ",studIdL" + stuIdL);
+                    log.info("studentId:" + studentId + ",studIdL" + stuIdL);
                 }
                 if (!stuIdL.equals(studentId)) {
                     return false;

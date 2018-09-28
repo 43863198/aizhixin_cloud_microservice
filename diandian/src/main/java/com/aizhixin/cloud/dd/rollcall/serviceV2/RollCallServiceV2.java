@@ -147,7 +147,7 @@ public class RollCallServiceV2 {
                 resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_ASKFORLEAVE);
                 resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
                 if (log.isDebugEnabled()) {
-                    log.debug("this student is ASK_FOR_LEAVE,studentId:" + rollCall.getStudentId());
+                    log.info("this student is ASK_FOR_LEAVE,studentId:" + rollCall.getStudentId());
                 }
                 return resBody;
             }
@@ -231,7 +231,7 @@ public class RollCallServiceV2 {
         try {
             Object stuId = stringRedisTemplate.opsForHash().get(RedisUtil.getAntiCheatingKey(scheduleRollCallId), deviceToken);
             if (log.isDebugEnabled()) {
-                log.debug("antiCheating--> scheduleRollCallId:" + scheduleRollCallId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
+                log.info("antiCheating--> scheduleRollCallId:" + scheduleRollCallId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
             }
 
             if (null == stuId) {
@@ -239,7 +239,7 @@ public class RollCallServiceV2 {
             } else {
                 Long stuIdL = Long.valueOf((String) stuId);
                 if (log.isDebugEnabled()) {
-                    log.debug("studentId:" + studentId + ",studIdL" + stuIdL);
+                    log.info("studentId:" + studentId + ",studIdL" + stuIdL);
                 }
                 if (!stuIdL.equals(studentId)) {
                     return false;
@@ -259,7 +259,7 @@ public class RollCallServiceV2 {
         } else {
             String str = String.valueOf(run);
             if (RedisUtil.DIANDIAN_TASK_RUNNING.equals(str)) {
-                log.debug("计算任务正在执行中，等待其上一次执行结束...");
+                log.info("计算任务正在执行中，等待其上一次执行结束...");
                 return;
             }
         }
@@ -300,7 +300,7 @@ public class RollCallServiceV2 {
                         redisTemplate.opsForValue().getAndSet(RedisUtil.getScheduleTask(), RedisUtil.DIANDIAN_TASK_UNRUNNING);
                     }
                     Long end = System.currentTimeMillis();
-                    log.debug("执行计算中值耗时为：" + (end - start) + "ms");
+                    log.info("执行计算中值耗时为：" + (end - start) + "ms");
                 }
             });
             t.start();

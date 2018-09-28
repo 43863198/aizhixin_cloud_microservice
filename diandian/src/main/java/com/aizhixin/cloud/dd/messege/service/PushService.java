@@ -40,7 +40,7 @@ public class PushService {
     private static BlockingQueue<PushMessage> pushQueue = new LinkedBlockingQueue<PushMessage>(PUSH_QUEUE_SIZE);
 
     public PushService() {
-        log.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>启动推送消息线程。");
+        log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>启动推送消息线程。");
         Thread pushThread = new Thread(run);
         pushThread.start();
     }
@@ -48,10 +48,9 @@ public class PushService {
     public boolean listPush(String authorization, String text, String ticker,
                             String title, Iterable<Long> userIds) {
         try {
-            pushQueue.put(new PushMessage(authorization, text, ticker, title,
-                    userIds));
+            pushQueue.put(new PushMessage(authorization, text, ticker, title, userIds));
         } catch (InterruptedException e) {
-            log.warn("添加消息到推送队列异常。");
+            log.warn("添加消息到推送队列异常。", e);
             e.printStackTrace();
         }
         return true;
@@ -63,7 +62,7 @@ public class PushService {
         public void run() {
             while (true) {
                 try {
-                    log.debug("获取需要推送的消息数据...");
+                    log.info("获取需要推送的消息数据...");
                     PushMessage message = pushQueue.take();
                     if (message == null) {
                         sleep(500);
@@ -71,17 +70,15 @@ public class PushService {
                     }
                     listPush(message);
                     sleep(50);
-                    log.debug("推送消息成功,现推送队列消息数量为:" + pushQueue.size());
+                    log.info("推送消息成功,现推送队列消息数量为:" + pushQueue.size());
                 } catch (Exception e) {
                     ERROR_NUM.incrementAndGet();
                     log.warn("推送消息异常。");
                     e.printStackTrace();
                 }
                 // 防止推送消息异常缓慢，导致队列增大，从而引起调用服务阻塞。
-                if (ERROR_NUM.get() > 20
-                        && pushQueue.size() > PUSH_QUEUE_OVER_SIZE) {
-                    log.warn("无法正常推送消息，已删除消息条数:" + pushQueue.size()
-                            + ",请检查消息推送服务。");
+                if (ERROR_NUM.get() > 20 && pushQueue.size() > PUSH_QUEUE_OVER_SIZE) {
+                    log.warn("无法正常推送消息，已删除消息条数:" + pushQueue.size() + ",请检查消息推送服务。");
                     pushQueue.clear();
                     ERROR_NUM.set(0);
                 }
@@ -116,7 +113,7 @@ public class PushService {
                 log.warn("推送消息失败,返回值：" + response.getStatusCode() + ",消息："
                         + paramsStr);
             } else {
-                log.debug("推送消息:" + paramsStr);
+                log.info("推送消息:" + paramsStr);
             }
         }
     };

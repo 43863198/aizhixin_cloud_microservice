@@ -134,7 +134,7 @@ public class InitScheduleService {
         // 清除学校中值信息
         Set<Long> tempSet = new HashSet<>();
         redisTemplate.opsForHash().put(RedisUtil.getScheduleOrganId(), orgId, tempSet);
-        log.debug("开始执行初始化操作.....................................,组织机构Id:" + orgId);
+        log.info("开始执行初始化操作.....................................,组织机构Id:" + orgId);
         List<DianDianSchoolTimeDomain> ddList = orgManagerRemoteService.findSchoolTimeDay(orgId, semesterId, currentDate);
         List<PeriodDTO> periods = periodService.listPeriod(orgId);
         // 将数据直接入库。
@@ -374,7 +374,7 @@ public class InitScheduleService {
             CourseRollCall courseRollCall = courseRollCallService.get(schedule.getCourseId(), schedule.getTeacherId());
             if (null == courseRollCall) {
                 if (log.isDebugEnabled()) {
-                    log.debug("老师未开启点名，不需要初始化。课程id为:" + schedule.getId());
+                    log.info("老师未开启点名，不需要初始化。课程id为:" + schedule.getId());
                 }
                 return Boolean.TRUE;
             }
@@ -382,7 +382,7 @@ public class InitScheduleService {
             if (null == isOpen) {
                 if (!CourseRollCallConstants.OPEN_ROLLCALL.equals(courseRollCall.getIsOpen())) {
                     if (log.isDebugEnabled()) {
-                        log.debug("老师已关闭点名，不需要初始化!-->" + schedule.getId());
+                        log.info("老师已关闭点名，不需要初始化!-->" + schedule.getId());
                     }
                     return Boolean.TRUE;
                 }
@@ -396,7 +396,7 @@ public class InitScheduleService {
 
             if (scheduleRollCall.getIsInClassroom() != null && scheduleRollCall.getIsInClassroom() && scheduleRollCall.getClassRoomRollCall() != null && (scheduleRollCall.getClassRoomRollCall() == CourseRollCallConstants.OPEN_CLASSROOMROLLCALL || scheduleRollCall.getClassRoomRollCall() == CourseRollCallConstants.CLOSED_CLASSROOMROLLCALL)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("已开启过点名组，不需要初始化!-->" + schedule.getId());
+                    log.info("已开启过点名组，不需要初始化!-->" + schedule.getId());
                 }
                 return Boolean.TRUE;
             }
@@ -437,7 +437,7 @@ public class InitScheduleService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.warn("初始化排课的点名信息失败," + schedule.getId() + "," + e.getMessage());
+            log.warn("初始化排课的点名信息失败," + schedule.getId(), e);
         }
         return false;
     }
@@ -528,7 +528,7 @@ public class InitScheduleService {
         } else {
             String str = String.valueOf(run);
             if (RedisUtil.DIANDIAN_TASK_RUNNING.equals(str)) {
-                log.debug("计算任务正在执行中，等待其上一次执行结束...");
+                log.info("计算任务正在执行中，等待其上一次执行结束...");
                 return;
             }
         }
@@ -569,7 +569,7 @@ public class InitScheduleService {
                         redisTemplate.opsForValue().getAndSet(RedisUtil.getScheduleTask(), RedisUtil.DIANDIAN_TASK_UNRUNNING);
                     }
                     Long end = System.currentTimeMillis();
-                    log.debug("执行计算中值耗时为：" + (end - start) + "ms");
+                    log.info("执行计算中值耗时为：" + (end - start) + "ms");
                 }
             });
             t.start();
