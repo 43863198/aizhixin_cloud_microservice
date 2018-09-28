@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -28,6 +29,7 @@ public class PauseAttendanceOperationLogService {
     private JdbcTemplate jdbcTemplate;
 
     @Async
+    @Transactional
     public void initLogStatus() {
         String sql = "UPDATE t_student_rollcall_set SET is_last=0;";
         jdbcTemplate.execute(sql);
