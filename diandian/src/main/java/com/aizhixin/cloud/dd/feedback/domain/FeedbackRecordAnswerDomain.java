@@ -26,6 +26,9 @@ public class FeedbackRecordAnswerDomain {
     @ApiModelProperty(value = "填写答案")
     private String answer;
 
+    @ApiModelProperty(value = "填写答案")
+    private String answer2;
+
     @ApiModelProperty(value = "选项列表")
     private List<FeedbackTempletOptionsDomain> optionList;
 }
