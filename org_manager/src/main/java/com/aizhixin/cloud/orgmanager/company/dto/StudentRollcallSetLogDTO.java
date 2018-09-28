@@ -42,5 +42,7 @@ public class StudentRollcallSetLogDTO {
     private String stuProfessionalName;
     @ApiModelProperty(value = "学院")
     private String stuCollegeName;
+    @ApiModelProperty(value = "是否最新")
+    private Boolean isLast;
 
 }
