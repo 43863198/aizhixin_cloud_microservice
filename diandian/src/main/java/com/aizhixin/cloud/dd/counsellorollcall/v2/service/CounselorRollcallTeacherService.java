@@ -379,7 +379,7 @@ public class CounselorRollcallTeacherService {
                     // 创建默认分组
                     Set<Long> allStudentIds = new HashSet<>();
                     for (IdNameDomain idNameDomain : classesInfo) {
-                        Set<Long> studentIds = classesService.getStudentIdsNotIncludeException(idNameDomain.getId());
+                        Set<Long> studentIds = classesService.getStudentIdsByClassId(idNameDomain.getId());
                         if (studentIds == null || studentIds.isEmpty()) {
                             continue;
                         }
@@ -492,13 +492,19 @@ public class CounselorRollcallTeacherService {
             List<TempGroup> groups = new ArrayList<>();
             groups.add(tempGroup);
             Date startDate = new Date();
-            startDate.setHours(0);
-            startDate.setMinutes(0);
-            startDate.setSeconds(0);
+            Calendar sCalendar = Calendar.getInstance();
+            sCalendar.setTime(startDate);
+            sCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            sCalendar.set(Calendar.MINUTE, 0);
+            sCalendar.set(Calendar.SECOND, 0);
+            startDate = sCalendar.getTime();
             Date endDate = new Date();
-            endDate.setHours(23);
-            endDate.setMinutes(59);
-            endDate.setSeconds(59);
+            Calendar eCalendar = Calendar.getInstance();
+            eCalendar.setTime(endDate);
+            eCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            eCalendar.set(Calendar.MINUTE, 59);
+            eCalendar.set(Calendar.SECOND, 59);
+            endDate = eCalendar.getTime();
             List<Long> rollcallList = rollcallRepository.findByTempGroupAndOpenTime(groups, startDate, endDate);
             if (rollcallList != null && rollcallList.size() > 0) {
                 //添加到队列中，第二天生效
@@ -906,13 +912,19 @@ public class CounselorRollcallTeacherService {
         if (rule != null) {
             //检查是否开启
             Date startDate = new Date();
-            startDate.setHours(0);
-            startDate.setMinutes(0);
-            startDate.setSeconds(0);
+            Calendar sCalendar = Calendar.getInstance();
+            sCalendar.setTime(startDate);
+            sCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            sCalendar.set(Calendar.MINUTE, 0);
+            sCalendar.set(Calendar.SECOND, 0);
+            startDate = sCalendar.getTime();
             Date endDate = new Date();
-            endDate.setHours(23);
-            endDate.setMinutes(59);
-            endDate.setSeconds(59);
+            Calendar eCalendar = Calendar.getInstance();
+            eCalendar.setTime(endDate);
+            eCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            eCalendar.set(Calendar.MINUTE, 59);
+            eCalendar.set(Calendar.SECOND, 59);
+            endDate = eCalendar.getTime();
             List<TempGroup> groups = groupRepository.findByRuleIdAndDeleteFlag(rule.getId(), DataValidity.VALID.getState());
             List<Long> rollcallList = null;
             if (groups != null && groups.size() > 0) {

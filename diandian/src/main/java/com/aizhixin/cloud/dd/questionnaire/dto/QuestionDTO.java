@@ -31,6 +31,9 @@ public class QuestionDTO {
     @ApiModelProperty(value = "题目分值", required = false)
     private Integer score = 0;
 
+    @ApiModelProperty(value = "题目分值", required = false)
+    private Float score2 = 0f;
+
     /**
      * 选择题选项
      */
@@ -42,6 +45,9 @@ public class QuestionDTO {
      */
     @ApiModelProperty(value = "实际得分", required = false)
     private Integer actualScore = 0;
+
+    @ApiModelProperty(value = "实际得分", required = false)
+    private Float actualScore2 = 0f;
 
     /**
      * 学生答案
@@ -58,13 +64,13 @@ public class QuestionDTO {
     public QuestionDTO() {
     }
 
-    public QuestionDTO(Long id, Integer no, String name, Integer score, Integer actualScore) {
+    public QuestionDTO(Long id, Integer no, String name, Float score, Float actualScore) {
         super();
         this.id = id;
         this.no = no;
         this.name = name;
-        this.score = score;
-        this.actualScore = actualScore;
+        this.score2 = score;
+        this.actualScore2 = actualScore;
     }
 
 }

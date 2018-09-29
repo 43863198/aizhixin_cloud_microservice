@@ -19,6 +19,9 @@ public class FeedbackRecordAnswerDTO {
     @ApiModelProperty(value = "填写答案")
     private String answer;
 
+    @ApiModelProperty(value = "填写答案")
+    private String answer2;
+
     public FeedbackRecordAnswerDTO() {
 
     }

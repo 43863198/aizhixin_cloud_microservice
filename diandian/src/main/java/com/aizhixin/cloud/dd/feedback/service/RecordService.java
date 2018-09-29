@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -383,7 +385,11 @@ public class RecordService {
                 d.setRecord(record);
                 FeedbackTempletQues templetQues = templetQuesRespository.findOne(item.getQuesId());
                 d.setTempletQues(templetQues);
-                d.setAnswer(item.getAnswer());
+                if (item.getAnswer2() != null) {
+                    d.setAnswer(item.getAnswer2());
+                } else {
+                    d.setAnswer(item.getAnswer());
+                }
                 savelist.add(d);
             }
         }
@@ -437,8 +443,20 @@ public class RecordService {
             record.setJobNum(item.getJobNum());
             record.setUserName(item.getUserName());
             record.setUserAvatar(item.getUserAvatar());
-            record.setTeachingScore(item.getTeachingScore());
-            record.setStudyStyleScore(item.getStudyStyleScore());
+            if (item.getTeachingScore2() != null && item.getTeachingScore2() > 0) {
+                record.setTeachingScore(item.getTeachingScore2());
+            } else if (item.getTeachingScore() != null) {
+                record.setTeachingScore(Float.parseFloat(item.getTeachingScore().toString()));
+            } else {
+                record.setTeachingScore(0f);
+            }
+            if (item.getStudyStyleScore2() != null && item.getStudyStyleScore2() > 0) {
+                record.setStudyStyleScore(item.getStudyStyleScore2());
+            } else if (item.getStudyStyleScore() != null) {
+                record.setStudyStyleScore(Float.parseFloat(item.getStudyStyleScore().toString()));
+            } else {
+                record.setStudyStyleScore(0f);
+            }
         }
         return record;
     }
@@ -462,13 +480,24 @@ public class RecordService {
         return null;
     }
 
+    private boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
+    }
+
     private FeedbackRecordAnswerDomain typeFeedbackRecordAnswerDomain(FeedbackRecordAnswer item) {
         if (item != null) {
             FeedbackRecordAnswerDomain d = new FeedbackRecordAnswerDomain();
             d.setSubject(item.getTempletQues().getSubject());
             d.setContent(item.getTempletQues().getContent());
-            d.setScore(item.getTempletQues().getScore());
-            d.setAnswer(item.getAnswer());
+            d.setScore2(item.getTempletQues().getScore());
+            d.setScore(new BigDecimal(item.getTempletQues().getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            d.setAnswer2(item.getAnswer());
+            if (item.getAnswer() != null && isInteger(item.getAnswer())) {
+                d.setAnswer(new BigDecimal(item.getAnswer()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue() + "");
+            } else {
+                d.setAnswer(item.getAnswer());
+            }
             if (item.getTempletQues().getTemplet().getQuesType() == FeedbackQuesType.XUANXIANG.getType()) {
                 List<FeedbackTempletOptionsDTO> optionsDTOS = optionsRespository.findByQuesId(item.getTempletQues().getId());
                 d.setOptionList(typeListFeedbackTempletOptionsDomain(optionsDTOS));
@@ -528,8 +557,18 @@ public class RecordService {
             d.setJobNum(item.getJobNum());
             d.setUserName(item.getUserName());
             d.setUserAvatar(item.getUserAvatar());
-            d.setTeachingScore(item.getTeachingScore());
-            d.setStudyStyleScore(item.getStudyStyleScore());
+            d.setTeachingScore2(item.getTeachingScore());
+            if (d.getTeachingScore2() != null) {
+                d.setTeachingScore(new BigDecimal(item.getTeachingScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                d.setTeachingScore(0);
+            }
+            d.setStudyStyleScore2(item.getStudyStyleScore());
+            if (d.getStudyStyleScore2() != null) {
+                d.setStudyStyleScore(new BigDecimal(item.getStudyStyleScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                d.setStudyStyleScore(0);
+            }
             d.setCreateDate(item.getCreatedDate());
             d.setQuesType(item.getTemplet().getQuesType());
             return d;

@@ -63,7 +63,7 @@ public class StuTeachClassService {
 
     public void saveStuTeachClassIds() {
 
-        log.debug("根据排课信息查询当天学生教学班信息开始。。。。。。。。。。。。。。。。。");
+        log.info("根据排课信息查询当天学生教学班信息开始。。。。。。。。。。。。。。。。。");
         String todayStr = DateFormatUtil.formatShort(new Date());
         String sql = "SELECT DISTINCT(s.TEACHINGCLASS_ID),TEACH_DATE FROM `dd_schedule` s where s.DELETE_FLAG = 0 and s.TEACH_DATE = '" + todayStr + "';";
 
@@ -92,19 +92,9 @@ public class StuTeachClassService {
                 Long key = (Long) entry.getKey();
                 Set <Long> val = (Set <Long>) entry.getValue();
                 String teachClassIds = StringUtils.join(val.toArray(), ",");
-//	    	for(Long teachClassId :val){
-//	    		if(StringUtils.isBlank(teachClassIds)){
-//	    			teachClassIds += teachClassId;
-//	    		}else{
-//	    			teachClassIds += ","+teachClassId;
-//	    		}
-//	    	}
-
                 stringRedisTemplate.opsForValue().set(todayStr + "_" + String.valueOf(key), teachClassIds, 1, TimeUnit.DAYS);
             }
         }
-        log.debug("根据排课信息查询当天学生教学班信息结束。。。。。。。。。。。。。。。。。");
+        log.info("根据排课信息查询当天学生教学班信息结束。。。。。。。。。。。。。。。。。");
     }
-
-
 }

@@ -82,7 +82,7 @@ public class QuestionnaireAssginStudents extends AbstractEntitytwo implements Se
 	@Column(name = "SCORE")
 	@Getter
 	@Setter
-	private Integer score;
+	private Float score;
 	/**
 	 * 状态
 	 */
@@ -101,7 +101,7 @@ public class QuestionnaireAssginStudents extends AbstractEntitytwo implements Se
 	public QuestionnaireAssginStudents() {
 	};
 	public QuestionnaireAssginStudents(Long id, QuestionnaireAssgin questionnaireAssgin, Long studentId,
-			String studentName, Long classesId, String classesName, Date commitDate, Integer score, Integer status) {
+			String studentName, Long classesId, String classesName, Date commitDate, Float score, Integer status) {
 		super();
 		this.id = id;
 		this.questionnaireAssgin = questionnaireAssgin;

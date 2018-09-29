@@ -77,10 +77,10 @@ public class DDUserService {
     public AccountDTO getUserInfoWithLogin(String authorization) {
         AccountDTO accountDTO = ddUserServiceLogin.getUserInfoWithLogin(authorization);
         if (null == accountDTO) {
-            log.debug("缓存失效...，从二级缓存获取...");
-            	   accountDTO = (AccountDTO) redisTemplate.opsForValue().get(authorization);
+            log.info("缓存失效...，从二级缓存获取...");
+            accountDTO = (AccountDTO) redisTemplate.opsForValue().get(authorization);
             if (null == accountDTO) {
-                log.debug("缓存失效...，从三级级缓存获取...");
+                log.info("缓存失效...，从三级级缓存获取...");
                 accountDTO = ddUserServiceLogin.getUserInfoWithLoginUpdate(authorization);
             }
         }
@@ -217,14 +217,8 @@ public class DDUserService {
         OauthGet get = new OauthGet();
         HttpResponse response = null;
         try {
-            response = get
-                    .get(configCache.getConfigValueByParm("user.service.host")
-                                    + configCache
-                                    .getConfigValueByParm("user.service.getInfo"),
-                            "", authorization);
-            System.out.println(configCache
-                    .getConfigValueByParm("user.service.host")
-                    + configCache.getConfigValueByParm("user.service.getInfo"));
+            response = get.get(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfo"), "", authorization);
+            System.out.println(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfo"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -237,14 +231,8 @@ public class DDUserService {
         OauthGet get = new OauthGet();
         HttpResponse response = null;
         try {
-            response = get
-                    .get(configCache.getConfigValueByParm("user.service.host")
-                                    + configCache
-                                    .getConfigValueByParm("user.service.getInfoNew"),
-                            "", authorization);
-            System.out.println(configCache
-                    .getConfigValueByParm("user.service.host")
-                    + configCache.getConfigValueByParm("user.service.getInfoNew"));
+            response = get.get(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfoNew"), "", authorization);
+            System.out.println(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfoNew"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -255,9 +243,9 @@ public class DDUserService {
 
 
     public boolean updateAvatar(Long userId, String accessToken, String fileName, byte[] avatarData) {
-        if (accessToken == null)
+        if (accessToken == null) {
             return false;
-
+        }
         String apiURL = configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.avatar");
         // 存储文件
         IODTO ioDTO = ioUtil.upload(fileName, avatarData);
@@ -267,11 +255,10 @@ public class DDUserService {
         put.setRequestHeader("Authorization", accessToken);
         try {
             client.executeMethod(put);
-//			final String response = put.getResponseBodyAsString();
             switch (put.getStatusCode()) {
                 case 200:
                 case 201:
-                    log.debug("update avatar success.");
+                    log.info("update avatar success.");
                     redisTemplate.opsForValue().set("avatarFile:" + userId, ioDTO.getFileUrl(), 1, TimeUnit.HOURS);
                     return true;
                 default:
@@ -288,7 +275,7 @@ public class DDUserService {
     }
 
 
-    public JSONObject getUserinfoByIds(List <Long> ids) {
+    public JSONObject getUserinfoByIds(List<Long> ids) {
         OauthGet get = new OauthGet();
         HttpResponse response = null;
         String idsStr = "";
@@ -315,7 +302,7 @@ public class DDUserService {
             listMap = new HashMap();
             String s = response.getResponseBody();
             JSONObject user = JSONObject.fromString(s);
-            Iterator <String> iterator = user.keys();
+            Iterator<String> iterator = user.keys();
             while (iterator.hasNext()) {
                 String key = iterator.next();
                 String value = user.getString(key);
@@ -328,9 +315,9 @@ public class DDUserService {
 
         return result;
     }
-    
-    
-    public Map<Long,AccountDTO> getUserinfoByIdsV2(List <Long> ids) {
+
+
+    public Map<Long, AccountDTO> getUserinfoByIdsV2(List<Long> ids) {
         OauthGet get = new OauthGet();
         HttpResponse response = null;
         String idsStr = "";
@@ -350,50 +337,44 @@ public class DDUserService {
             }
         } catch (IOException e) {
         }
-        HashMap<Long,AccountDTO> listMap = null;
+        HashMap<Long, AccountDTO> listMap = null;
         JSONObject result = null;
         if (null != response) {
             listMap = new HashMap();
             String s = response.getResponseBody();
             JSONObject user = JSONObject.fromString(s);
-            Iterator <String> iterator = user.keys();
+            Iterator<String> iterator = user.keys();
             while (iterator.hasNext()) {
                 String key = iterator.next();
                 String value = user.getString(key);
-              //  JSONObject user_json = JSONObject.fromString(value);
-              Map<String, Object> data=null;
-              AccountDTO adt=new AccountDTO();
-			try {
-				data = JsonUtil.Json2Object(value);
-	                if(null!=data.get("id")&&null!=data){
-	                	adt.setId(Long.valueOf(data.get("id").toString()));
-	                }
-	                
-	                if(null!=data.get("phoneNumber")){
-	                	adt.setPhoneNumber(data.get("phoneNumber").toString());
-	                }
-	                if(null!=data.get("avatar")){
-	                	adt.setAvatar(data.get("avatar").toString());
-	                }
-	                if(null!=data.get("userName")){
-	                    adt.setName(data.get("userName").toString());
-	                }
-			} catch (JsonParseException e) {
+                Map<String, Object> data = null;
+                AccountDTO adt = new AccountDTO();
+                try {
+                    data = JsonUtil.Json2Object(value);
+                    if (null != data.get("id") && null != data) {
+                        adt.setId(Long.valueOf(data.get("id").toString()));
+                    }
 
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
+                    if (null != data.get("phoneNumber")) {
+                        adt.setPhoneNumber(data.get("phoneNumber").toString());
+                    }
+                    if (null != data.get("avatar")) {
+                        adt.setAvatar(data.get("avatar").toString());
+                    }
+                    if (null != data.get("userName")) {
+                        adt.setName(data.get("userName").toString());
+                    }
+                } catch (JsonParseException e) {
 
-				e.printStackTrace();
-			} catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JsonMappingException e) {
 
-				e.printStackTrace();
-			}
+                    e.printStackTrace();
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+                }
                 listMap.put(Long.valueOf(key), adt);
-//                JSONObject user_json = JSONObject.fromString(value);
-//                result = user_json;
-//                break;
-                // phone = user_json.getString("phoneNumber");
-                
             }
         }
 

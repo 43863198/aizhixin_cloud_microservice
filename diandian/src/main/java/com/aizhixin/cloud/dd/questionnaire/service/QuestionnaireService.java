@@ -1,6 +1,7 @@
 package com.aizhixin.cloud.dd.questionnaire.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,11 +29,14 @@ import com.aizhixin.cloud.dd.questionnaire.repository.*;
 import com.aizhixin.cloud.dd.questionnaire.utils.QuestionnaireType;
 import com.aizhixin.cloud.dd.remote.*;
 import com.aizhixin.cloud.dd.messege.service.PushService;
+import com.aizhixin.cloud.dd.rollcall.service.AnnouncementService;
 import com.aizhixin.cloud.dd.rollcall.service.SemesterService;
 import com.aizhixin.cloud.dd.rollcall.service.StudentService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +79,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @Service
 @Transactional
 public class QuestionnaireService {
+    private Logger log = LoggerFactory.getLogger(QuestionnaireService.class);
     @Autowired
     private QuestionnaireRepository questionnaireRepository;
     @Autowired
@@ -547,15 +552,20 @@ public class QuestionnaireService {
             questionnaire.setId(dto.getId());
             questionnaire.setName(dto.getName());
             questionnaire.setTotalQuestions(dto.getQuestions().size());
-            questionnaire.setTotalScore(dto.getTotalScore());
+            if (dto.getTotalScore2() != null && dto.getTotalScore2() > 0) {
+                questionnaire.setTotalScore(dto.getTotalScore2());
+            } else if (dto.getTotalScore() != null) {
+                questionnaire.setTotalScore(Float.parseFloat(dto.getTotalScore().toString()));
+            } else {
+                questionnaire.setTotalScore(0f);
+            }
             questionnaire.setStatus(QuestionnaireStatus.QUESTION_STATUS_INIT);
             questionnaire.setDeleteFlag(DataValidity.VALID.getState());
             questionnaire.setOrganId(organId);
             questionnaire.setQComment(dto.isQcomment());
             questionnaire.setChoiceQuestion(dto.isChoiceQuestion());
             questionnaire.setQuantification(dto.isQuantification());
-            questionnaire.setEndDate(DateFormatUtil.parse((DateFormatUtil.formatShort(dto.getEndDate()) + " 23:59:59"),
-                    DateFormatUtil.FORMAT_LONG));
+            questionnaire.setEndDate(DateFormatUtil.parse((DateFormatUtil.formatShort(dto.getEndDate()) + " 23:59:59"), DateFormatUtil.FORMAT_LONG));
             //默认学生评教
             if (dto.getQuesType() == null || dto.getQuesType() < 1) {
                 dto.setQuesType(QuestionnaireType.STUDENT.getType());
@@ -569,6 +579,13 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if (questionDto.getScore2() != null) {
+                        question.setScore(questionDto.getScore2());
+                    } else if (questionDto.getScore() != null) {
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     question.setQuestionsChoice(null);
                     question.setId(null);
@@ -579,6 +596,11 @@ public class QuestionnaireService {
                             BeanUtils.copyProperties(questionsChoiceDTO, qc);
                             qc.setId(null);
                             qc.setQuestions(question);
+                            if (StringUtils.isNotEmpty(questionsChoiceDTO.getScore2())) {
+                                qc.setScore(questionsChoiceDTO.getScore2());
+                            } else {
+                                qc.setScore(questionsChoiceDTO.getScore());
+                            }
                             qcl.add(qc);
                         }
                     }
@@ -591,6 +613,13 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if (questionDto.getScore2() != null) {
+                        question.setScore(questionDto.getScore2());
+                    } else if (questionDto.getScore() != null) {
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     ql.add(question);
                 }
@@ -658,6 +687,8 @@ public class QuestionnaireService {
                 for (Questionnaire questionnaire : content) {
                     dto = new QuestionnaireDTO();
                     BeanUtils.copyProperties(questionnaire, dto);
+                    dto.setTotalScore2(questionnaire.getTotalScore());
+                    dto.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                     dto.setCreateDate(questionnaire.getCreatedDate());
                     dto.setQuestions(null);
                     dto.setTeachingNum(questionnaireMap.get(questionnaire.getId()) == null ? 0
@@ -687,6 +718,12 @@ public class QuestionnaireService {
         Questionnaire questionnaire = questionnaireRepository.findOne(questionnaireID);
         if (questionnaire != null) {
             BeanUtils.copyProperties(questionnaire, questionnaireDTO);
+            questionnaireDTO.setTotalScore2(questionnaire.getTotalScore());
+            if (questionnaire.getTotalScore() != null) {
+                questionnaireDTO.setTotalScore(new BigDecimal(questionnaire.getTotalScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                questionnaireDTO.setTotalScore(0);
+            }
             questionnaireDTO.setCreateDate(questionnaire.getCreatedDate());
             questionnaireDTO.setQcomment(questionnaire.isQComment());
             List<Questions> questions = questionsRepository.findAllByQuestionnaireId(questionnaireID);
@@ -696,21 +733,37 @@ public class QuestionnaireService {
                     for (Questions question : questions) {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
+                        questionDTO.setScore2(question.getScore());
+                        if (question.getScore() != null) {
+                            questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+                        } else {
+                            questionDTO.setScore(0);
+                        }
                         questionDtos.add(questionDTO);
                     }
                 } else {
                     for (Questions question : questions) {
                         QuestionDTO questionDTO = new QuestionDTO();
                         BeanUtils.copyProperties(question, questionDTO);
+                        questionDTO.setScore2(question.getScore());
+                        if (question.getScore() != null) {
+                            questionDTO.setScore(new BigDecimal(question.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+                        } else {
+                            questionDTO.setScore(0);
+                        }
                         List<QuestionsChoiceDTO> qcdl = new ArrayList<>();
                         for (QuestionsChoice questionsChoice : question.getQuestionsChoice()) {
                             QuestionsChoiceDTO qcd = new QuestionsChoiceDTO();
                             qcd.setChoice(questionsChoice.getChoice());
                             qcd.setContent(questionsChoice.getContent());
-                            qcd.setScore(questionsChoice.getScore());
+                            qcd.setScore2(questionsChoice.getScore());
+                            if (StringUtils.isNotEmpty(questionsChoice.getScore())) {
+                                qcd.setScore(new BigDecimal(questionsChoice.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue() + "");
+                            } else {
+                                qcd.setScore("0");
+                            }
                             qcd.setId(questionsChoice.getId());
                             qcdl.add(qcd);
-                            // BeanUtils.copyProperties(questionsChoice, qcd);
                         }
                         questionDTO.setQuestionChioce(qcdl);
                         questionDtos.add(questionDTO);
@@ -760,7 +813,11 @@ public class QuestionnaireService {
             questionnaire.setId(null);
             questionnaire.setName(dto.getName());
             questionnaire.setTotalQuestions(dto.getQuestions().size());
-            questionnaire.setTotalScore(dto.getTotalScore());
+            if (dto.getTotalScore2() != null && dto.getTotalScore2() > 0) {
+                questionnaire.setTotalScore(dto.getTotalScore2());
+            } else {
+                questionnaire.setTotalScore(Float.parseFloat(dto.getTotalScore().toString()));
+            }
             questionnaire.setStatus(QuestionnaireStatus.QUESTION_STATUS_INIT);
             questionnaire.setEndDate(dto.getEndDate());
             questionnaire.setDeleteFlag(QuestionnaireStatus.QUESTION_DELETEFLAG_NORMAL);
@@ -780,6 +837,14 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if (questionDto.getScore2() != null) {
+                        question.setScore(questionDto.getScore2());
+                    }
+                    if (questionDto.getScore() != null) {
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     question.setQuestionsChoice(null);
                     question.setId(null);
@@ -788,6 +853,11 @@ public class QuestionnaireService {
                             QuestionsChoice qc = new QuestionsChoice();
                             qc.setId(null);
                             BeanUtils.copyProperties(questionsChoiceDTO, qc);
+                            if (questionsChoiceDTO.getScore2() != null) {
+                                qc.setScore(questionsChoiceDTO.getScore2());
+                            } else if (questionsChoiceDTO.getScore() != null) {
+                                qc.setScore(questionsChoiceDTO.getScore());
+                            }
                             qc.setId(null);
                             qc.setQuestions(question);
                             qcl.add(qc);
@@ -802,6 +872,14 @@ public class QuestionnaireService {
                 for (QuestionDTO questionDto : questionDtos) {
                     Questions question = new Questions();
                     BeanUtils.copyProperties(questionDto, question);
+                    if (questionDto.getScore2() != null) {
+                        question.setScore(questionDto.getScore2());
+                    }
+                    if (questionDto.getScore() != null) {
+                        question.setScore(Float.parseFloat(questionDto.getScore().toString()));
+                    } else {
+                        question.setScore(0f);
+                    }
                     question.setQuestionnaire(questionnaire);
                     ql.add(question);
                 }
@@ -815,10 +893,7 @@ public class QuestionnaireService {
         return result;
     }
 
-    public QuestionnaireDetailDTO findStudentInfo(
-            QuestionnaireDetailDTO questionnaireDetailDTO,
-            QuestionnaireAssgin questionnaireAssgin,
-            QuestionnaireAssginStudents questionnaireAssginStudents)
+    public QuestionnaireDetailDTO findStudentInfo(QuestionnaireDetailDTO questionnaireDetailDTO, QuestionnaireAssgin questionnaireAssgin, QuestionnaireAssginStudents questionnaireAssginStudents)
             throws JsonParseException, JsonMappingException, IOException {
         String json = orgManagerRemoteClient.findByStudentId(questionnaireAssginStudents.getStudentId());
         Map<String, Object> map = JsonUtil.Json2Object(json);
@@ -923,8 +998,7 @@ public class QuestionnaireService {
                             questionnaireAssginStudents.setStudentName(studentDTO.getStudentName());
                             questionnaireAssginStudents.setClassesId(studentDTO.getClassesId());
                             questionnaireAssginStudents.setClassesName(studentDTO.getClassesName());
-                            questionnaireAssginStudents
-                                    .setStatus(QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_INIT);
+                            questionnaireAssginStudents.setStatus(QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_INIT);
                             qasList.add(questionnaireAssginStudents);
                             PushMessage message = new PushMessage();
                             message.setContent("您有新的调查问卷。");
@@ -1239,10 +1313,11 @@ public class QuestionnaireService {
                     if (null != qasd) {
                         if (qasd.getScore() == null) {
                             questionDTO.setActualScore(0);
+                            questionDTO.setActualScore2(0f);
                         } else {
-                            questionDTO.setActualScore(qasd.getScore());
+                            questionDTO.setActualScore2(qasd.getScore());
+                            questionDTO.setActualScore(new BigDecimal(qasd.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                         }
-
                         questionDTO.setAnswer(qasd.getAnswer());
                     }
                 }
@@ -1252,7 +1327,12 @@ public class QuestionnaireService {
             result.setQcomment(questionnaireDTO.isQcomment());
             result.setQuestionnaireAssginId(questionnaireAssginId);
             result.setQuestionnaireAssginStudentId(questionnaireAssginStudentId);
-            result.setTotalActualScore(questionnaireAssginStudents.getScore() == null ? 0 : questionnaireAssginStudents.getScore());
+            result.setTotalActualScore2(questionnaireAssginStudents.getScore() == null ? 0 : questionnaireAssginStudents.getScore());
+            if (result.getTotalActualScore2() != null && result.getTotalActualScore2() > 0) {
+                result.setTotalActualScore(new BigDecimal(result.getTotalActualScore2()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                result.setTotalActualScore(0);
+            }
             result.setCourseName(questionnaireAssgin.getCourseName());
             result.setTeacherName(questionnaireAssgin.getTeacherName());
             result.setComment(questionnaireAssginStudents.getComment());
@@ -1274,10 +1354,11 @@ public class QuestionnaireService {
                     if (null != qasd) {
                         if (qasd.getScore() == null) {
                             questionDTO.setActualScore(0);
+                            questionDTO.setActualScore2(0f);
                         } else {
-                            questionDTO.setActualScore(qasd.getScore());
+                            questionDTO.setActualScore2(qasd.getScore());
+                            questionDTO.setActualScore(new BigDecimal(qasd.getScore()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
                         }
-
                         questionDTO.setAnswer(qasd.getAnswer());
                     }
                 }
@@ -1287,7 +1368,12 @@ public class QuestionnaireService {
             result.setQcomment(questionnaireDTO.isQcomment());
             result.setQuestionnaireAssginId(questionnaireAssginId);
             result.setQuestionnaireAssginStudentId(questionnaireAssginStudentId);
-            result.setTotalActualScore(questionnaireAssgin.getScore() == null ? 0 : questionnaireAssgin.getScore());
+            result.setTotalActualScore2(questionnaireAssgin.getScore() == null ? 0 : questionnaireAssgin.getScore());
+            if (result.getTotalActualScore2() != null && result.getTotalActualScore2() > 0) {
+                result.setTotalActualScore(new BigDecimal(result.getTotalActualScore2()).setScale(0, BigDecimal.ROUND_HALF_UP).intValue());
+            } else {
+                result.setTotalActualScore(0);
+            }
             result.setCourseName(questionnaireAssgin.getCourseName());
             result.setTeacherName(questionnaireAssgin.getTeacherName());
             result.setComment(questionnaireAssgin.getComment());
@@ -1316,6 +1402,13 @@ public class QuestionnaireService {
             if (id == null || id < 1) {
                 id = questionsDTO.getQuestionnaireId();
             }
+            if (questionsDTO.getTotalActualScore2() == null || questionsDTO.getTotalActualScore2() < 1) {
+                if (questionsDTO.getTotalActualScore() != null && questionsDTO.getTotalActualScore() > 0) {
+                    questionsDTO.setTotalActualScore2(Float.parseFloat(questionsDTO.getTotalActualScore().toString()));
+                } else {
+                    questionsDTO.setTotalActualScore2(0f);
+                }
+            }
             Questionnaire questionnaire = questionnaireRepository.findOne(id);
             List<QuestionDTO> questionDTOs = questionsDTO.getQuestions();
             if (questionnaire.getQuesType().intValue() == QuestionnaireType.STUDENT.getType()) {
@@ -1327,18 +1420,18 @@ public class QuestionnaireService {
                     Questions questions = new Questions();
                     questions.setId(questionDTO.getId());
                     QuestionAnswerRecord.setQuestions(questions);
-                    QuestionAnswerRecord.setScore(questionDTO.getActualScore().intValue());
+                    if (questionDTO.getActualScore2() != null && questionDTO.getActualScore2() > 0) {
+                        QuestionAnswerRecord.setScore(questionDTO.getActualScore2());
+                    } else {
+                        QuestionAnswerRecord.setScore(Float.parseFloat(questionDTO.getActualScore().toString()));
+                    }
                     QuestionAnswerRecord.setAnswer(questionDTO.getAnswer());
                     questionAnswerRecordRepository.save(QuestionAnswerRecord);
                 }
                 if (!org.springframework.util.StringUtils.isEmpty(questionsDTO.getComment())) {
-                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date(), questionsDTO.getComment());
+                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), questionsDTO.getComment());
                 } else {
-                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date());
+                    assginStudentsRepository.updateScore(questionsDTO.getQuestionnaireAssginStudentId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date());
                 }
             } else {
                 float weight = 0;
@@ -1357,9 +1450,13 @@ public class QuestionnaireService {
                     Questions questions = new Questions();
                     questions.setId(questionDTO.getId());
                     record.setQuestions(questions);
-                    record.setScore(questionDTO.getActualScore().intValue());
+                    if (questionDTO.getActualScore2() != null && questionDTO.getActualScore2() > 0) {
+                        record.setScore(questionDTO.getActualScore2());
+                    } else {
+                        record.setScore(Float.parseFloat(questionDTO.getActualScore().toString()));
+                    }
                     if (weight > 0) {
-                        record.setWeightScore(record.getScore().intValue() * weight / 100);
+                        record.setWeightScore(new BigDecimal((record.getScore().floatValue() * weight / 100) + "").setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                     } else {
                         record.setWeightScore(record.getScore().floatValue());
                     }
@@ -1368,19 +1465,14 @@ public class QuestionnaireService {
                     questionAnswerRecordRepository.save(record);
                 }
                 if (!org.springframework.util.StringUtils.isEmpty(questionsDTO.getComment())) {
-                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date(), questionsDTO.getComment(), totalWeight);
+                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), questionsDTO.getComment(), totalWeight);
                 } else {
-                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(),
-                            questionsDTO.getTotalActualScore(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH,
-                            new Date(), totalWeight);
+                    assginRepository.updateScore(questionsDTO.getQuestionnaireAssginId(), questionsDTO.getTotalActualScore2(), QuestionnaireStatus.DD_QUESTIONNAIRE_ASSGIN_STUDENTS_FINISH, new Date(), totalWeight);
                 }
             }
-
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("saveQuestionsException", e);
             result.put("trueMSG", false);
         }
         return result;
@@ -1394,13 +1486,10 @@ public class QuestionnaireService {
         return questionnairAssignQuery.queryAssign(offset, limit, courseName, teacherName, id, assginId, collegeId);
     }
 
-    public PageData<QuestionnaireAssginStudents> regularStatistics(Long assginId, Integer pageNumber,
-                                                                   Integer pageSize) {
-        Pageable pageable = PageUtil.createNoErrorPageRequestAndSort(pageNumber, pageSize,
-                new Sort(new Sort.Order(Sort.Direction.ASC, "studentId")));
+    public PageData<QuestionnaireAssginStudents> regularStatistics(Long assginId, Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageUtil.createNoErrorPageRequestAndSort(pageNumber, pageSize, new Sort(new Sort.Order(Sort.Direction.ASC, "studentId")));
         PageData<QuestionnaireAssginStudents> pageData = PageData.getPageData(pageable);
-        Page<QuestionnaireAssginStudents> page = assginStudentsRepository
-                .findByQuestionnaireAssgin_Id(assginId, pageable);
+        Page<QuestionnaireAssginStudents> page = assginStudentsRepository.findByQuestionnaireAssgin_Id(assginId, pageable);
         pageData.setData(page.getContent());
         PageData.setPageData(pageData, page.getTotalElements(), page.getTotalPages());
         return pageData;

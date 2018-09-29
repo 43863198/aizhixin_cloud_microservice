@@ -313,7 +313,7 @@ public class RollCallEverService {
         try {
             Object stuId = stringRedisTemplate.opsForHash().get(RedisUtil.getCounslorAntiCheatingKey(counsellorId), deviceToken);
             if (log.isDebugEnabled()) {
-                log.debug("辅导员点名:antiCheating--> counsellorId:" + counsellorId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
+                log.info("辅导员点名:antiCheating--> counsellorId:" + counsellorId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
             }
 
             if (null == stuId) {
@@ -321,7 +321,7 @@ public class RollCallEverService {
             } else {
                 Long stuIdL = Long.valueOf((String) stuId);
                 if (log.isDebugEnabled()) {
-                    log.debug("辅导员点名:studentId:" + studentId + ",studIdL" + stuIdL);
+                    log.info("辅导员点名:studentId:" + studentId + ",studIdL" + stuIdL);
                 }
                 if (!stuIdL.equals(studentId)) {
                     return false;

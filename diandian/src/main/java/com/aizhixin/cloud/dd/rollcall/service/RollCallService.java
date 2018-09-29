@@ -195,7 +195,6 @@ public class RollCallService {
                         o1.setStudentNum("");
                     }
                     return o1.getStudentNum().compareTo(o2.getStudentName());
-                    // return o1.getStudentId() - o2.getStudentId() > 0 ? 1 : -1;
                 }
             });
         }
@@ -209,21 +208,7 @@ public class RollCallService {
         String ids = "";
         Map<Long, RollCallClassDTO> map = new TreeMap<Long, RollCallClassDTO>();
 
-//        List<Long> slss = studentLeaveScheduleService.findStudentIdByScheduleId(schedule);
         for (RollCall rollCall : rollCallList) {
-//            if (!RollCallConstants.TYPE_CANCEL_ROLLCALL.equals(rollCall.getType()) && slss != null && slss.contains(rollCall.getStudentId())) {
-//                String tempType = rollCall.getType();
-//                rollCall.setLastType(tempType);
-//                rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-//                if (!RollCallConstants.TYPE_ASK_FOR_LEAVE.equals(tempType)) {
-//                    if (inClass) {
-//                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
-//                    } else {
-//                        rollCallRepository.save(rollCall);
-//                    }
-//                }
-//            }
-
             RollCallDTO rollCallDTO = new RollCallDTO();
             // 组装数据
             rollCallDTO.setId(rollCall.getId());
@@ -301,7 +286,7 @@ public class RollCallService {
     }
 
     public List<RollCallClassDTO> getRollCallNum(Long teacher_id, Long scheduleId, String type, String name) {
-        log.debug("获取点名信息:" + scheduleId);
+        log.info("获取点名信息:" + scheduleId);
         Schedule schedule = scheduleService.findOne(scheduleId);
         if (null == schedule) {
             return null;
@@ -577,7 +562,7 @@ public class RollCallService {
                 resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_ASKFORLEAVE);
                 resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
                 if (log.isDebugEnabled()) {
-                    log.debug("this student is ASK_FOR_LEAVE,studentId:" + rollCall.getStudentId());
+                    log.info("this student is ASK_FOR_LEAVE,studentId:" + rollCall.getStudentId());
                 }
                 return resBody;
             }
@@ -690,7 +675,7 @@ public class RollCallService {
         try {
             Object stuId = stringRedisTemplate.opsForHash().get(RedisUtil.getAntiCheatingKey(scheduleRollCallId), deviceToken);
             if (log.isDebugEnabled()) {
-                log.debug("antiCheating--> scheduleRollCallId:" + scheduleRollCallId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
+                log.info("antiCheating--> scheduleRollCallId:" + scheduleRollCallId + ",stuId:" + stuId + ",studentId:" + studentId + ",deviceToken:" + deviceToken);
             }
 
             if (null == stuId) {
@@ -698,7 +683,7 @@ public class RollCallService {
             } else {
                 Long stuIdL = Long.valueOf((String) stuId);
                 if (log.isDebugEnabled()) {
-                    log.debug("studentId:" + studentId + ",studIdL" + stuIdL);
+                    log.info("studentId:" + studentId + ",studIdL" + stuIdL);
                 }
                 if (!stuIdL.equals(studentId)) {
                     return false;
@@ -781,24 +766,14 @@ public class RollCallService {
      * @param teacherId
      */
     public void cancleRollCall(Long scheduleId, Long teacherId) {
-
-        // ScheduleRollCall scheduleRollCall = scheduleRollCallService
-        // .findOne(scheduleRollCallId);
-
-        // Schedule schedule = scheduleService.findOne(scheduleId);
-
         ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(scheduleId);
-
         List<RollCall> rollCallList = rollCallRepository.findByScheduleRollcallId(scheduleRollCall.getId());
-
         // 修改所有学生的状态为取消考勤
         Set<Long> cancleRollCallIds = new HashSet<Long>();
         for (RollCall rollCall : rollCallList) {
             cancleRollCallIds.add(rollCall.getId());
         }
-
         rollCallRepository.cancleRollCall(cancleRollCallIds, RollCallConstants.TYPE_CANCEL_ROLLCALL, null);
-
         scheduleRollCall.setLocaltion("");
         scheduleRollCallService.save(scheduleRollCall, scheduleId);
     }
@@ -834,7 +809,7 @@ public class RollCallService {
 
             //更新统计
             rollCallStatsService.statsStuAllByStuId(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getStudentId());
-            rollCallStatsService.statsStuByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
+            rollCallStatsService.statsStuTeachingClassByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
         }
 
     }
@@ -952,7 +927,7 @@ public class RollCallService {
 
         }
         scheduleRollCallService.save(scheduleRollCall, scheduleId);
-        // 将上课的id放入reids,定时任务后续将计算中值
+        // 将上课的id放入reids,定时任务后续将计算中值 无用代码
         Set<Long> scheduleRollCallIds = (Set<Long>) redisTemplate.opsForHash().get(RedisUtil.getScheduleOrganId(), schedule.getOrganId().longValue());
         if (null == scheduleRollCallIds) {
             scheduleRollCallIds = new HashSet<>();
@@ -1191,71 +1166,6 @@ public class RollCallService {
         return dtoList;
     }
 
-    // 获取当天内的总签到数
-    public Long findCountByClassIds(Set<Long> scheduleRollcallIds, Date startTime, Date endTime) throws ParseException {
-        return rollCallRepository.findCountByClassIds(scheduleRollcallIds, startTime, endTime, DataValidity.VALID.getState());
-    }
-
-    // 获取当天内的旷课数
-    public Long findAbsenteeismCount(Set<Long> scheduleRollcallIds, Date startTime, Date endTime) throws ParseException {
-        return rollCallRepository.findAbsenteeismCount(scheduleRollcallIds, startTime, endTime, DataValidity.VALID.getState());
-    }
-
-    // 统计代课老师的应签到学生数
-    public Long countByteacherIdAndsignTimeAfter(Long teacherId) throws ParseException {
-        String sfTime = sf.format(new Date());
-        Date startTime = sf.parse(sfTime);
-        return rollCallRepository.countByteacherIdAndDeleteFlagAndSignTimeAfter(teacherId, DataValidity.VALID.getState(), startTime);
-    }
-
-    // 统计代课老师的签到数
-    public Long absenteeismCountByteacherId(Long teacherId) throws ParseException {
-        String sfTime = sf.format(new Date());
-        Date startTime = sf.parse(sfTime);
-        return rollCallRepository.countByteacherIdAndDeleteFlagAndGpsLocationNotNullAndSignTimeAfter(teacherId, DataValidity.VALID.getState(), startTime);
-    }
-
-    // 根据签到id获取签到信息
-    public RollCall findOneByRollcallId(Long rollcallId) {
-        return rollCallRepository.findOne(rollcallId);
-    }
-
-    // 管理员修改签到状态
-    public boolean updateRollcallType(Long rollcallId, String type) {
-        RollCall rollCall = rollCallRepository.findOne(rollcallId);
-        rollCall.setType(type);
-        rollCall.setLastModifiedDate(new Date());
-        try {
-            rollCallRepository.save(rollCall);
-            List<RollCall> rollCallRe = (List<RollCall>) redisTemplate.opsForValue().get(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId());
-            if (null != rollCallRe) {
-                for (RollCall r : rollCallRe) {
-                    if (r.getScheduleRollcallId().equals(rollCall.getScheduleRollcallId())) {
-                        r.setType(type);
-                        redisTemplate.opsForValue().set(RedisUtil.DIANDIAN_ROLLCALL + r.getStudentId(), rollCallRe, 15, TimeUnit.HOURS);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    public void updateRollcallsTypeCache(List<RollCall> rollcallIds, String type) {
-        for (RollCall rollCall : rollcallIds) {
-            List<RollCall> rollCallRe = (List<RollCall>) redisTemplate.opsForValue().get(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId());
-            if (null != rollCallRe) {
-                for (RollCall r : rollCallRe) {
-                    if (r.getScheduleRollcallId().equals(rollCall.getScheduleRollcallId())) {
-                        r.setType(type);
-                        redisTemplate.opsForValue().set(RedisUtil.DIANDIAN_ROLLCALL + r.getStudentId(), rollCallRe, 15, TimeUnit.HOURS);
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * 补录考勤
      */
@@ -1264,6 +1174,7 @@ public class RollCallService {
         ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(scheduleId);
         if (null == scheduleRollCall) {
             scheduleRollCall = new ScheduleRollCall();
+            scheduleRollCall.setCreatedDate(DateFormatUtil.parse2(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT));
         }
         // 进行该排课点名信息的初始化操作。
         scheduleRollCall.setSchedule(schedule);
@@ -1291,8 +1202,7 @@ public class RollCallService {
             rollCall.setId(RedisUtil.getRollCallId());
             rollCall.setScheduleRollcallId(scheduleRollCall.getId());
             rollCall.setTeacherId(schedule.getTeacherId());
-            long studentId = dto.getStudentId();
-            rollCall.setStudentId(studentId);
+            rollCall.setStudentId(dto.getStudentId());
             rollCall.setStudentNum(dto.getSutdentNum());
             rollCall.setClassId(dto.getClassesId());
             rollCall.setClassName(dto.getClassesName());
@@ -1306,6 +1216,7 @@ public class RollCallService {
             rollCall.setCollegeName(dto.getCollegeName());
             rollCall.setOrgId(schedule.getOrganId());
             rollCall.setTeachingYear(dto.getTeachingYear());
+            rollCall.setCreatedDate(DateFormatUtil.parse2(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT));
             // 判断该学生是否有请假
             if (studentLeaves != null && studentLeaves.contains(dto.getStudentId())) {
                 rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);

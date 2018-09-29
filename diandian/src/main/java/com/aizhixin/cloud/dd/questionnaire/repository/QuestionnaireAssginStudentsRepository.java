@@ -27,11 +27,11 @@ public interface QuestionnaireAssginStudentsRepository extends
     QuestionnaireAssginStudents findFirstByStudentIdAndQuestionnaireAssgin_statusOrderByCreatedDateDesc(Long stuId,String status);
     @Modifying
     @Query("update #{#entityName} q set q.score = ?2 , q.status= ?3 , q.commitDate = ?4 ,q.comment= ?5  where q.id = ?1")
-    public int updateScore(Long queAssginStudentId, int totalActualScore, int status, Date commitDate,String comment);
+    public int updateScore(Long queAssginStudentId, float totalActualScore, int status, Date commitDate,String comment);
     
     @Modifying
     @Query("update #{#entityName} q set q.score = ?2 , q.status= ?3 , q.commitDate = ?4   where q.id = ?1")
-    public int updateScore(Long queAssginStudentId, int totalActualScore, int status, Date commitDate);
+    public int updateScore(Long queAssginStudentId, float totalActualScore, int status, Date commitDate);
     
     public Long countByStudentIdAndStatus(Long studentId,Integer status);
 }

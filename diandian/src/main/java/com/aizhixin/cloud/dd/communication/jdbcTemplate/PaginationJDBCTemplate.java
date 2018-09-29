@@ -78,10 +78,10 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         System.out.println(sql);
         List<T> data = jdbc.query(sql, parameters, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -99,7 +99,7 @@ public class PaginationJDBCTemplate<T> {
 
         else {
             String s = "";
-            log.debug("sorts size : {} ", sorts.size());
+            log.info("sorts size : {} ", sorts.size());
             for (int i = 0; i < sorts.size(); i++) {
                 SortDTO sdto = sorts.get(i);
                 if (sdto.getAsc())
@@ -141,9 +141,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -183,9 +183,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -223,9 +223,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -263,9 +263,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -305,9 +305,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -345,9 +345,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -381,7 +381,7 @@ public class PaginationJDBCTemplate<T> {
                 orderBy = getOrderByStatement(paginationSQL.sort());
         }
         sql = sql + orderBy;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
 
         System.out.println("TTTTTTTTTTT  " + data);
@@ -419,7 +419,7 @@ public class PaginationJDBCTemplate<T> {
                 e.printStackTrace();
             }
         }
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
         PageInfo info = new PageInfo();
         info.setTotalCount(((long) da.size()));
         info.setData(da);
@@ -452,13 +452,13 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<ElectricFenceLeaveConnectDTO> data = (List<ElectricFenceLeaveConnectDTO>) jdbcTemplate.query(sql,
                 rowMapper);
 
         Map<String, String> map = new HashMap<String, String>();
         List<ElectricFenceLeaveConnectDTO> data1 = new ArrayList<ElectricFenceLeaveConnectDTO>();
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
         String leaveNum = null;
         // 处理结果集合，计算目前离线的时长
         for (int i = 0; i < data.size(); i++) {
@@ -467,7 +467,7 @@ public class PaginationJDBCTemplate<T> {
             String name = oo.getName();
 
             long time = oo.getNoticeTimeInterval();
-            log.debug("第一次打印截取之前时间 notice  " + oo.getNoticeTime() + "  name   " + name);
+            log.info("第一次打印截取之前时间 notice  " + oo.getNoticeTime() + "  name   " + name);
 
             if (oo.getNoticeTime() == null) {
                 map.put(id, null);
@@ -482,7 +482,7 @@ public class PaginationJDBCTemplate<T> {
                     long minutes = date2.getTime() - date1.getTime();
 
                     long min = minutes / (1000);
-                    log.debug("相隔" + min + "秒");
+                    log.info("相隔" + min + "秒");
                     // 人数
                     if (min > time) {
                         long minn = minutes / (1000 * 60);
@@ -491,7 +491,6 @@ public class PaginationJDBCTemplate<T> {
                         } else {
                             Long dd = minn / 60;// 取整数部分为小时
                             Long mm = minn % 60;// 取余数部分为分钟
-                            // log.debug("相隔"+dd+"小时 "+mm + "分钟");
                             leaveNum = dd + "小时  " + mm + "分钟";
                         }
                         map.put(id, leaveNum);
@@ -569,7 +568,7 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
@@ -592,7 +591,7 @@ public class PaginationJDBCTemplate<T> {
         if (paginationSQL.getFindSql().toLowerCase().contains("limit"))
             throw new DlEduException("this sql cannot contains limit or order by statement when query for pagination {"
                     + paginationSQL.getFindSql() + "}");
-        log.debug("=============", paginationSQL.getFindCountSql());
+        log.info("=============", paginationSQL.getFindCountSql());
         Long totalCount = jdbcTemplate.queryForObject(paginationSQL.getFindCountSql(), Long.class);
         String sql = paginationSQL.getFindSql();
         String orderBy = "";
@@ -608,7 +607,7 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
         List<ElectricFenceLeaveSchoolDTO> data1 = new ArrayList<ElectricFenceLeaveSchoolDTO>();
         long sum = 0;
@@ -644,7 +643,7 @@ public class PaginationJDBCTemplate<T> {
                 e.getStackTrace();
             }
         }
-        log.debug("YYYYYYY 总人数   " + totalCount + "  在线人数:  " + sum);
+        log.info("YYYYYYY 总人数   " + totalCount + "  在线人数:  " + sum);
 
         long ll = totalCount - sum;
         ElectricFenceLeaveSchoolDTO el = new ElectricFenceLeaveSchoolDTO();
@@ -688,9 +687,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -727,7 +726,7 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, electricfencequerymapper);
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -765,7 +764,7 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, electricfencequerymapper);
 
         ElectricFenceQueryDTO tt = (ElectricFenceQueryDTO) data.get(0);
@@ -844,9 +843,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<Map<String, String>> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -882,9 +881,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();
@@ -922,9 +921,9 @@ public class PaginationJDBCTemplate<T> {
         sql = sql + orderBy;
         int start = (offset - 1) * pageSize;
         sql += " limit " + start + " , " + pageSize;
-        log.debug("find page = {} " + sql);
+        log.info("find page = {} " + sql);
         List<T> data = jdbcTemplate.query(sql, rowMapper);
-        log.debug("data size : {} ", data.size());
+        log.info("data size : {} ", data.size());
 
         int pageCount = totalCount == 0 ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
         PageInfo info = new PageInfo();

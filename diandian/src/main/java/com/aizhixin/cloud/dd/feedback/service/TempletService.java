@@ -80,6 +80,7 @@ public class TempletService {
             steeringTemplet.setOrgId(orgId);
             steeringTemplet.setQuesType(FeedbackQuesType.DAFEN.getType());
             steeringTemplet.setTotalScore(100);
+            steeringTemplet.setTotalScore2(100f);
 
             List<FeedbackTempletQuesDTO> teacherList = new ArrayList<>();
             //1.
@@ -87,6 +88,7 @@ public class TempletService {
             tq1.setSubject("基本教学能力");
             tq1.setContent("为人师表，遵守教学纪律；\n教学准备认真，文件齐全；\n语言规范、准确，语速适中；\n板书合理，能灵活利用现代信息技术配合教学；");
             tq1.setScore(20);
+            tq1.setScore2(20f);
             tq1.setOptionList(new ArrayList<>());
             teacherList.add(tq1);
             //2.
@@ -94,6 +96,7 @@ public class TempletService {
             tq2.setSubject("教学设计");
             tq2.setContent("依据专业培养目标和课程目标，合理确定本单元教学目标；\n根据学情合理组织教学内容，信息量适中，注重培养学生职业素养、学习能力和实践能力；");
             tq2.setScore(30);
+            tq2.setScore2(30f);
             tq2.setOptionList(new ArrayList<>());
             teacherList.add(tq2);
             steeringTemplet.setTeacherQuesList(teacherList);
@@ -104,6 +107,7 @@ public class TempletService {
             sq1.setSubject("班风班貌");
             sq1.setContent("学生精神状态好，师生互敬，文明礼貌。");
             sq1.setScore(20);
+            sq1.setScore2(20f);
             sq1.setOptionList(new ArrayList<>());
             styleList.add(sq1);
             //2.
@@ -111,6 +115,7 @@ public class TempletService {
             sq2.setSubject("学习纪律");
             sq2.setContent("无迟到、早退、旷课；\n无睡觉、玩手机和吵闹现象。");
             sq2.setScore(30);
+            sq2.setScore2(30f);
             sq2.setOptionList(new ArrayList<>());
             styleList.add(sq2);
             steeringTemplet.setStyleQuesList(styleList);
@@ -166,7 +171,13 @@ public class TempletService {
         FeedbackTemplet newTemplet = new FeedbackTemplet();
         newTemplet.setOrgId(templet.getOrgId());
         newTemplet.setQuesType(templet.getQuesType());
-        newTemplet.setTotalScore(templet.getTotalScore());
+        if (templet.getTotalScore2() != null && templet.getTotalScore2() > 0) {
+            newTemplet.setTotalScore(templet.getTotalScore2());
+        } else if (templet.getTotalScore() != null) {
+            newTemplet.setTotalScore(Float.parseFloat(templet.getTotalScore().toString()));
+        } else {
+            newTemplet.setTotalScore(0f);
+        }
         newTemplet.setType(type);
         newTemplet.setCreatedDate(new Date());
         newTemplet.setDeleteFlag(DataValidity.VALID.getState());
@@ -187,7 +198,13 @@ public class TempletService {
             obj.setSubject(item.getSubject());
             obj.setContent(item.getContent());
             obj.setGroup(group);
-            obj.setScore(item.getScore());
+            if (item.getScore2() != null && item.getScore2() > 0) {
+                obj.setScore(item.getScore2());
+            } else if (item.getScore() != null) {
+                obj.setScore(Float.parseFloat(item.getScore().toString()));
+            } else {
+                obj.setScore(0f);
+            }
             obj = quesRespository.save(obj);
             saveOptions(obj, item.getOptionList());
         }

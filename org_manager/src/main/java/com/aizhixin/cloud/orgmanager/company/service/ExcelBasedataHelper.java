@@ -444,6 +444,7 @@ public class ExcelBasedataHelper {
                     isError = true;
                     break;
                 } else {
+                    teacherJobNumMap.put(jobNum, Boolean.TRUE);
                     list.add(new TeacherDomain(name, jobNum, gender, collegeName, msg));
                     line++;
                 }
@@ -512,6 +513,7 @@ public class ExcelBasedataHelper {
                     isError = true;
                     break;
                 } else {
+                    stuJobNumMap.put(jobNum, Boolean.TRUE);
                     list.add(new StudentDomain(name, jobNum, gender, className, profession, department, startYear, idNumber, msg));
                     line++;
                 }

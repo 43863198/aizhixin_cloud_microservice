@@ -150,7 +150,7 @@ public class TempGroupService {
                 Thread thread = new Thread(myRunnable);
                 thread.start();
             } catch (Exception e) {
-                LOG.debug("delCacheByDelTempGroup-1", e);
+                LOG.info("delCacheByDelTempGroup-1", e);
             }
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
@@ -353,13 +353,19 @@ public class TempGroupService {
             if (tempGroup.getRollcallNum() != null && tempGroup.getRollcallNum().intValue() > 1 && tempGroup.getRuleId() != null) {
                 try {
                     Date startDate = new Date();
-                    startDate.setHours(0);
-                    startDate.setMinutes(0);
-                    startDate.setSeconds(0);
+                    Calendar sCalendar = Calendar.getInstance();
+                    sCalendar.setTime(startDate);
+                    sCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                    sCalendar.set(Calendar.MINUTE, 0);
+                    sCalendar.set(Calendar.SECOND, 0);
+                    startDate = sCalendar.getTime();
                     Date endDate = new Date();
-                    endDate.setHours(23);
-                    endDate.setMinutes(59);
-                    endDate.setSeconds(59);
+                    Calendar eCalendar = Calendar.getInstance();
+                    eCalendar.setTime(endDate);
+                    eCalendar.set(Calendar.HOUR_OF_DAY, 23);
+                    eCalendar.set(Calendar.MINUTE, 59);
+                    eCalendar.set(Calendar.SECOND, 59);
+                    endDate = eCalendar.getTime();
                     List<TempGroup> groups = new ArrayList<>();
                     groups.add(tempGroup);
                     List<Long> rollcallList = rollcallRepository.findByTempGroupAndOpenTime(groups, startDate, endDate);

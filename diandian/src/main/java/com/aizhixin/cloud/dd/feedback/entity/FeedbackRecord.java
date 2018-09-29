@@ -106,13 +106,13 @@ public class FeedbackRecord extends AbstractEntity {
     @Column(name = "teaching_score")
     @Getter
     @Setter
-    private Integer teachingScore;
+    private Float teachingScore;
 
     //学风评价总分
     @Column(name = "study_style_score")
     @Getter
     @Setter
-    private Integer studyStyleScore;
+    private Float studyStyleScore;
 
     public FeedbackRecord() {
     }

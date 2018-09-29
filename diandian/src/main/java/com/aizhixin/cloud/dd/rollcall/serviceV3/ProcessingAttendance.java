@@ -33,15 +33,15 @@ public class ProcessingAttendance {
             ExecutorService pool = Executors.newFixedThreadPool(5);
             while (true) {
                 if (RollCallServiceV3.concurrentLinkedDeque.isEmpty()) {
-                    log.debug("签到队列为空！");
+                    log.info("签到队列为空！");
                     try {
                         Thread.sleep(2000);
-                        log.debug("休息2秒！");
+                        log.info("休息2秒！");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    log.debug("开始处理签到队列.");
+                    log.info("开始处理签到队列.");
                     try {
                         Map<String, Object> info = (Map<String, Object>) RollCallServiceV3.concurrentLinkedDeque.poll();
                         pool.execute(new RunnableClass(info));

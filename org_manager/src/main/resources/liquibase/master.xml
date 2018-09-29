@@ -66,6 +66,7 @@
     <include file="classpath:liquibase/changelog/20180621111600_add_entity_TrainingGroupSet.xml" relativeToChangelogFile="false"/>
     <include file="classpath:liquibase/changelog/20180622155500_update_entity_TrainingGroupSet.xml" relativeToChangelogFile="false"/>
     <include file="classpath:liquibase/changelog/201808301105_update_entity_User.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:liquibase/changelog/201809281130_update_entity_StudentRollCallSet.xml" relativeToChangelogFile="false"/>
     <!--
     <include file="classpath:liquibase/changelog/20180808104100_update_entity_TrainingGroupSet.xml" relativeToChangelogFile="false"/>
      -->

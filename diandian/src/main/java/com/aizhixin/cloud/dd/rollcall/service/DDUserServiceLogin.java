@@ -106,7 +106,7 @@ public class DDUserServiceLogin {
             log.warn("token认证异常,token:" + authorization, e);
         }
         if (redisTemplate.opsForValue().setIfAbsent(authorization, account)) {
-            redisTemplate.expire(authorization, 1, TimeUnit.HOURS);
+            redisTemplate.expire(authorization, 10, TimeUnit.HOURS);
         }
 
         TokenUtil.accessToken = authorization;
@@ -129,10 +129,10 @@ public class DDUserServiceLogin {
                 return;
             }
             JSONObject json = JSONObject.fromObject(userInfo);
-            log.debug("获取用户信息:" + json.toString());
+            log.info("获取用户信息:" + json.toString());
 
             String str = json.getString("teachingYear");
-            log.debug("获取teachingYear------------------>" + str);
+            log.info("获取teachingYear------------------>" + str);
             System.out.println("获取teachingYear------------------>" + str);
             accountDto.setTeachingYear((StringUtils.isBlank(str) || "null".equals(str)) ? "" : str);
 
@@ -159,15 +159,11 @@ public class DDUserServiceLogin {
                                 }
                             }
                         }
-                        // if (userService.isHeaderTeacher(accountDto.getId())) {
-                        // roles.append(",");
-                        // roles.append(RoleConstants.ROLE_CLASSROOMTEACHE);
-                        // }
                     }
                     accountDto.setRole(roles.toString());
                 }
             } catch (Exception e) {
-                log.warn("", e);
+                log.warn("Exception", e);
             }
         }
 

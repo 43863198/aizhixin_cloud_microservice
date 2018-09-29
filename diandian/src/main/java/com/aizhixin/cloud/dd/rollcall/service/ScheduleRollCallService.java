@@ -354,6 +354,7 @@ public class ScheduleRollCallService {
                     set.add(dianDianDaySchoolTimeTableDomain.getTeachingClassId());
                 }
                 teachingClassIdsStr = StringUtils.join(set.toArray(), ",");
+                stringRedisTemplate.opsForValue().set(currentDate + "_" + studentId, teachingClassIdsStr, 1, TimeUnit.DAYS);
             }
             if (StringUtils.isNotBlank(teachingClassIdsStr)) {
                 Set<Long> teachingClassIds = new HashSet();
@@ -740,7 +741,7 @@ public class ScheduleRollCallService {
                         }
                     }
                 } else {
-                    log.debug("根据该排课ID:" + scheduleId + ",未找到班级信息！");
+                    log.info("根据该排课ID:" + scheduleId + ",未找到班级信息！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

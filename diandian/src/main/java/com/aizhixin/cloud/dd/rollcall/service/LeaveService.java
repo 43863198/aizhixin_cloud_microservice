@@ -800,7 +800,7 @@ public class LeaveService {
                 List<TeachingClassStudent> teachingClassList = teachingClassStudentRepository.findByStuId(leave.getStudentId());
                 if (teachingClassList != null && teachingClassList.size() > 0) {
                     for (TeachingClassStudent tcs : teachingClassList) {
-                        rollCallStatsService.statsStuByTeachingClass(account.getOrganId(), semesterId, tcs.getTeachingClassId());
+                        rollCallStatsService.statsStuTeachingClassByTeachingClass(account.getOrganId(), semesterId, tcs.getTeachingClassId());
                     }
                 }
             }

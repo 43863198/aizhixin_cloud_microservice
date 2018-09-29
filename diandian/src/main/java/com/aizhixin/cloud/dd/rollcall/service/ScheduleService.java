@@ -475,7 +475,7 @@ public class ScheduleService {
                 sb.append(dto.getScheduleId());
                 sb.append(",");
             }
-            log.debug("上课需要初始化的课程信息:" + sb.toString());
+            log.info("上课需要初始化的课程信息:" + sb.toString());
             sb = null;
 
             log.info("课前需要启动课程初始化线程数为: " + beginMap.size());
@@ -513,7 +513,7 @@ public class ScheduleService {
                 sb.append(dto.getScheduleId());
                 sb.append(",");
             }
-            log.debug("下课需要初始化的课程信息:" + sb.toString());
+            log.info("下课需要初始化的课程信息:" + sb.toString());
             sb = null;
             endMap.forEach((sleepTime, listDto) -> {
                 Thread t = new Thread(() -> {
@@ -537,27 +537,27 @@ public class ScheduleService {
     public void executeBeginClassPerTask(Long sleepTime, List<CourseScheduleDTO> list) {
         long beginTime = System.currentTimeMillis();
         try {
-            log.debug("等待上课...," + sleepTime / 1000 + "秒," + "需要初始化的数据科目数" + list.size());
+            log.info("等待上课...," + sleepTime / 1000 + "秒," + "需要初始化的数据科目数" + list.size());
             sleepTime = sleepTime - 5 * 1000;// 提前5秒开始计算学生状态
             Thread.sleep(sleepTime);
 
-            log.debug("上课了开始初始化学生的状态...");
+            log.info("上课了开始初始化学生的状态...");
             for (CourseScheduleDTO dto : list) {
 
-                log.debug("上课了开始初始化学生的状态..." + dto.getScheduleId());
+                log.info("上课了开始初始化学生的状态..." + dto.getScheduleId());
                 if (null == dto) {
                     continue;
                 }
                 Schedule schedule = scheduleRepository.findOne(dto.getScheduleId());
                 if (null == schedule) {
-                    log.debug("上课初始化课程信息...，无排课信息" + schedule.getId());
+                    log.info("上课初始化课程信息...，无排课信息" + schedule.getId());
                     continue;
                 }
                 beforeClassDoAnyThings(schedule);
             }
-            log.debug("上课了开始初始化学生的状态完毕...");
+            log.info("上课了开始初始化学生的状态完毕...");
         } catch (Exception e) {
-            log.warn("上课了开始初始化学生的状态失败，" + e.getMessage());
+            log.warn("上课了开始初始化学生的状态失败，", e);
             e.printStackTrace();
         }
         log.info("课前初始化数据耗时： " + (System.currentTimeMillis() - beginTime) + "ms");
@@ -572,14 +572,14 @@ public class ScheduleService {
             CourseRollCall courseRollCall = courseRollCallRepository.findByCourseIdAndTeacherIdAndDeleteFlag(schedule.getCourseId(), schedule.getTeacherId(), DataValidity.VALID.getState());
             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(schedule);
             if (scheduleRollCall == null) {
-                log.debug("上课初始化课程信息...，scheduleRollCall is null" + schedule.getId());
+                log.info("上课初始化课程信息...，scheduleRollCall is null" + schedule.getId());
                 message = "scheduleRollCall is null,老师未开启该课程打卡机。";
                 pushMonitor.addBeforeClass(schedule, (System.currentTimeMillis() - schedueUseTime), scheduleFlag, message, ScheduelStatusEnum.ScheduleStatuClose.getStatus());
                 return ApiReturn.message(Boolean.FALSE, "scheduleRollcall is null", null);
             }
             Long scheduleRollcallId = scheduleRollCall.getId();
             if (null == courseRollCall) {
-                log.debug("上课初始化课程信息...，打卡机为关闭状态。" + schedule.getId());
+                log.info("上课初始化课程信息...，打卡机为关闭状态。" + schedule.getId());
                 message = "打卡机为关闭状态";
                 pushMonitor.addBeforeClass(schedule, (System.currentTimeMillis() - schedueUseTime), scheduleFlag, message, ScheduelStatusEnum.ScheduleStatuClose.getStatus());
                 return ApiReturn.message(Boolean.FALSE, message, null);
@@ -596,7 +596,7 @@ public class ScheduleService {
             } else {
                 status = ScheduelStatusEnum.ScheduleStatuClose.getStatus();
                 message = "打卡机为关闭状态";
-                log.debug("未开启打卡机，清除缓存数据。-->" + schedule.getId());
+                log.info("未开启打卡机，清除缓存数据。-->" + schedule.getId());
                 // 删除redis中缓存的数据
                 List<RollCall> rollCallList = listRollCallBySRCIdInRedis(scheduleRollcallId);
                 // 判断是否已经在 进行点名签到中
@@ -604,9 +604,9 @@ public class ScheduleService {
                     redisTemplate.delete(RedisUtil.getScheduleRollCallKey(scheduleRollcallId));
                 }
             }
-            log.debug("上课了开始初始化学生的状态成功..." + schedule.getId());
+            log.info("上课了开始初始化学生的状态成功..." + schedule.getId());
         } catch (Exception e) {
-            log.warn("上课了开始初始化学生的状态失败" + e.getMessage());
+            log.warn("上课了开始初始化学生的状态失败", e);
             message = e.getMessage();
             scheduleFlag = Boolean.FALSE;
         }
@@ -628,7 +628,7 @@ public class ScheduleService {
     public void executeAfterClassPerTask(Long sleepTime, List<CourseScheduleDTO> list) {
         long beginTime = System.currentTimeMillis();
         try {
-            log.debug("等待下课!!!...," + sleepTime / 1000 + "秒," + "需要修改的数据科目数" + list.size());
+            log.info("等待下课!!!...," + sleepTime / 1000 + "秒," + "需要修改的数据科目数" + list.size());
             sleepTime = sleepTime - 5 * 1000;// 提前5秒开始计算学生状态
             Thread.sleep(sleepTime);
             updateStudentStatusAfterClass(list);
@@ -641,17 +641,17 @@ public class ScheduleService {
     }
 
     public void updateStudentStatusAfterClass(List<CourseScheduleDTO> list) {
-        log.debug("下课!!!修改学生的状态=================================start=================================");
+        log.info("下课!!!修改学生的状态=================================start=================================");
         for (CourseScheduleDTO dto : list) {
             Schedule schedule = scheduleRepository.findOne(dto.getScheduleId());
-            log.debug("修改下课!!!排课ID为" + schedule.getId());
+            log.info("修改下课!!!排课ID为" + schedule.getId());
             if (null == schedule) {
                 pushMonitor.addOutClass(schedule, 0L, Boolean.TRUE, "schedule为空,Id:" + dto.getScheduleId());
                 continue;
             }
             outClassDoAnything(schedule, Boolean.FALSE);
         }
-        log.debug("下课!!!修改学生的状态=================================end=================================");
+        log.info("下课!!!修改学生的状态=================================end=================================");
         list = null;
     }
 
@@ -680,7 +680,7 @@ public class ScheduleService {
                             }
                         }
                         if (execptionlCount == rollCallList.size()) {
-                            log.debug("该节课，学生未进行签到操作，不计算入考勤。排课id为:" + schedule.getId() + ",execptionCount:" + execptionlCount);
+                            log.info("该节课，学生未进行签到操作，不计算入考勤。排课id为:" + schedule.getId() + ",execptionCount:" + execptionlCount);
                             scheduleRollCall.setIsInClassroom(Boolean.FALSE);
                             scheduleRollCall.setIsOpenRollcall(Boolean.FALSE);
                             scheduleRollCallService.save(scheduleRollCall, schedule.getId());
@@ -747,12 +747,12 @@ public class ScheduleService {
                 scheduleRollCallService.save(scheduleRollCall, schedule.getId());
                 clearRedisInfo(scheduleRollCall.getId());
             }
-            log.debug("下课!!!修改学生的状态成功..." + schedule.getId());
+            log.info("下课!!!修改学生的状态成功..." + schedule.getId());
             // ===============redisRollCall===================
             deleteRedisRollCallIng(schedule.getOrganId(), scheduleRollCall.getId());
             //统计学生累计考勤
             log.info("统计学生累计考勤...", schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
-            rollCallStatsService.statsStuByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
+            rollCallStatsService.statsStuTeachingClassByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
             rollCallStatsService.statsStuAllByScheduleRollCallId(scheduleRollCall.getId());
         } catch (Exception e) {
             e.printStackTrace();

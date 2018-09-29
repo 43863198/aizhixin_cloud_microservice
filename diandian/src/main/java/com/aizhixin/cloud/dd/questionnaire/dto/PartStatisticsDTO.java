@@ -11,7 +11,7 @@ public class PartStatisticsDTO {
     private Long questionId;
     private Integer no;
     private String questionName;
-    private Integer score;
+    private Float score;
     private Integer count;
     private String ration;//比例
 }

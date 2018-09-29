@@ -237,20 +237,21 @@ public class StudentPhoneController {
     @ApiOperation(httpMethod = "POST", value = "GPS信息保存", response = Void.class, notes = "GPS信息保存  <br>@author HUM")
     public ResponseEntity<?> save(@ApiParam(value = "electricFenceBase GPS信息") @RequestBody ElectricFenceBaseDTO electricFenceBaseDTO,
                                   @RequestHeader("Authorization") String accessToken) {
-        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
-        if (account == null) {
-            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
-        } else {
-            electricFenceBaseDTO.setOrganId(account.getOrganId());
-            electricFenceBaseDTO.setUserId(account.getId());
-        }
+//        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+//        if (account == null) {
+//            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+//        } else {
+//            electricFenceBaseDTO.setOrganId(account.getOrganId());
+//            electricFenceBaseDTO.setUserId(account.getId());
+//        }
         Map<String, Object> result = new HashMap<>();
-        try {
-            result = orgManagerRemoteService.saveBase(electricFenceBaseDTO);// 获取用户id:account.getId();
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = new HashMap<>();
-        }
+//        try {
+//            result = orgManagerRemoteService.saveBase(electricFenceBaseDTO);// 获取用户id:account.getId();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            result = new HashMap<>();
+//        }
+        result.put("falseMSG", true);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -262,13 +263,13 @@ public class StudentPhoneController {
     @RequestMapping(value = "/queryTimeInterval", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "GET", value = "电子围栏申报时隔查看", response = Void.class, notes = "电子围栏申报时隔查看<br>@author HUM")
     public ResponseEntity<?> queryTimeInterval(@RequestHeader("Authorization") String accessToken) throws URISyntaxException, DlEduException {
-        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
-        if (account == null) {
-            Map<String, Object> resBody = new HashMap<>();
-            resBody.put("message", "unvalid_token");
-            resBody.put("error", UserConstants.UNVALID_TOKEN);
-            return new ResponseEntity<Object>(resBody, HttpStatus.UNAUTHORIZED);
-        }
+//        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+//        if (account == null) {
+//            Map<String, Object> resBody = new HashMap<>();
+//            resBody.put("message", "unvalid_token");
+//            resBody.put("error", UserConstants.UNVALID_TOKEN);
+//            return new ResponseEntity<Object>(resBody, HttpStatus.UNAUTHORIZED);
+//        }
         Map<String, Object> result = new HashedMap();
         result.put("timeInterval", 1800);
         // orgManagerRemoteService.queryTimeInterval(account.getOrganId());

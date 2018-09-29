@@ -19,15 +19,19 @@ public class StudentRollcallSetService {
     private StudentRollcallSetRepository studentRollcallSetRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private PauseAttendanceOperationLogService logService;
 
     /**
      * 保存实体
      *
-     * @param semester
+     * @param set
      * @return
      */
-    public StudentRollcallSet save(StudentRollcallSet semester) {
-        return studentRollcallSetRepository.save(semester);
+    public StudentRollcallSet save(StudentRollcallSet set) {
+        logService.setLogStatus(set.getStudent().getId(), 0);
+        set.setIsLast(true);
+        return studentRollcallSetRepository.save(set);
     }
 
     /**

@@ -152,4 +152,14 @@
 	<include file="classpath:liquibase/changelog/201808111043_add_entity_CreditTempletQues.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809041414_update_entity_Leave.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809101044_update_entity_Leave.xml" relativeToChangelogFile="false"/>
+
+	<include file="classpath:liquibase/changelog/201809201730_update_entity_Questions.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211016_update_entity_FeedbackTempletQues.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211026_update_entity_FeedbackTemplet.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211028_update_entity_FeedbackRecord.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211038_update_entity_QuestionnaireAssignUser.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211040_update_entity_QuestionnaireAssginStudents.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211045_update_entity_QuestionnaireAssgin.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211046_update_entity_QuestionAnswerRecord.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201809211459_update_entity_Questionnaire.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

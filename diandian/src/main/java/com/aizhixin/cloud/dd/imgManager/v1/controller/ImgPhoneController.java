@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,19 +33,21 @@ public class ImgPhoneController {
     @Autowired
     private DDUserService ddUserService;
 
-    @RequestMapping(value = "/img/info",method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "手机端广告信息",httpMethod = "GET",response = Void.class,notes = "手机端广告信息：数据缓存5分钟<br>@author xiagen")
-    public ResponseEntity<Map<String,Object>> getInfo(@RequestHeader("Authorization")String accessToken){
-        Map<String,Object> result=new HashMap<>();
-        AccountDTO accountDTO=ddUserService.getUserInfoWithLogin(accessToken);
-        if (null==accountDTO){
-            result.put(ApiReturnConstants.RESULT,Boolean.FALSE);
-            result.put(ApiReturnConstants.CAUSE,"无权限");
-            return  new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
-        }
-        List<ImgInfoDomain> imgInfoDomainList= imgManagerService.findByImgInfo(accountDTO.getOrganId());
-        result.put(ApiReturnConstants.RESULT,Boolean.TRUE);
-        result.put(ApiReturnConstants.DATA,imgInfoDomainList);
-        return  new ResponseEntity<>(result, HttpStatus.OK);
+    @RequestMapping(value = "/img/info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "手机端广告信息", httpMethod = "GET", response = Void.class, notes = "手机端广告信息：数据缓存5分钟<br>@author xiagen")
+    public ResponseEntity<Map<String, Object>> getInfo(@RequestHeader("Authorization") String accessToken) {
+        Map<String, Object> result = new HashMap<>();
+//        AccountDTO accountDTO = ddUserService.getUserInfoWithLogin(accessToken);
+//        if (null == accountDTO) {
+//            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+//            result.put(ApiReturnConstants.CAUSE, "无权限");
+//            return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
+//        }
+        //暂时屏蔽
+//        List<ImgInfoDomain> imgInfoDomainList= imgManagerService.findByImgInfo(accountDTO.getOrganId());
+        List<ImgInfoDomain> imgInfoDomainList = new ArrayList<>();
+        result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
+        result.put(ApiReturnConstants.DATA, imgInfoDomainList);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

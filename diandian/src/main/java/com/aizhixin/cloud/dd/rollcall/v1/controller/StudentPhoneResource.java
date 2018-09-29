@@ -119,7 +119,7 @@ public class StudentPhoneResource {
         }
         List<StudentScheduleDTO> studentSignCourse = scheduleRollCallService.getStudentSignCourse(account.getId());
         if (null == studentSignCourse) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            studentSignCourse = new ArrayList<>();
         }
         return new ResponseEntity<>(studentSignCourse, HttpStatus.OK);
     }

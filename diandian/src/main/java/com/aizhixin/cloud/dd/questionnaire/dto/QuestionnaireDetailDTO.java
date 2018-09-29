@@ -4,28 +4,42 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class QuestionnaireDetailDTO extends QuestionnaireDTO {
-    @Getter@Setter
-    private Long   questionnaireAssginId;
-    @Getter@Setter
+    @Getter
+    @Setter
+    private Long questionnaireAssginId;
+    @Getter
+    @Setter
     private String className;
-    @Getter@Setter
+    @Getter
+    @Setter
     private String studentName;
-    @Getter@Setter
+    @Getter
+    @Setter
     private String courseName;
-    @Getter@Setter
+    @Getter
+    @Setter
     private String courseCode;
-    @Getter@Setter
+    @Getter
+    @Setter
     private String teacherName;
-    @Getter@Setter
-    private double totalActualScore;
-    @Getter@Setter
-    private Long   questionnaireAssginStudentId;
-    @Getter @Setter
+    @Getter
+    @Setter
+    private Integer totalActualScore;
+    @Getter
+    @Setter
+    private Float totalActualScore2;
+    @Getter
+    @Setter
+    private Long questionnaireAssginStudentId;
+    @Getter
+    @Setter
     private String comment;
-    @Getter@Setter
+    @Getter
+    @Setter
     private Integer commit;
-    @Getter@Setter
+    @Getter
+    @Setter
     private Integer classType;
 
-   
+
 }

@@ -172,7 +172,7 @@ public class QuestionnaireAssgin extends AbstractEntity implements Serializable 
 	@Column(name = "score")
 	@Getter
 	@Setter
-	private Integer score;
+	private Float score;
 
 	/**
 	 * 权重评分

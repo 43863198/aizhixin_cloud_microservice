@@ -20,8 +20,14 @@ public class FeedbackRecordAnswerDomain {
     @ApiModelProperty(value = "分数")
     private Integer score;
 
+    @ApiModelProperty(value = "分数")
+    private Float score2;
+
     @ApiModelProperty(value = "填写答案")
     private String answer;
+
+    @ApiModelProperty(value = "填写答案")
+    private String answer2;
 
     @ApiModelProperty(value = "选项列表")
     private List<FeedbackTempletOptionsDomain> optionList;
