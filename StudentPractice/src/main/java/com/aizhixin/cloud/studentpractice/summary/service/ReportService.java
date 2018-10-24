@@ -224,9 +224,9 @@ public class ReportService {
 			msg.setReportId(report.getId());
 			msg.setCommitUserName(dto.getName());
          	msg.setTaskName(domain.getReportTitle());
-         	msg.setContent(MessageCode.MESSAGE_HEAD.concat(MessageCode.MESSAGE_STUDENT_ADD_TASK).replace("{1}", dto.getName()));
+         	msg.setContent(MessageCode.MESSAGE_HEAD.concat(MessageCode.MESSAGE_REPORT_SAVE).replace("{1}", dto.getName()));
 			msg.setFunction(PushMessageConstants.MODULE_REPORT);
-			msg.setModule(PushMessageConstants.MODULE_TASK);
+			msg.setModule(PushMessageConstants.MODULE_REPORT);
 			msg.setTitle(MessageCode.MESSAGE_TITLE_REPORT);
 			ArrayList<Long> ids = new ArrayList<Long>();
 			ids.add(report.getCounselorId());
