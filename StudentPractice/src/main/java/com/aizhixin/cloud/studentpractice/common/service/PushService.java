@@ -1,11 +1,13 @@
 package com.aizhixin.cloud.studentpractice.common.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -17,6 +19,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import com.aizhixin.cloud.studentpractice.common.domain.MessageDTOV2;
 import com.aizhixin.cloud.studentpractice.common.domain.PushMessageDTO;
 import com.aizhixin.cloud.studentpractice.common.util.http.HttpResponse;
 import com.aizhixin.cloud.studentpractice.common.util.http.OauthPostJson;
@@ -97,7 +101,14 @@ public class PushService {
 		
 		public void listPush(PushMessageDTO dto){
 			
-			authUtilService.saveMsgInfor(dto);
+//			authUtilService.saveMsgInfor(dto);
+			MessageDTOV2 messageDTO = new MessageDTOV2();
+			messageDTO.setAudience(dto.getUserIds());
+			messageDTO.setContent(dto.getContent());
+			messageDTO.setFunction(dto.getFunction());
+			messageDTO.setTitle(dto.getTitle());
+			messageDTO.setData(dto);
+			authUtilService.pushMsg(messageDTO);
 			pushMessageService.createPushMessage(dto);
 		}
 		
