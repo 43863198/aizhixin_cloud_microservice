@@ -222,11 +222,11 @@ public class ReportService {
 		if (StringUtils.isEmpty(domain.getId())) {
 			PushMessageDTO msg = new PushMessageDTO();
 			msg.setReportId(report.getId());
-			msg.setCommitUserName(dto.getName());
          	msg.setTaskName(domain.getReportTitle());
          	msg.setContent(MessageCode.MESSAGE_HEAD.concat(MessageCode.MESSAGE_REPORT_SAVE).replace("{1}", dto.getName()));
-			msg.setFunction(PushMessageConstants.MODULE_REPORT);
-			msg.setModule(PushMessageConstants.MODULE_REPORT);
+			msg.setFunction(PushMessageConstants.MODULE_TASK);
+			msg.setModule(PushMessageConstants.MODULE_TASK);
+			msg.setGroupId(report.getGroupId());
 			msg.setTitle(MessageCode.MESSAGE_TITLE_REPORT);
 			ArrayList<Long> ids = new ArrayList<Long>();
 			ids.add(report.getCounselorId());
@@ -280,9 +280,10 @@ public class ReportService {
 					msg.setReportId(report.getId());
 		         	msg.setTaskName(report.getReportTitle());
 		         	msg.setContent(MessageCode.MESSAGE_HEAD.concat(MessageCode.MESSAGE_REPORT_REVIEW));
-					msg.setFunction(PushMessageConstants.MODULE_REPORT);
+					msg.setFunction(PushMessageConstants.MODULE_TASK);
 					msg.setModule(PushMessageConstants.MODULE_TASK);
 					msg.setTitle(MessageCode.MESSAGE_TITLE_REPORT);
+					msg.setGroupId(report.getGroupId());
 					ArrayList<Long> ids = new ArrayList<Long>();
 					ids.add(report.getCreatedBy());
 					msg.setUserIds(ids);

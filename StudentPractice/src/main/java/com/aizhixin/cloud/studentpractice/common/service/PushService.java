@@ -101,7 +101,7 @@ public class PushService {
 		
 		public void listPush(PushMessageDTO dto){
 			
-//			authUtilService.saveMsgInfor(dto);
+		    authUtilService.saveMsgInfor(dto);
 			MessageDTOV2 messageDTO = new MessageDTOV2();
 			messageDTO.setAudience(dto.getUserIds());
 			messageDTO.setContent(dto.getContent());

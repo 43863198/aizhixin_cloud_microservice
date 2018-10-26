@@ -72,8 +72,8 @@
 	  <include file="classpath:liquibase/changelog/20180710142900_update_entity_PeopleCountDetail.xml" relativeToChangelogFile="false"/>
 	  <include file="classpath:liquibase/changelog/20180711095300_add_entity_Evaluate.xml" relativeToChangelogFile="false"/>
 	  <include file="classpath:liquibase/changelog/20180807154600_update_entity_Summary.xml" relativeToChangelogFile="false"/>
-	  <!-- 
 	  <include file="classpath:liquibase/changelog/20180808150900_update_entity_PushMessage.xml" relativeToChangelogFile="false"/>
+	   <!--
 	  <include file="classpath:liquibase/changelog/20180808151600_update_entity_Summary.xml" relativeToChangelogFile="false"/>
 	   -->
 </databaseChangeLog>

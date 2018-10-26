@@ -217,7 +217,7 @@ public class SummaryController {
 					
 					QueryCommentTotalDomain queryCountDTO = new QueryCommentTotalDomain();
 					queryCountDTO.setSourceIds(idList);
-					queryCountDTO.setModule(PushMessageConstants.MODULE_SUMMARY);
+					queryCountDTO.setModule(PushMessageConstants.MODULE_TASK);
 
 					HashMap<String, Integer> commentTotalMap = authUtilService
 							.getCommentTotalCount(queryCountDTO, token);

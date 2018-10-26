@@ -12,7 +12,7 @@
         <addColumn tableName="SP_PUSH_MESSAGE">
         	<column name="SUMMARY_ID" type="VARCHAR(36)" remarks="周日志id"/>
         	<column name="REPORT_ID" type="VARCHAR(36)" remarks="实践报告id"/>
-        	<column name="COMMIT_USER_NAME" type="VARCHAR(80)" remarks="提交人名称"/>
+        	<column name="GROUP_ID" type="BIGINT" remarks="实践计划id"/>
 		</addColumn>
     </changeSet>
 </databaseChangeLog>
