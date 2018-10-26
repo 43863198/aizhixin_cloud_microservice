@@ -689,7 +689,8 @@ public class TaskController {
 //			} 
 			 TrainingGroupInfoDTO groupDTO = orgMangerService.queryTrainGroupInfo(dto.getId());
 			 if(null != groupDTO){
-				 
+				 status = true;
+				 result.put("groupId", groupDTO.getId());
 			 }
 		 }
 		 result.put("status", status);
