@@ -24,7 +24,9 @@ import com.aizhixin.cloud.studentpractice.common.core.PublicErrorCode;
 import com.aizhixin.cloud.studentpractice.common.core.RoleCode;
 import com.aizhixin.cloud.studentpractice.common.domain.AccountDTO;
 import com.aizhixin.cloud.studentpractice.common.domain.IdNameDomain;
+import com.aizhixin.cloud.studentpractice.common.domain.TrainingGroupInfoDTO;
 import com.aizhixin.cloud.studentpractice.common.exception.CommonException;
+import com.aizhixin.cloud.studentpractice.common.remote.OrgMangerService;
 import com.aizhixin.cloud.studentpractice.common.service.AuthUtilService;
 import com.aizhixin.cloud.studentpractice.task.core.TaskStatusCode;
 import com.aizhixin.cloud.studentpractice.task.domain.MentorTaskDetailDomain;
@@ -76,6 +78,8 @@ public class TaskController {
 	private ReviewTaskService reviewTaskService;
 	@Autowired
 	private MentorTaskCountService mentorTaskCountService;
+	@Autowired
+	private OrgMangerService orgMangerService;
 	
 	/**
 	 * 创建任务
@@ -655,12 +659,12 @@ public class TaskController {
 	
 	
 	/**
-	 * 查询学生是否分配有企业导师
+	 * 查询学生是否参与实践计划
 	 * @param token
 	 * @return
 	 */
 	@RequestMapping(value = "/isassignmentor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(httpMethod = "GET", value = "学生是否分配有企业导师", response = Void.class, notes = "学生是否分配有企业导师<br><br><b>@author 郑宁</b>")
+	@ApiOperation(httpMethod = "GET", value = "查询学生是否参与实践计划", response = Void.class, notes = "查询学生是否参与实践计划<br><br><b>@author 郑宁</b>")
 	public ResponseEntity<Map<String, Object>> isAssignMentor(
 			@RequestHeader("Authorization") String token) {
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -678,11 +682,15 @@ public class TaskController {
 		
 		List<String> roles = dto.getRoleNames();
 		 if (roles.contains(RoleCode.ROLE_STUDENT)) {
-			StuInforDomain stuDTO = authUtilService.getMentorInfo(dto.getId());
-			if (stuDTO != null && !StringUtils.isEmpty(stuDTO.getMentorId())) {
-				status = true;
-				result.put("groupId", stuDTO.getTrainingGroupId());
-			} 
+//			StuInforDomain stuDTO = authUtilService.getMentorInfo(dto.getId());
+//			if (stuDTO != null && !StringUtils.isEmpty(stuDTO.getMentorId())) {
+//				status = true;
+//				result.put("groupId", stuDTO.getTrainingGroupId());
+//			} 
+			 TrainingGroupInfoDTO groupDTO = orgMangerService.queryTrainGroupInfo(dto.getId());
+			 if(null != groupDTO){
+				 
+			 }
 		 }
 		 result.put("status", status);
 			
