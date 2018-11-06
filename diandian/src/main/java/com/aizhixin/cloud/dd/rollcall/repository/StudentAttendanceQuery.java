@@ -27,7 +27,7 @@ public class StudentAttendanceQuery {
     public PageData<AttendanceAllDTO> queryScheduleAttendance(Integer offset, Integer limit, Long organId, Long userId, Long semesterId, String typeId, String courseName, Long courseId) {
 
         String sql = "SELECT dr.TEACHER_ID AS teacherId, ds.TEACHER_NAME AS NAME, ds.COURSE_ID as courseId,dr.TYPE AS typeId, ds.DAY_OF_WEEK AS dayWeek, ds.TEACH_DATE AS teachTime, " +
-                " ds.PERIOD_NO AS periodName, ds.COURSE_NAME AS courseName, ds.ID AS scheduleId, dsr.ID AS scheduleRollCallId " +
+                " ds.PERIOD_NO AS periodName, ds.COURSE_NAME AS courseName, ds.ID AS scheduleId, dsr.ID AS scheduleRollCallId, dr.is_public_leave " +
                 " FROM dd_rollcall dr LEFT JOIN dd_schedule_rollcall dsr ON dr.SCHEDULE_ROLLCALL_ID = dsr.ID " +
                 " LEFT JOIN dd_schedule ds ON ds.ID = dsr.SCHEDULE_ID where 1=1 and dr.TYPE >=1 AND dr.TYPE <=5 ";
 
@@ -74,6 +74,7 @@ public class StudentAttendanceQuery {
                 item.setCourseId(rs.getString("courseId"));
                 item.setScheduleId(rs.getString("scheduleId"));
                 item.setScheduleRollCallId(rs.getString("scheduleRollCallId"));
+                item.setIsPublicLeave(rs.getBoolean("is_public_leave"));
                 return item;
             }
         }));

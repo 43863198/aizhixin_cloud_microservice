@@ -25,6 +25,8 @@ public interface UserInfoRepository extends MongoRepository<UserInfo, String> {
 
     public Page<UserInfo> findByOrgIdAndNameLike(Pageable page, Long orgId, String name);
 
+    public Page<UserInfo> findByOrgId(Pageable page, Long orgId);
+
     public Page<UserInfo> findByCollegeIdAndNameLike(Pageable page, Long collegeId, String name);
 
     public Page<UserInfo> findByProfIdAndNameLike(Pageable page, Long profId, String name);
@@ -33,11 +35,11 @@ public interface UserInfoRepository extends MongoRepository<UserInfo, String> {
 
     public Page<UserInfo> findByUserIdInAndNameLike(Pageable page, List<Long> userIds, String name);
 
-    public Long countByUserTypeAndOrgIdAndCollegeId(Integer userType, Long orgId, Long collegeId);
-
     public Set<UserInfo> findByUserIdIn(Set<Long> userIds);
 
     public List<UserInfo> findByUserIdIn(List<Long> userIds);
+
+    public List<UserInfo> findByUserIdInAndUserType(List<Long> userIds, Integer userType);
 
     public List<UserInfo> findByUserIdInOrderByUserId(Set<Long> userIds);
 
@@ -55,11 +57,11 @@ public interface UserInfoRepository extends MongoRepository<UserInfo, String> {
 
     public List<UserInfo> findByOrgIdAndUserType(Long orgId, Integer userType);
 
-    public Long countByUserTypeAndProfId(Integer userType, Long profId);
-
-    public Page<UserInfo> findByOrgIdAndProfIdAndUserTypeAndSexAndNameLike(Pageable page, Long orgId, Long profId, Integer userType, String sex, String name);
+    public Page<UserInfo> findByOrgIdAndUserType(Pageable page,Long orgId, Integer userType);
 
     public Page<UserInfo> findByOrgIdAndCollegeIdAndUserTypeAndIsHTeacherAndTeacherTypeAndNameLikeOrOrgIdAndCollegeIdAndUserTypeAndIsHTeacherAndTeacherTypeAndJobNumLike(Pageable page, Long orgId, Long collegeId, Integer userType, Boolean isHTeacher, Integer teacherType, String name, Long orgId1, Long collegeId1, Integer userType1, Boolean isHTeacher1, Integer teacherType1, String jobNum);
+
+    public Page<UserInfo> findByOrgIdAndCollegeIdAndUserType(Pageable page, Long orgId, Long collegeId, Integer userType);
 
     public Page<UserInfo> findByOrgIdAndCollegeIdAndUserTypeAndIsHTeacherAndNameLikeOrOrgIdAndCollegeIdAndUserTypeAndIsHTeacherAndJobNumLike(Pageable page, Long orgId, Long collegeId, Integer userType, Boolean isHTeacher, String name, Long orgId1, Long collegeId1, Integer userType1, Boolean isHTeacher1, String jobNum);
 

@@ -147,7 +147,6 @@ public class RollCallService {
             authCode = String.valueOf(getRandomAuthCode());
             scheduleRollCall.setLocaltion(authCode);
             scheduleRollCallService.save(scheduleRollCall, scheduleId);
-
         } else {
             authCode = scheduleRollCall.getLocaltion() == null ? "" : scheduleRollCall.getLocaltion();
         }
@@ -216,10 +215,11 @@ public class RollCallService {
             rollCallDTO.setClassId(rollCall.getClassId());
             rollCallDTO.setUserId(rollCall.getStudentId());
             rollCallDTO.setType(rollCall.getType());
+            rollCallDTO.setIsPublicLeave(rollCall.getIsPublicLeave());
             rollCallDTO.setDistance(null == rollCall.getDistance() ? "" : rollCall.getDistance());
             rollCallDTO.setSignTime(DateFormatUtil.format(rollCall.getSignTime(), DateFormatUtil.FORMAT_MINUTE));
             rollCallDTO.setUserName(rollCall.getStudentName());
-            String className = rollCall.getClassName(); // "23";
+            String className = rollCall.getClassName();
             rollCallDTO.setClassName(className);
             rollCallDTO.setRollCall(scheduleRollCall.getIsOpenRollcall());
             rollCallDTO.setTeacherId(schedule.getTeacherId());
@@ -763,17 +763,20 @@ public class RollCallService {
      * ]只有已经结束的课程才可以进行该操作,取消正在进行的课程的点名信息
      *
      * @param scheduleId
-     * @param teacherId
+     * @param accountDTO
      */
-    public void cancleRollCall(Long scheduleId, Long teacherId) {
+    public void cancleRollCall(Long scheduleId, AccountDTO accountDTO) {
         ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(scheduleId);
         List<RollCall> rollCallList = rollCallRepository.findByScheduleRollcallId(scheduleRollCall.getId());
         // 修改所有学生的状态为取消考勤
-        Set<Long> cancleRollCallIds = new HashSet<Long>();
         for (RollCall rollCall : rollCallList) {
-            cancleRollCallIds.add(rollCall.getId());
+            rollCall.setLastType(rollCall.getType());
+            rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
         }
-        rollCallRepository.cancleRollCall(cancleRollCallIds, RollCallConstants.TYPE_CANCEL_ROLLCALL, null);
+        rollCallRepository.save(rollCallList);
+        //保存修改记录
+        saveRollCallLog(rollCallList, accountDTO, null);
+
         scheduleRollCall.setLocaltion("");
         scheduleRollCallService.save(scheduleRollCall, scheduleId);
     }
@@ -953,12 +956,13 @@ public class RollCallService {
         Schedule schedule = scheduleRollCall.getSchedule();
         Long teachingclassId = schedule.getTeachingclassId();
         Date date = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
-        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, date);
+        Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
+        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, date, endDate);
         if (null == studentList) {
             log.info("根据教学班id获取学生列表信息为空!" + schedule.getId());
             return false;
         }
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
+//        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
         RollCall rollCall = null;
         Map<Long, RollCall> rollCallMap = new HashMap();
         for (StudentDTO dto : studentList) {
@@ -981,14 +985,19 @@ public class RollCallService {
             rollCall.setCollegeName(dto.getCollegeName());
             rollCall.setTeachingYear(dto.getTeachingYear());
             rollCall.setOrgId(schedule.getOrganId());
+            rollCall.setStudentName(dto.getStudentName());
+            rollCall.setSemesterId(schedule.getSemesterId());
             // 判断该学生是否有请假
-            if (studentLeaves != null && studentLeaves.contains(dto.getStudentId())) {
+            rollCall.setIsPublicLeave(Boolean.FALSE);
+            if (dto.getIsPublicLeave()) {
+                rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                rollCall.setIsPublicLeave(Boolean.TRUE);
+                rollCall.setCanRollCall(Boolean.FALSE);
+            } else if (dto.getIsPrivateLeave()) {
                 rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
             } else {
                 rollCall.setType(RollCallConstants.TYPE_UNCOMMITTED);
             }
-            rollCall.setStudentName(dto.getStudentName());
-            rollCall.setSemesterId(schedule.getSemesterId());
             rollCallMap.put(studentId, rollCall);
         }
         redisTemplate.opsForHash().putAll(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCallMap);
@@ -1169,67 +1178,85 @@ public class RollCallService {
     /**
      * 补录考勤
      */
-    public void additionaleRollcall(Long scheduleId) {
-        Schedule schedule = scheduleService.findOne(scheduleId);
-        ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(scheduleId);
-        if (null == scheduleRollCall) {
-            scheduleRollCall = new ScheduleRollCall();
-            scheduleRollCall.setCreatedDate(DateFormatUtil.parse2(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT));
-        }
-        // 进行该排课点名信息的初始化操作。
-        scheduleRollCall.setSchedule(schedule);
-        scheduleRollCall.setRollCallType(ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC);
-        scheduleRollCall.setCourseLaterTime(0);
-        scheduleRollCall.setAbsenteeismTime(0);
-        scheduleRollCall.setClassRoomRollCall(CourseRollCallConstants.NOT_OPEN_CLASSROOMROLLCALL);
-        scheduleRollCall.setLocaltion("补录考勤");
-        scheduleRollCall.setIsOpenRollcall(Boolean.TRUE);
-        scheduleRollCall.setIsInClassroom(Boolean.FALSE);
-        scheduleRollCallService.save(scheduleRollCall, scheduleId);
-        Long teachingclassId = schedule.getTeachingclassId();
-        Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
-        Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
-        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate);
-        if (null == studentList) {
-            log.info("根据教学班id获取学生列表信息为空!");
-            return;
-        }
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
-        RollCall rollCall = null;
-        List list = new ArrayList();
-        for (StudentDTO dto : studentList) {
-            rollCall = new RollCall();
-            rollCall.setId(RedisUtil.getRollCallId());
-            rollCall.setScheduleRollcallId(scheduleRollCall.getId());
-            rollCall.setTeacherId(schedule.getTeacherId());
-            rollCall.setStudentId(dto.getStudentId());
-            rollCall.setStudentNum(dto.getSutdentNum());
-            rollCall.setClassId(dto.getClassesId());
-            rollCall.setClassName(dto.getClassesName());
-            rollCall.setTeachingClassId(teachingclassId);
-            rollCall.setCourseId(schedule.getCourseId());
-            rollCall.setCanRollCall(Boolean.FALSE);
-            rollCall.setHaveReport(Boolean.FALSE);
-            rollCall.setProfessionalId(dto.getProfessionalId());
-            rollCall.setProfessionalName(dto.getProfessionalName());
-            rollCall.setCollegeId(dto.getCollegeId());
-            rollCall.setCollegeName(dto.getCollegeName());
-            rollCall.setOrgId(schedule.getOrganId());
-            rollCall.setTeachingYear(dto.getTeachingYear());
-            rollCall.setCreatedDate(DateFormatUtil.parse2(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT));
-            // 判断该学生是否有请假
-            if (studentLeaves != null && studentLeaves.contains(dto.getStudentId())) {
-                rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-            } else {
-                rollCall.setType(RollCallConstants.TYPE_NORMA);
+    public void additionaleRollcall(Long scheduleId, AccountDTO accountDTO) {
+        try {
+            log.info("补录考勤开始!{}", scheduleId);
+            Schedule schedule = scheduleService.findOne(scheduleId);
+            ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(scheduleId);
+            if (null == scheduleRollCall) {
+                scheduleRollCall = new ScheduleRollCall();
+                scheduleRollCall.setCreatedDate(DateFormatUtil.parse2(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT));
             }
-            rollCall.setStudentName(dto.getStudentName());
-            rollCall.setSemesterId(schedule.getSemesterId());
-            list.add(rollCall);
+            // 进行该排课点名信息的初始化操作。
+            scheduleRollCall.setSchedule(schedule);
+            scheduleRollCall.setRollCallType(ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC);
+            scheduleRollCall.setCourseLaterTime(0);
+            scheduleRollCall.setAbsenteeismTime(0);
+            scheduleRollCall.setClassRoomRollCall(CourseRollCallConstants.NOT_OPEN_CLASSROOMROLLCALL);
+            scheduleRollCall.setLocaltion("补录考勤");
+            scheduleRollCall.setIsOpenRollcall(Boolean.TRUE);
+            scheduleRollCall.setIsInClassroom(Boolean.FALSE);
+            scheduleRollCallService.save(scheduleRollCall, scheduleId);
+            Long teachingclassId = schedule.getTeachingclassId();
+            Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
+            Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
+            List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate, endDate);
+            if (null == studentList) {
+                log.info("根据教学班id获取学生列表信息为空!");
+                return;
+            }
+//        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
+            List list = new ArrayList();
+            for (StudentDTO dto : studentList) {
+                RollCall rollCall = new RollCall();
+                rollCall.setId(RedisUtil.getRollCallId());
+                rollCall.setScheduleRollcallId(scheduleRollCall.getId());
+                rollCall.setTeacherId(schedule.getTeacherId());
+                rollCall.setStudentId(dto.getStudentId());
+                rollCall.setStudentNum(dto.getSutdentNum());
+                rollCall.setClassId(dto.getClassesId());
+                rollCall.setClassName(dto.getClassesName());
+                rollCall.setTeachingClassId(teachingclassId);
+                rollCall.setCourseId(schedule.getCourseId());
+                rollCall.setCanRollCall(Boolean.FALSE);
+                rollCall.setHaveReport(Boolean.FALSE);
+                rollCall.setProfessionalId(dto.getProfessionalId());
+                rollCall.setProfessionalName(dto.getProfessionalName());
+                rollCall.setCollegeId(dto.getCollegeId());
+                rollCall.setCollegeName(dto.getCollegeName());
+                rollCall.setOrgId(schedule.getOrganId());
+                rollCall.setTeachingYear(dto.getTeachingYear());
+                rollCall.setCreatedDate(DateFormatUtil.parse2(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT));
+                rollCall.setLastType(RollCallConstants.TYPE_UNROLLCALL);
+                rollCall.setStudentName(dto.getStudentName());
+                rollCall.setSemesterId(schedule.getSemesterId());
+                // 判断该学生是否有请假
+                rollCall.setIsPublicLeave(Boolean.FALSE);
+                if (dto.getIsPublicLeave()) {
+                    rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                    rollCall.setIsPublicLeave(Boolean.TRUE);
+                    rollCall.setCanRollCall(Boolean.FALSE);
+                } else if (dto.getIsPrivateLeave()) {
+                    rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                } else {
+                    rollCall.setType(RollCallConstants.TYPE_UNCOMMITTED);
+                }
+                list.add(rollCall);
+            }
+            list = rollCallRepository.save(list);
+            schedule.setIsInitRollcall(Boolean.TRUE);
+            scheduleService.save(schedule);
+            //保存修改记录
+            saveRollCallLog(list, accountDTO, "补录考勤");
+            log.info("补录考勤结束!{}", scheduleId);
+        } catch (Exception e) {
+            log.warn("additionaleRollcallException", e);
         }
-        rollCallRepository.save(list);
-        schedule.setIsInitRollcall(Boolean.TRUE);
-        scheduleService.save(schedule);
+    }
+
+    @Async
+    private void saveRollCallLog(List<RollCall> list, AccountDTO accountDTO, String type) {
+        modifyAttendanceLogService.modifyAttendances(list, accountDTO.getName(), accountDTO.getId(), type);
     }
 
     /**
@@ -1263,7 +1290,15 @@ public class RollCallService {
         int type = organSet.getArithmetic() == null ? 10 : organSet.getArithmetic();
 
         List<RollCall> rollCalls = rollCallRepository.findAllByScheduleRollcallIdAndDeleteFlag(scheduleRollCallId, DataValidity.VALID.getState());
-        return calculateAttendanceRollCall(rollCalls, type);
+        List<RollCall> datas = new ArrayList<>();
+        if (rollCalls != null && rollCalls.size() > 0) {
+            for (RollCall rollCall : rollCalls) {
+                if (rollCall.getType() != null && !rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
+                    datas.add(rollCall);
+                }
+            }
+        }
+        return calculateAttendanceRollCall(datas, type);
     }
 
     public String calculateAttendanceRollCall(List<RollCall> rollCalls, int type) {
@@ -1294,27 +1329,6 @@ public class RollCallService {
                 }
             }
             result = RollCallUtils.AttendanceAccount(total, normal, later, askForLeave, leave, type);
-        }
-        return result;
-    }
-
-    public Integer calculateRollCallStu(List<RollCall> rollCalls, int type) {
-        Integer result = 0;
-        if (rollCalls == null || rollCalls.isEmpty()) {
-            return result;
-        }
-        for (RollCall rollCall : rollCalls) {
-            switch (rollCall.getType()) {
-                case RollCallConstants.TYPE_NORMA:
-                    result++;
-                    break;
-                case RollCallConstants.TYPE_LATE:
-                    result++;
-                    break;
-                case RollCallConstants.TYPE_COMMITTED:
-                    result++;
-                    break;
-            }
         }
         return result;
     }

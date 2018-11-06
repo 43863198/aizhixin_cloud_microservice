@@ -20,12 +20,12 @@ public class OrganSetService {
         OrganSet os = null;
         try {
             os = organSetRepository.findByOrganId(organId);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (null == os) {
             os = new OrganSet();
+            os.setOrganId(organId);
             os.setCalcount(11);
             os.setAnti_cheating(Boolean.TRUE);
             os.setConfilevel(60);

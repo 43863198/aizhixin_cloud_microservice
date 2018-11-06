@@ -138,6 +138,7 @@ public class QuestionnaireExport {
                 QuestionnaireQuestionDataDTO qqdd = new QuestionnaireQuestionDataDTO();
                 // 试题内容
                 qqdd.setContent(questions.getName());
+                qqdd.setQA(questions.isQA());
                 // 试题序号
                 qqdd.setNo(questions.getNo());
                 if (q.isQuantification()) {

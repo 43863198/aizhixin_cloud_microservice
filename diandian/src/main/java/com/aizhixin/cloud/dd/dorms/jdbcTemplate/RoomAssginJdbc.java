@@ -56,8 +56,8 @@ public class RoomAssginJdbc {
     }
 
     public List<RoomInfoDomain> findRoomInfo(Long orgId, List<Long> floorIds, List<String> unitNo, List<String> floorNo,
-                                             Boolean full, Boolean open, Boolean isAssignment, Long profId, String no, Integer pageNumber, Integer pageSize) {
-        String sql = "SELECT dr.`id`,df.`name`,dr.`unit_no`,dr.`floor_no`,dr.`no`,dr.`beds`,dr.`em_beds`,dr.`open`,draa.`id` as rid, GROUP_CONCAT(draa.prof_id) profId, GROUP_CONCAT(draa.prof_name)  profName, draa.counselor_ids, draa.counselor_names  FROM `dd_floor` AS df LEFT JOIN `dd_room` AS dr ON df.`id`=dr.`floor_id`";
+                                             Boolean full, Boolean open, Boolean isAssignment, Long profId, String no, String grade, Integer pageNumber, Integer pageSize) {
+        String sql = "SELECT dr.`id`,df.`name`,dr.`unit_no`,dr.`floor_no`,dr.`no`,dr.`beds`,dr.`em_beds`,dr.`open`,draa.`id` as rid, GROUP_CONCAT(draa.prof_id) profId, GROUP_CONCAT(draa.prof_name)  profName, draa.counselor_ids, draa.counselor_names, dr.grade  FROM `dd_floor` AS df LEFT JOIN `dd_room` AS dr ON df.`id`=dr.`floor_id`";
         // 专业
         //			if (null != profId) {
         sql += " LEFT JOIN `dd_room_assgin` AS draa ON draa.`room_id`=dr.`id` AND draa.DELETE_FLAG=0";
@@ -113,6 +113,10 @@ public class RoomAssginJdbc {
                 sql += " AND dr.`open`=0";
             }
         }
+        // 年级
+        if (!StringUtils.isEmpty(grade)) {
+            sql += " AND dr.`grade`='" + grade + "'";
+        }
         // 是否分配
         if (null != isAssignment) {
             if (isAssignment) {
@@ -145,7 +149,7 @@ public class RoomAssginJdbc {
                 rd.setRoomId(rs.getLong("id"));
                 rd.setProfNames(rs.getString("profName"));
                 rd.setCounselorNames(rs.getString("counselor_names"));
-
+                rd.setGrade(rs.getString("grade"));
                 if (rs.getLong("rid") == 0) {
                     rd.setAssgin(false);
                 } else {
@@ -159,7 +163,7 @@ public class RoomAssginJdbc {
     }
 
     public Integer countRoomInfo(Long orgId, List<Long> floorIds, List<String> unitNo, List<String> floorNo,
-                                 Boolean full, Boolean open, Boolean isAssignment, Long profId, String no) {
+                                 Boolean full, Boolean open, Boolean isAssignment, Long profId, String no, String grade) {
         String sql = "SELECT count(DISTINCT dr.`id`) FROM `dd_floor` AS df LEFT JOIN `dd_room` AS dr ON df.`id`=dr.`floor_id`";
         // 专业
         //		if (null != profId) {
@@ -215,6 +219,10 @@ public class RoomAssginJdbc {
             } else {
                 sql += " AND dr.`open`=0";
             }
+        }
+        // 年级
+        if (!StringUtils.isEmpty(grade)) {
+            sql += " AND dr.`grade`='" + grade + "'";
         }
         //是否分配
         if (null != isAssignment) {

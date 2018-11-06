@@ -198,4 +198,9 @@ public class RollCall extends AbstractEntity {
     @Getter
     @Setter
     private Long orgId;
+
+    @Column(name = "is_public_leave")
+    @Getter
+    @Setter
+    private Boolean isPublicLeave = false;
 }

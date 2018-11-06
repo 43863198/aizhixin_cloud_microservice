@@ -30,5 +30,6 @@ public class RoomInfoDomain {
 
 	@ApiModelProperty(value="辅导员名称")
 	private String counselorNames;
-
+	@ApiModelProperty(value="年级")
+	private String grade;
 }

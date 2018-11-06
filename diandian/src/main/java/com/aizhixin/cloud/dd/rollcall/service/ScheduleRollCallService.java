@@ -288,17 +288,24 @@ public class ScheduleRollCallService {
     }
 
     private String calculateAttendanceRollCall(List<RollCall> rollCalls, int type) {
+
         String result = null;
         if (rollCalls == null || rollCalls.isEmpty()) {
             return result;
         }
         if (null != rollCalls && !rollCalls.isEmpty()) {
-            int total = rollCalls.size();
+            List<RollCall> datas = new ArrayList<>();
+            for (RollCall rollCall : rollCalls) {
+                if (!rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
+                    datas.add(rollCall);
+                }
+            }
+            int total = datas.size();
             int normal = 0;
             int later = 0;
             int askForLeave = 0;
             int leave = 0;
-            for (RollCall rollCall : rollCalls) {
+            for (RollCall rollCall : datas) {
                 switch (rollCall.getType()) {
                     case RollCallConstants.TYPE_NORMA:
                         normal++;
@@ -324,7 +331,13 @@ public class ScheduleRollCallService {
         if (rollCalls == null || rollCalls.isEmpty()) {
             return result;
         }
+        List<RollCall> datas = new ArrayList<>();
         for (RollCall rollCall : rollCalls) {
+            if (!rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
+                datas.add(rollCall);
+            }
+        }
+        for (RollCall rollCall : datas) {
             switch (rollCall.getType()) {
                 case RollCallConstants.TYPE_NORMA:
                     result++;
@@ -363,6 +376,18 @@ public class ScheduleRollCallService {
                     teachingClassIds.add(Long.valueOf(str));
                 }
                 studentSignCourse = scheduleQuery.getStudentSignCourse(teachingClassIds, teachingClassIdsStr);
+                if (studentSignCourse != null && studentSignCourse.size() > 0) {
+                    for (StudentScheduleDTO dto : studentSignCourse) {
+                        RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(dto.getScheduleRollCallId()), studentId);
+                        if (rollCall != null) {
+                            dto.setType(rollCall.getType());
+                            dto.setIsPublicLeave(rollCall.getIsPublicLeave());
+                            if (rollCall.getType() != null && rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
+                                dto.setCanReport(false);
+                            }
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             log.warn("获取签到列表失败", e);
@@ -527,6 +552,9 @@ public class ScheduleRollCallService {
                     if (flag) {
                         currenScheduleRollCallId = scheduleRollCall.getId();
                     }
+                    if (scheduleRollCall.getIsOpenRollcall() && flag) {
+                        studentScheduleDTO.setCanReport(true);
+                    }
                     RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(currenScheduleRollCallId), account.getId());
                     if (rollCall != null) {
                         studentScheduleDTO.setType(rollCall.getType());
@@ -535,14 +563,16 @@ public class ScheduleRollCallService {
                         studentScheduleDTO.setLocaltion(scheduleRollCall.getLocaltion());
                         studentScheduleDTO.setHaveReport(rollCall.getHaveReport());
                         studentScheduleDTO.setSignTime(rollCall.getSignTime() == null ? "" : sdf.format(rollCall.getSignTime()));
+                        studentScheduleDTO.setIsPublicLeave(rollCall.getIsPublicLeave());
+
+                        if (rollCall.getType() != null && rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
+                            studentScheduleDTO.setCanReport(false);
+                        }
                     } else {
                         studentScheduleDTO.setType(RollCallConstants.TYPE_UNCOMMITTED);
                         studentScheduleDTO.setRollcallType(scheduleRollCall.getRollCallType());
                         studentScheduleDTO.setRollCall(scheduleRollCall.getIsOpenRollcall());
                         studentScheduleDTO.setLocaltion(scheduleRollCall.getLocaltion());
-                    }
-                    if (scheduleRollCall.getIsOpenRollcall() && flag) {
-                        studentScheduleDTO.setCanReport(true);
                     }
                 }
                 tlist.add(studentScheduleDTO);
@@ -675,14 +705,11 @@ public class ScheduleRollCallService {
                     studentScheduleDTO.setSignTime(rollCall.getSignTime() == null ? "" : DateFormatUtil.format(rollCall.getSignTime(), DateFormatUtil.FORMAT_MINUTE));
                     studentScheduleDTO.setHaveReport(rollCall.getHaveReport());
                     studentScheduleDTO.setAddress(rollCall.getGpsDetail());
-                    // studentScheduleDTO.setRollcallType(scheduleRollCall.getRollCallType());
                     studentScheduleDTO.setRollcallType(rollCall.getType());
-
+                    studentScheduleDTO.setIsPublicLeave(rollCall.getIsPublicLeave());
                 } else {
                     studentScheduleDTO.setType(RollCallConstants.TYPE_UNCOMMITTED);
                     studentScheduleDTO.setRollcallType(RollCallConstants.TYPE_UNCOMMITTED);
-                    // studentScheduleDTO.setRollcallType(scheduleRollCall.getRollCallType());
-
                 }
                 studentScheduleDTO.setRollCall(scheduleRollCall.getIsOpenRollcall());
                 studentScheduleDTO.setInClass(scheduleRollCall.getIsInClassroom());
@@ -758,11 +785,6 @@ public class ScheduleRollCallService {
         } else {
             return null;
         }
-    }
-
-    public int countStudentsByTeachingClassId(Long teachingClassId) {
-        Long count = orgManagerRemoteService.countStudentsByTeachingClassId(teachingClassId);
-        return null == count ? 0 : count.intValue();
     }
 
     public List<ClassStatsDTO> getClassInfor(Long teachingClassId) {

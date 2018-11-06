@@ -403,6 +403,41 @@ public class DistributeLock {
     }
 
     /**
+     * 初始化教师平时打分
+     *
+     * @return 是否获取到锁
+     */
+    public boolean getInitAllTeacherLimitScoreLock() {
+        StringBuilder lockPath = new StringBuilder(zkLockPath);
+        StringBuilder taskPath = new StringBuilder(zkTaskPath);
+        Date current = new Date();
+        String curDayString = DateUtil.format(current);
+        String HHmm = DateUtil.format(current, "HHmm");
+        lockPath.append("/").append(curDayString).append("/initAllTeacherLimitScore/").append(HHmm);
+        taskPath.append("/").append(curDayString).append("/initAllTeacherLimitScore/").append(HHmm);
+        return getLock(lockPath.toString(), taskPath.toString());
+    }
+
+    public void delInitAllTeacherLimitScoreLock() {
+        StringBuilder lockPath = new StringBuilder(zkLockPath);
+        StringBuilder taskPath = new StringBuilder(zkTaskPath);
+        Date current = new Date();
+        String curDayString = DateUtil.format(current);
+        lockPath.append("/").append(curDayString).append("/initAllTeacherLimitScore");
+        taskPath.append("/").append(curDayString).append("/initAllTeacherLimitScore");
+        CuratorFramework client = CuratorFrameworkFactory.newClient(zkConnectString, new RetryNTimes(ZOOKEEPER_RETRY_TIMES, ZOOKEEPER_RETRY_SLEEP_TIMES));
+        try {
+            client.start();
+            client.delete().deletingChildrenIfNeeded().forPath(lockPath.toString());
+            client.delete().deletingChildrenIfNeeded().forPath(taskPath.toString());
+            client.close();
+        } catch (Exception e) {
+            LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 导员点名
      *
      * @return 是否获取到锁

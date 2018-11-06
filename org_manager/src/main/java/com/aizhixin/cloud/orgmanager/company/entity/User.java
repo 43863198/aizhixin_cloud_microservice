@@ -167,4 +167,7 @@ public class User implements java.io.Serializable {
 
 	@Column(name = "is_choose_dormitory")
 	@Getter @Setter private Boolean isChooseDormitory;
+
+	@Column(name = "is_monitor")
+	@Getter @Setter private Boolean isMonitor;
 }

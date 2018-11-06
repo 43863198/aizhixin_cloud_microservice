@@ -8,6 +8,7 @@ import com.aizhixin.cloud.orgmanager.common.exception.CommonException;
 import com.aizhixin.cloud.orgmanager.common.provider.store.redis.RedisTokenStore;
 import com.aizhixin.cloud.orgmanager.common.util.RoleConfig;
 import com.aizhixin.cloud.orgmanager.company.core.UserType;
+import com.aizhixin.cloud.orgmanager.company.dto.UpdateStudentTeachingClassDTO;
 import com.aizhixin.cloud.orgmanager.company.entity.*;
 import com.aizhixin.cloud.orgmanager.company.repository.*;
 import com.aizhixin.cloud.orgmanager.company.service.*;
@@ -211,6 +212,7 @@ public class BaseDataService {
         List<Map<String, String>> professionNames = new ArrayList<>();
         List<String> collegsNames = new ArrayList<>();
         Map<String, StudentDomain> cache = new HashMap<>();
+        List<UpdateStudentTeachingClassDTO> updateStudentTeachingClassDTOList = new ArrayList<>();
         for (StudentDomain domain : datas) {
             Map<String, String> map = new HashMap<>();
             map.put("classname", domain.getClassName());
@@ -240,6 +242,7 @@ public class BaseDataService {
             if (list != null && list.size() > 0) {
                 //已经存在 更新
                 User stu = list.get(0);
+                updateStudentTeachingClassDTOList.add(new UpdateStudentTeachingClassDTO(stu.getId(), stu.getClasses(), classes.get(domain.getClassName())));
                 stu.setUserType(UserType.B_STUDENT.getState());
                 stu.setName(domain.getName());
                 stu.setJobNumber(domain.getJobNum());
@@ -279,6 +282,7 @@ public class BaseDataService {
                     stu.setInSchoolDate(date);
                 }
                 addStuList.add(stu);
+
             }
         }
 
@@ -300,6 +304,7 @@ public class BaseDataService {
                 u.setId(cache.get(u.getJobNumber()).getId());
                 userRepository.save(u);
 
+                updateStudentTeachingClassDTOList.add(new UpdateStudentTeachingClassDTO(u.getId(), null, u.getClasses()));
                 UserRole userRole = new UserRole();
                 userRole.setRoleGroup(roleConfig.getRoleGroup2B());
                 userRole.setUser(u);
@@ -307,6 +312,7 @@ public class BaseDataService {
                 userRoleRepository.save(userRole);
             }
         }
+        userService.updateStudentTeachingClass(updateStudentTeachingClassDTOList);
     }
 
     /**

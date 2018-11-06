@@ -2,6 +2,7 @@ package com.aizhixin.cloud.dd.common.schedule;
 
 import javax.annotation.PostConstruct;
 
+import com.aizhixin.cloud.dd.classperf.service.ClassPerfService;
 import com.aizhixin.cloud.dd.counsellorollcall.thread.StudentSignThread;
 import com.aizhixin.cloud.dd.counsellorollcall.thread.UpdateRollcallMessageThread;
 import com.aizhixin.cloud.dd.counsellorollcall.v1.service.TempGroupService;
@@ -74,6 +75,9 @@ public class MyScheduleService {
 
     @Autowired
     private CounselorRollcallTeacherService counselorRollcallTeacherService;
+
+    @Autowired
+    private ClassPerfService classPerfService;
 
     @Value("${schedule.execute}")
     private Boolean execute = true;
@@ -251,6 +255,20 @@ public class MyScheduleService {
     public void cleanDianTask() {
         distributeLock.deleteChooseRoomDieLock();
         distributeLock.deleteTaskDianLock();
+    }
+
+    /**
+     * 初始化教师平时打分
+     */
+    @Scheduled(cron = "1 0 0 * * ?")
+    public void initTeacherClassPerf() {
+        if (distributeLock.getInitAllTeacherLimitScoreLock()) {
+            log.info("初始化教师平时打分");
+            classPerfService.initAllTeacherLimitScore();
+            distributeLock.delInitAllTeacherLimitScoreLock();
+        } else {
+            log.info("初始化教师平时打分，获取锁失败");
+        }
     }
 
     @PostConstruct

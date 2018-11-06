@@ -14,6 +14,8 @@ public class NewStudent {
     @Indexed
     private Long orgId;
 
+    private String orgName;
+
     @Indexed
     private Long stuId;
 

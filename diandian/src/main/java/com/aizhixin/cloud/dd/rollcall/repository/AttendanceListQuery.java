@@ -18,42 +18,6 @@ public class AttendanceListQuery {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public List <AttendanceDTO> queryScheduleAttendance(
-            Set <Long> scheduleRollCallIds) {
-
-        String sql = "SELECT   da.schedule_rollcall_id,  allcount,  IFNULL(normalCount, 0) AS normalCount"
-                + " FROM  (SELECT     COUNT(*) AS allcount,    dr.schedule_rollcall_id   FROM "
-                + " dd_rollcall dr   WHERE dr.schedule_rollcall_id IN ( #scheduleRollCallIds# )"
-                + " GROUP BY dr.`schedule_rollcall_id`) da   LEFT JOIN     (SELECT "
-                + " COUNT(*) AS normalCount,      dr.schedule_rollcall_id     FROM"
-                + " dd_rollcall dr     WHERE (dr.`type` = '1' or dr.type='4')      AND dr.schedule_rollcall_id IN ( #scheduleRollCallIds# )"
-                + " GROUP BY dr.`schedule_rollcall_id`) dn     ON da.schedule_rollcall_id = dn.schedule_rollcall_id "
-                + " WHERE da.schedule_rollcall_id IN ( #scheduleRollCallIds# )";
-
-        if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
-            StringBuilder sc = new StringBuilder();
-            scheduleRollCallIds.forEach(s -> {
-                sc.append(s);
-                sc.append(",");
-            });
-            String temp = sc.toString();
-            temp = temp.substring(0, temp.length() - 1);
-            sql = sql.replace("#scheduleRollCallIds#", temp);
-        } else {
-            return null;
-        }
-        return jdbcTemplate.query(sql, new RowMapper() {
-            public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-                AttendanceDTO item = new AttendanceDTO();
-                item.setScheduleRollCallId(rs.getLong("schedule_rollcall_id"));
-                item.setNormalCount(rs.getInt("normalCount"));
-                item.setAllCount(rs.getInt("allCount"));
-                return item;
-            }
-        });
-    }
-
-
     public List <AttendanceDTO> queryScheduleAttendanceNew(
             Set <Long> scheduleRollCallIds) {
 
@@ -61,7 +25,7 @@ public class AttendanceListQuery {
                 + "   SUM(IF(dr.`TYPE`=1,1,0)) AS normalCount,  SUM(IF(dr.`TYPE`=5,1,0)) AS leaveCount, "
                 + "   SUM(IF(dr.`TYPE`=3,1,0)) AS laterCount,  SUM(IF(dr.`TYPE`=4,1,0)) AS askForLeaveCount "
                 + " FROM  dd_rollcall dr   LEFT JOIN dd_schedule_rollcall ds "
-                + "     ON dr.`SCHEDULE_ROLLCALL_ID` = ds.`ID` WHERE dr.`SCHEDULE_ROLLCALL_ID` IN (#scheduleRollCallIds#) "
+                + "     ON dr.`SCHEDULE_ROLLCALL_ID` = ds.`ID` WHERE dr.DELETE_FLAG=0 and dr.type<9 and dr.`SCHEDULE_ROLLCALL_ID` IN (#scheduleRollCallIds#) "
                 + " GROUP BY dr.`SCHEDULE_ROLLCALL_ID` ";
 
         if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
@@ -91,7 +55,7 @@ public class AttendanceListQuery {
     }
 
     /**
-     * 老师断 学生考勤 单周
+     * 老师端 学生考勤 单周
      *
      * @param teacherId
      * @param weekId
@@ -105,7 +69,7 @@ public class AttendanceListQuery {
                 + " 	min(r.class_id) AS class_id, r.class_name,	r.all_count all_count,	r.n_count n_count"
                 + " FROM	dd_schedule ds LEFT JOIN dd_schedule_rollcall dsc ON dsc.SCHEDULE_ID = ds.id"
                 + " LEFT JOIN (	SELECT		count(rc.id) all_count,		rc.SCHEDULE_ROLLCALL_ID,		rc.class_id,rc.class_name,"
-                + " count(IF(rc.type = 1, 1, IF(rc.`TYPE` = 4, 1, NULL))) n_count	FROM		dd_rollcall rc	WHERE		rc.teacher_id = #teacher_id#"
+                + " count(IF(rc.type = 1, 1, IF(rc.`TYPE` = 4, 1, NULL))) n_count	FROM		dd_rollcall rc	WHERE rc.DELETE_FLAG=0 and rc.type<9 and rc.teacher_id = #teacher_id#"
                 + " GROUP BY		rc.SCHEDULE_ROLLCALL_ID,		rc.class_id) r ON r.SCHEDULE_ROLLCALL_ID = dsc.ID"
                 + " where ds.TEACHER_ID = #teacher_id# and ds.WEEK_ID = #weekId# GROUP BY	ds.SEMESTER_ID,ds.COURSE_ID,ds.TEACH_DATE,ds.PERIOD_NO,r.class_id "
                 + " ORDER BY	ds.DAY_OF_WEEK ASC,	ds.PERIOD_NO ASC";

@@ -37,5 +37,6 @@ public class StudentScheduleDTO {
     private Boolean inClass = false;
     private Integer deviation = 0;
     private Boolean inAssess = false;
+    private Boolean isPublicLeave = false;
 
 }

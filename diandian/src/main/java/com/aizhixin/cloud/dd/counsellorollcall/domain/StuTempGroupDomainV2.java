@@ -25,7 +25,7 @@ public class StuTempGroupDomainV2 {
     @ApiModelProperty(value = "点名类型")
     private Integer rollcallType;
 
-    @ApiModelProperty(value = "辅导员名称", dataType = "Boolean", notes = "辅导员名称")
+    @ApiModelProperty(value = "辅导员名称", notes = "辅导员名称")
     private String teacherName;
     @ApiModelProperty(value = "学生id", dataType = "Long", notes = "学生id")
     private Long studentId;

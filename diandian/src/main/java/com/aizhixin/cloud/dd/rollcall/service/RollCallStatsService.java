@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,7 @@ public class RollCallStatsService {
     private RollCallRepository rollCallRepository;
     @Autowired
     private RedisTokenStore redisTokenStore;
+    @Lazy
     @Autowired
     private HomePagePhoneService homePagePhoneService;
     @Autowired
@@ -145,7 +147,9 @@ public class RollCallStatsService {
             List<Map<String, Object>> list = rollCallStatsJdbc.getStuStats(orgId, semesterId);
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> item : list) {
-                    redisTokenStore.setStudentRollCallStatsAll(Long.parseLong(item.get("STUDENT_ID").toString()), item);
+                    if (item.get("STUDENT_ID") != null) {
+                        redisTokenStore.setStudentRollCallStatsAll(Long.parseLong(item.get("STUDENT_ID").toString()), item);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -166,7 +170,9 @@ public class RollCallStatsService {
             List<Map<String, Object>> list = rollCallStatsJdbc.getStuStatsByStuId(orgId, semesterId, stuId);
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> item : list) {
-                    redisTokenStore.setStudentRollCallStatsAll(Long.parseLong(item.get("STUDENT_ID").toString()), item);
+                    if (item.get("STUDENT_ID") != null) {
+                        redisTokenStore.setStudentRollCallStatsAll(Long.parseLong(item.get("STUDENT_ID").toString()), item);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -195,11 +201,14 @@ public class RollCallStatsService {
     public void statsStuTeachingClassByTeachingClass(Long orgId, Long semesterId, Long teachingClassId) {
         try {
             Integer type = getStatsType(orgId);
-            List<Map<String, Object>> list = rollCallStatsJdbc.getStuTeachingClassStatsByTeachingClassId(orgId,semesterId, teachingClassId);
+            List<Map<String, Object>> list = rollCallStatsJdbc.getStuTeachingClassStatsByTeachingClassId(orgId, semesterId, teachingClassId);
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> item : list) {
-                    calculateRate(item, type);
-                    redisTokenStore.setStudentRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString() + item.get("STUDENT_ID"), item);
+                    if (item != null && item.get("TEACHINGCLASS_ID") != null && item.get("STUDENT_ID") != null) {
+                        calculateRate(item, type);
+                        log.info(item.toString());
+                        redisTokenStore.setStudentRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString() + item.get("STUDENT_ID"), item);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -218,8 +227,10 @@ public class RollCallStatsService {
             List<Map<String, Object>> list = rollCallStatsJdbc.getStuTeachingClassStats(orgId);
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> item : list) {
-                    calculateRate(item, type);
-                    redisTokenStore.setStudentRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString() + item.get("STUDENT_ID"), item);
+                    if (item.get("TEACHINGCLASS_ID") != null && item.get("STUDENT_ID") != null) {
+                        calculateRate(item, type);
+                        redisTokenStore.setStudentRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString() + item.get("STUDENT_ID"), item);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -239,8 +250,10 @@ public class RollCallStatsService {
             List<Map<String, Object>> list = rollCallStatsJdbc.getTeachingClassStats(orgId, semesterId);
             if (list != null && list.size() > 0) {
                 for (Map<String, Object> item : list) {
-                    calculateRate(item, type);
-                    redisTokenStore.setRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString(), item);
+                    if (item.get("TEACHINGCLASS_ID") != null) {
+                        calculateRate(item, type);
+                        redisTokenStore.setRollCallTeachingClassStats(item.get("TEACHINGCLASS_ID").toString(), item);
+                    }
                 }
             }
         } catch (Exception e) {

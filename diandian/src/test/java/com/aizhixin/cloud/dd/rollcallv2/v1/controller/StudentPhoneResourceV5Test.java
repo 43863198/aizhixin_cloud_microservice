@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * StudentPhoneResourceV5 Tester.
- * 
+ *
  * @author limh
  * @since
  * @version 1.0
@@ -39,13 +39,13 @@ public class StudentPhoneResourceV5Test {
     }
 
     /**
-     * 
-     * Method: getStudentCourseList(@ApiParam(value = "tokenĞÅÏ¢:</b><br/>
-     * ĞèÒªÔÚhttp headerÌí¼ÓµÇÂ¼¹ı³ÌÖĞ»ñÈ¡µ½µÄtokenÖµ,±ØÌî<br/>
-     * Ê¾Àı£ºbearer xxxxx") @RequestHeader("Authorization") String accessToken, @ApiParam(value = "teachTime Ê±¼ä") @RequestParam(value = "teachTime", required = false) String
-     * teachTime, @ApiParam(value = "offset ÆğÊ¼Ò³") @RequestParam(value = "offset", required = false) Integer offset, @ApiParam(value = "limit Ã¿Ò³µÄÏŞÖÆÊıÄ¿") @RequestParam(value =
+     *
+     * Method: getStudentCourseList(@ApiParam(value = "tokenä¿¡æ¯:</b><br/>
+     * éœ€è¦åœ¨http headeræ·»åŠ ç™»å½•è¿‡ç¨‹ä¸­è·å–åˆ°çš„tokenå€¼,å¿…å¡«<br/>
+     * ç¤ºä¾‹ï¼šbearer xxxxx") @RequestHeader("Authorization") String accessToken, @ApiParam(value = "teachTime æ—¶é—´") @RequestParam(value = "teachTime", required = false) String
+     * teachTime, @ApiParam(value = "offset èµ·å§‹é¡µ") @RequestParam(value = "offset", required = false) Integer offset, @ApiParam(value = "limit æ¯é¡µçš„é™åˆ¶æ•°ç›®") @RequestParam(value =
      * "limit", required = false) Integer limit)
-     * 
+     *
      */
     @Test
     public void testGetStudentCourseList() throws Exception {
@@ -56,9 +56,9 @@ public class StudentPhoneResourceV5Test {
     }
 
     /**
-     * 
+     *
      * Method: getStudentSignCourseV2(@RequestHeader("Authorization") String accessToken)
-     * 
+     *
      */
     @Test
     public void testGetStudentSignCourseV2() throws Exception {
@@ -67,9 +67,9 @@ public class StudentPhoneResourceV5Test {
     }
 
     /**
-     * 
-     * Method: signIn(@ApiParam(value = "µãÃûĞÅÏ¢") @RequestBody SignInDTO signInDTO, @RequestHeader("Authorization") String accessToken)
-     * 
+     *
+     * Method: signIn(@ApiParam(value = "ç‚¹åä¿¡æ¯") @RequestBody SignInDTO signInDTO, @RequestHeader("Authorization") String accessToken)
+     *
      */
     @Test
     public void testSignIn() throws Exception {
@@ -95,6 +95,6 @@ public class StudentPhoneResourceV5Test {
     }
 
     public void getTQ() {
-        ResponseEntity<String> stringResponseEntity = restUtil.httpRequest("http://www.sojson.com/open/api/weather/xml.shtml?city=±±¾©", null, HttpMethod.GET);
+        ResponseEntity<String> stringResponseEntity = restUtil.httpRequest("http://www.sojson.com/open/api/weather/xml.shtml?city=åŒ—äº¬", null, HttpMethod.GET);
     }
 }

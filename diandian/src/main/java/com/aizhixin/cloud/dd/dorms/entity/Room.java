@@ -75,4 +75,9 @@ public class Room extends AbstractEntity {
 	@Getter
 	@Setter
 	private Integer emBeds;
+
+	@Column(name = "grade")
+	@Getter
+	@Setter
+	private String grade;
 }

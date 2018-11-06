@@ -28,5 +28,6 @@ public class RoomDomain {
 	private boolean open;
 	@ApiModelProperty(value="床位信息")
 	private List<BedDomain> bedList=new ArrayList<>();
-	
+	@ApiModelProperty(value="年级")
+	private String grade;
 }

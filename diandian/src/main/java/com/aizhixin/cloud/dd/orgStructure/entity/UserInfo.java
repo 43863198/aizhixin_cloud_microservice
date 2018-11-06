@@ -67,4 +67,7 @@ public class UserInfo {
     private String teachingYear;
 
     private String studentSource;
+
+    @Indexed
+    private Boolean isMonitor;//是否班长
 }

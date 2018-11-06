@@ -65,7 +65,7 @@ public class StudentService {
         return null;
     }
 
-    public List<StudentDTO> listStudents2(Long teachingClassesId, Date date) {
+    public List<StudentDTO> listStudents2(Long teachingClassesId, Date startDate, Date endDate) {
         String str = orgManagerRemoteService.listNotIncludeException(teachingClassesId, 1, Integer.MAX_VALUE);
         if (null == str) {
             return null;
@@ -95,19 +95,24 @@ public class StudentService {
                 ids.add(studentDTO.getStudentId());
             }
             try {
-                List<Leave> leaves = leaveRepository.findByLeavePUblicAndStatusAndDeleteFlagAndStudentIdIn(LeaveConstants.TYPE_PU, LeaveConstants.STATUS_PASS, DataValidity.VALID.getState(), date, ids);
+                List<Leave> leaves = leaveRepository.findByStatusAndDeleteFlagAndStudentIdIn2(LeaveConstants.STATUS_PASS, DataValidity.VALID.getState(), startDate, endDate, ids);
                 if (leaves != null && leaves.size() > 0) {
-                    Map<Long, Boolean> idMap = new HashMap<>();
+                    Map<Long, Leave> leaveMap = new HashMap<>();
                     for (Leave l : leaves) {
-                        idMap.put(l.getStudentId(), true);
+                        leaveMap.put(l.getStudentId(), l);
                     }
-                    List<StudentDTO> newList = new ArrayList();
                     for (StudentDTO s : list) {
-                        if (idMap.get(s.getStudentId()) == null) {
-                            newList.add(s);
+                        if (leaveMap.get(s.getStudentId()) != null) {
+                            Leave leave = leaveMap.get(s.getStudentId());
+                            if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                s.setIsPublicLeave(true);
+                                s.setIsPrivateLeave(false);
+                            } else {
+                                s.setIsPublicLeave(false);
+                                s.setIsPrivateLeave(true);
+                            }
                         }
                     }
-                    list = newList;
                 }
             } catch (Exception e) {
                 log.warn("listStudents2Exception", e);

@@ -60,6 +60,12 @@ public class QuestionDTO {
      */
     @ApiModelProperty(value = "是否是单选", required = false)
     private boolean radio;
+
+    /**
+     *是否简答题
+     */
+    @ApiModelProperty(value = "是否简答题", required = false)
+    private boolean isQA;
     
     public QuestionDTO() {
     }

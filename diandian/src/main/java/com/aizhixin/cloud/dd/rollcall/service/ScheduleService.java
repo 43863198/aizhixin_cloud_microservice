@@ -54,8 +54,10 @@ public class ScheduleService {
     private ScheduleQuery scheduleQuery;
     @Autowired
     private InitScheduleService initScheduleService;
+    //    @Autowired
+//    private StudentLeaveScheduleService studentLeaveScheduleService;
     @Autowired
-    private StudentLeaveScheduleService studentLeaveScheduleService;
+    private StudentService studentService;
     @Autowired
     private RollCallRepository rollCallRepository;
     @Autowired
@@ -105,9 +107,19 @@ public class ScheduleService {
         Set<Long> teachingClassesIds = new HashSet<>();
         Set<Integer> dayWeekSet = new HashSet<>();
 
-        for (DianDianWeekSchoolTimeTableDomain ddd : studentScheduleCourse) {
-            teachingClassesIds.add(ddd.getTeachingClassId());
+        List<Map<String, Object>> teachingClassList = orgManagerRemoteService.findTeachingclassByStudentAndSemester(account.getId(), null);
+        if (teachingClassList != null && teachingClassList.size() > 0) {
+            for (Map<String, Object> item : teachingClassList) {
+                if (item != null && item.get("id") != null) {
+                    teachingClassesIds.add(Long.parseLong(item.get("id").toString()));
+                }
+            }
+        } else {
+            for (DianDianWeekSchoolTimeTableDomain ddd : studentScheduleCourse) {
+                teachingClassesIds.add(ddd.getTeachingClassId());
+            }
         }
+
         List<WeekDTO> weekDTOS = weekService.listWeek(account.getOrganId());
         Map<Long, String> weekMap = new HashMap();
         if (null != weekDTOS) {
@@ -156,7 +168,7 @@ public class ScheduleService {
     // 本地库查询
     public void naticateQueryStudent(Long weekId, Set<Long> teachingClassesIds, List<CourseListDTO> resultList, Map<Integer, CourseListDTO> map, Set<Integer> dayWeekSet) {
         Sort sort = new Sort(Sort.Direction.ASC, "dayOfWeek", "periodNo");
-        List<Schedule> allByweekId = scheduleRepository.findAllByweekIdAndTeachingclassIdIn(weekId, teachingClassesIds, sort);
+        List<Schedule> allByweekId = scheduleRepository.findAllByweekIdAndDeleteFlagAndTeachingclassIdIn(weekId, DataValidity.VALID.getState(), teachingClassesIds, sort);
         for (Schedule ddt : allByweekId) {
             dayWeekSet.add(ddt.getDayOfWeek());
             CourseListDTO cdto = map.get(ddt.getDayOfWeek());
@@ -668,84 +680,118 @@ public class ScheduleService {
             }
             if (scheduleRollCall != null) {
                 if (scheduleRollCall.getIsOpenRollcall() != null && scheduleRollCall.getIsOpenRollcall()) {
-                    List<Long> slss = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
-                    // 查询所有学生的签到信息
-                    List<RollCall> rollCallList = listRollCallBySRCIdInRedis(scheduleRollCall.getId());
-                    if (null != rollCallList && rollCallList.size() > 0) {
-                        // 对没有学生进行签到处理的课，默认其为关闭该节课考勤，数据不处理。
-                        int execptionlCount = 0;
+                    log.warn("打卡机开启, 排课id为:" + schedule.getId());
+                } else {
+                    log.warn("打卡机没有开启, 排课id为:" + schedule.getId());
+                }
+//                List<Long> slss = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
+                Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
+                Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
+                List<StudentDTO> studentList = studentService.listStudents2(schedule.getTeachingclassId(), startDate, endDate);
+                Map<Long, StudentDTO> studentDTOMap = new HashMap<>();
+                if (studentList != null && studentList.size() > 0) {
+                    for (StudentDTO studentDTO : studentList) {
+                        if (studentDTO.getIsPrivateLeave() || studentDTO.getIsPublicLeave()) {
+                            studentDTOMap.put(studentDTO.getStudentId(), studentDTO);
+                        }
+                    }
+                }
+                // 查询所有学生的签到信息
+                List<RollCall> rollCallList = listRollCallBySRCIdInRedis(scheduleRollCall.getId());
+                if (null != rollCallList && rollCallList.size() > 0) {
+                    // 对没有学生进行签到处理的课，默认其为关闭该节课考勤，数据不处理。
+                    int execptionlCount = 0;
+                    for (RollCall rollCall : rollCallList) {
+                        if (RollCallConstants.TYPE_UNCOMMITTED.equals(rollCall.getType()) || RollCallConstants.TYPE_ASK_FOR_LEAVE.equals(rollCall.getType()) || RollCallConstants.TYPE_CANCEL_ROLLCALL.equals(rollCall.getType())) {
+                            execptionlCount++;
+                        }
+                    }
+                    if (execptionlCount == rollCallList.size()) {
+                        log.info("该节课，学生未进行签到操作，不计算入考勤。排课id为:" + schedule.getId() + ",execptionCount:" + execptionlCount);
+                        scheduleRollCall.setIsInClassroom(Boolean.FALSE);
+                        scheduleRollCall.setIsOpenRollcall(Boolean.FALSE);
+                        scheduleRollCallService.save(scheduleRollCall, schedule.getId());
+                        message = "该节课，学生未进行签到操作，不计算入考勤";
+                        pushMonitor.addOutClass(schedule, (System.currentTimeMillis() - schedueUseTime), scheduleFlag, message);
+                        return ApiReturn.message(Boolean.FALSE, message, null);
+                    }
+                    log.info("需要进行课后处理的课程：" + schedule.getId() + ",需要处理的学生数量为:" + rollCallList.size() + ",其类型为:" + scheduleRollCall.getRollCallType());
+                    if (ScheduleConstants.TYPE_ROLL_CALL_DIGITAL.equals(scheduleRollCall.getRollCallType())) {
                         for (RollCall rollCall : rollCallList) {
-                            if (RollCallConstants.TYPE_UNCOMMITTED.equals(rollCall.getType()) || RollCallConstants.TYPE_ASK_FOR_LEAVE.equals(rollCall.getType())) {
-                                execptionlCount++;
-                            }
-                        }
-                        if (execptionlCount == rollCallList.size()) {
-                            log.info("该节课，学生未进行签到操作，不计算入考勤。排课id为:" + schedule.getId() + ",execptionCount:" + execptionlCount);
-                            scheduleRollCall.setIsInClassroom(Boolean.FALSE);
-                            scheduleRollCall.setIsOpenRollcall(Boolean.FALSE);
-                            scheduleRollCallService.save(scheduleRollCall, schedule.getId());
-                            message = "该节课，学生未进行签到操作，不计算入考勤";
-                            pushMonitor.addOutClass(schedule, (System.currentTimeMillis() - schedueUseTime), scheduleFlag, message);
-                            return ApiReturn.message(Boolean.FALSE, message, null);
-                        }
-                        log.info("需要进行课后处理的课程：" + schedule.getId() + ",需要处理的学生数量为:" + rollCallList.size() + ",其类型为:" + scheduleRollCall.getRollCallType());
-                        if (ScheduleConstants.TYPE_ROLL_CALL_DIGITAL.equals(scheduleRollCall.getRollCallType())) {
-                            for (RollCall rollCalls : rollCallList) {
-                                String type = rollCalls.getType();
-                                rollCalls.setLastType(type);
-                                rollCalls.setType(type.equals(RollCallConstants.TYPE_COMMITTED) ? RollCallConstants.TYPE_NORMA : type.equals(RollCallConstants.TYPE_UNCOMMITTED) ? RollCallConstants.TYPE_TRUANCY : type);
-                                if (null != slss && slss.contains(rollCalls.getStudentId())) {
-                                    rollCalls.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-                                }
-                            }
-                        } else if (ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC.equals(scheduleRollCall.getRollCallType())) {
-                            List<RollCall> reportCall = new ArrayList();
-                            for (RollCall r : rollCallList) {
-                                if (r.getHaveReport() && RollCallConstants.TYPE_COMMITTED.equals(r.getType())) {
-                                    reportCall.add(r);
-                                } else {
-                                    if (slss != null && slss.contains(r.getStudentId())) {
-                                        r.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
-                                    } else {
-                                        if (RollCallConstants.TYPE_UNCOMMITTED.equals(r.getType()) || RollCallConstants.TYPE_EXCEPTION.equals(r.getType())) {
-                                            r.setType(RollCallConstants.TYPE_TRUANCY);
-                                        }
+                            String type = rollCall.getType();
+                            if (!type.equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
+                                rollCall.setLastType(type);
+                                rollCall.setType(type.equals(RollCallConstants.TYPE_COMMITTED) ? RollCallConstants.TYPE_NORMA : type.equals(RollCallConstants.TYPE_UNCOMMITTED) ? RollCallConstants.TYPE_TRUANCY : type);
+                                if (studentDTOMap.get(rollCall.getStudentId()) != null) {
+                                    if (studentDTOMap.get(rollCall.getStudentId()).getIsPublicLeave()) {
+                                        rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                        rollCall.setIsPublicLeave(true);
+                                    } else if (studentDTOMap.get(rollCall.getStudentId()).getIsPrivateLeave()) {
+                                        rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                     }
                                 }
                             }
-                            for (RollCall rollCalls : reportCall) {
-                                String type = rollCalls.getType();
-                                if (type.equals(RollCallConstants.TYPE_UNCOMMITTED)) {
-                                    rollCalls.setType(RollCallConstants.TYPE_TRUANCY);
-                                } else if (type.equals(RollCallConstants.TYPE_COMMITTED)) {
-                                    rollCalls.setType(CourseUtils.getResultType(schedule.getScheduleStartTime(), scheduleRollCall.getCourseLaterTime() == null ? 15 : scheduleRollCall.getCourseLaterTime(), scheduleRollCall.getAbsenteeismTime(), rollCalls.getSignTime()));
-                                } else if (type.equals(RollCallConstants.TYPE_EXCEPTION)) {
-                                    rollCalls.setType(RollCallConstants.TYPE_TRUANCY);
-                                }
-
-                                if (null != slss && slss.contains(rollCalls.getStudentId())) {
-                                    rollCalls.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                        }
+                    } else if (ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC.equals(scheduleRollCall.getRollCallType())) {
+                        List<RollCall> reportCall = new ArrayList();
+                        for (RollCall rollCall : rollCallList) {
+                            if (rollCall.getHaveReport() && RollCallConstants.TYPE_COMMITTED.equals(rollCall.getType())) {
+                                reportCall.add(rollCall);
+                            } else {
+                                if (studentDTOMap.get(rollCall.getStudentId()) != null) {
+                                    if (studentDTOMap.get(rollCall.getStudentId()).getIsPublicLeave()) {
+                                        rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                        rollCall.setIsPublicLeave(true);
+                                    } else if (studentDTOMap.get(rollCall.getStudentId()).getIsPrivateLeave()) {
+                                        rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
+                                    }
+                                } else {
+                                    if (RollCallConstants.TYPE_UNCOMMITTED.equals(rollCall.getType()) || RollCallConstants.TYPE_EXCEPTION.equals(rollCall.getType())) {
+                                        rollCall.setType(RollCallConstants.TYPE_TRUANCY);
+                                    }
                                 }
                             }
                         }
-                        if (null != rollCallList && rollCallList.size() > 0) {
-                            for (RollCall rollCall : rollCallList) {
-                                rollCall.setSemesterId(schedule.getSemesterId());
-                                rollCall.setScheduleRollcallId(scheduleRollCall.getId());
-                                List<RollCall> rollCallRe = (List<RollCall>) redisTemplate.opsForValue().get(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId());
-                                if (rollCallRe == null) {
-                                    rollCallRe = new ArrayList<>();
+                        for (RollCall rollCall : reportCall) {
+                            String type = rollCall.getType();
+                            if (type.equals(RollCallConstants.TYPE_UNCOMMITTED)) {
+                                rollCall.setType(RollCallConstants.TYPE_TRUANCY);
+                            } else if (type.equals(RollCallConstants.TYPE_COMMITTED)) {
+                                rollCall.setType(CourseUtils.getResultType(schedule.getScheduleStartTime(), scheduleRollCall.getCourseLaterTime() == null ? 15 : scheduleRollCall.getCourseLaterTime(), scheduleRollCall.getAbsenteeismTime(), rollCall.getSignTime()));
+                            } else if (type.equals(RollCallConstants.TYPE_EXCEPTION)) {
+                                rollCall.setType(RollCallConstants.TYPE_TRUANCY);
+                            }
+                            if (studentDTOMap.get(rollCall.getStudentId()) != null) {
+                                if (studentDTOMap.get(rollCall.getStudentId()).getIsPublicLeave()) {
+                                    rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                    rollCall.setIsPublicLeave(true);
+                                } else if (studentDTOMap.get(rollCall.getStudentId()).getIsPrivateLeave()) {
+                                    rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                 }
-                                rollCallRe.add(rollCall);
-                                redisTemplate.opsForValue().set(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId(), rollCallRe, 15, TimeUnit.HOURS);
                             }
                         }
-                        rollCallRepository.save(rollCallList);
                     }
+                    if (null != rollCallList && rollCallList.size() > 0) {
+                        for (RollCall rollCall : rollCallList) {
+                            rollCall.setSemesterId(schedule.getSemesterId());
+                            rollCall.setScheduleRollcallId(scheduleRollCall.getId());
+                            List<RollCall> rollCallRe = (List<RollCall>) redisTemplate.opsForValue().get(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId());
+                            if (rollCallRe == null) {
+                                rollCallRe = new ArrayList<>();
+                            }
+                            rollCallRe.add(rollCall);
+                            redisTemplate.opsForValue().set(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId(), rollCallRe, 15, TimeUnit.HOURS);
+                        }
+                    }
+                    rollCallRepository.save(rollCallList);
+                } else {
+                    log.warn("无学生的签到信息, 排课id为:" + schedule.getId());
                 }
                 scheduleRollCall.setIsInClassroom(Boolean.FALSE);
                 scheduleRollCallService.save(scheduleRollCall, schedule.getId());
                 clearRedisInfo(scheduleRollCall.getId());
+            } else {
+                log.warn("无排课签到任务信息, 排课id为:" + schedule.getId());
             }
             log.info("下课!!!修改学生的状态成功..." + schedule.getId());
             // ===============redisRollCall===================

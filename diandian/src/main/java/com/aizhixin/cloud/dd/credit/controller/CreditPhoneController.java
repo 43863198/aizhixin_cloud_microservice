@@ -143,6 +143,24 @@ public class CreditPhoneController {
     }
 
     /**
+     * 修改学生记录分数
+     */
+    @RequestMapping(value = "/teacher/updateCreditStudentRecordScore", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "POST", value = "修改学生记录分数", response = Void.class, notes = "修改学生记录分数<br>@author hsh")
+    public ResponseEntity<?> updateCreditStudentRecordScore(@RequestHeader("Authorization") String accessToken,
+                                                            @ApiParam(value = "creditId", required = true) @RequestParam(value = "creditId", required = true) Long creditId,
+                                                            @ApiParam(value = "stuId", required = true) @RequestParam(value = "stuId", required = true) Long stuId,
+                                                            @ApiParam(value = "quesId", required = true) @RequestParam(value = "quesId", required = true) Long quesId,
+                                                            @ApiParam(value = "scores", required = true) @RequestParam(value = "scores", required = true) String scores) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        creditService.updateCreditStudentRecordScore(creditId, stuId, quesId, scores);
+        return new ResponseEntity(ApiReturn.message(Boolean.TRUE, null, null), HttpStatus.OK);
+    }
+
+    /**
      * 提交给学校
      */
     @RequestMapping(value = "/teacher/commitCredit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

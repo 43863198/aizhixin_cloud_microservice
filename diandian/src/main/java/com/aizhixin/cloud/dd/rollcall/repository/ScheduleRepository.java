@@ -44,7 +44,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     Schedule findByIdAndDeleteFlag(Long id, Integer deleteFlag);
 
-    List<Schedule> findAllByweekIdAndTeachingclassIdIn(Long weekId, Set<Long> teachingClassIds, Sort sort);
+    List<Schedule> findAllByweekIdAndDeleteFlagAndTeachingclassIdIn(Long weekId, Integer deteleFlag, Set<Long> teachingClassIds, Sort sort);
 
     List<Schedule> findDistinctCourseIdByTeacherIdAndSemesterIdAndDeleteFlag(Long teacherId, Long semesterId, Integer deteleFlag);
 

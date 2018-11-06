@@ -2,9 +2,11 @@ package com.aizhixin.cloud.dd.orgStructure.service;
 
 import java.util.*;
 
+import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
 import com.aizhixin.cloud.dd.orgStructure.entity.NewStudent;
 import com.aizhixin.cloud.dd.orgStructure.repository.NewStudentRepository;
 import com.aizhixin.cloud.dd.orgStructure.utils.UserType;
+import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import org.apache.catalina.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +35,54 @@ public class UserInfoService {
     private OrgInfoRepository orgInfoRepository;
     @Autowired
     private TeachingClassStudentRepository teachingClassStudentRepository;
+    @Autowired
+    private OrgManagerRemoteClient orgManagerRemoteClient;
+    @Autowired
+    private RedisTokenStore redisTokenStore;
+
+    public Map<String, Object> setClassMonitor(Long stuId, Boolean isMonitor) {
+        Map<String, Object> result = new HashMap<>();
+        UserInfo userInfo = userInfoRepository.findByUserId(stuId);
+        if (userInfo != null) {
+            Map<String, Object> data = orgManagerRemoteClient.setClassMonitor(stuId, isMonitor);
+            if (data != null && data.get(ApiReturnConstants.RESULT) != null) {
+                userInfo.setIsMonitor(isMonitor);
+                userInfoRepository.save(userInfo);
+                UserInfoDomain ud = new UserInfoDomain();
+                BeanUtils.copyProperties(userInfo, ud);
+                redisTokenStore.setUserInfoDomain(ud);
+                result.put(ApiReturnConstants.SUCCESS, true);
+            } else {
+                result.put(ApiReturnConstants.SUCCESS, false);
+            }
+        } else {
+            result.put(ApiReturnConstants.SUCCESS, false);
+        }
+
+        return result;
+    }
+
+    public UserInfo findById(Long userId) {
+        UserInfo ui = userInfoRepository.findByUserId(userId);
+        return ui;
+    }
 
     public UserInfoDomain findByUserId(Long userId) {
+        UserInfoDomain d = redisTokenStore.getUserInfoDomain(userId);
+        if (d == null) {
+            d = getUserDomain(userId);
+            redisTokenStore.setUserInfoDomain(d);
+        }
+        return d;
+    }
+
+    public List<UserInfo> findByClassId(Long classId){
+        return userInfoRepository.findByClassesIdAndUserType(classId, UserType.B_STUDENT.getState());
+    }
+
+    private UserInfoDomain getUserDomain(Long userId) {
         UserInfo ui = userInfoRepository.findByUserId(userId);
-        if(ui != null){
+        if (ui != null) {
             UserInfoDomain uid = new UserInfoDomain();
             BeanUtils.copyProperties(ui, uid);
             OrgInfo o = orgInfoRepository.findByOrgId(ui.getOrgId());
@@ -47,7 +93,7 @@ public class UserInfoService {
             return uid;
         } else {
             NewStudent s = newStudentRepository.findByStuId(userId);
-            if(s != null){
+            if (s != null) {
                 UserInfoDomain uid = new UserInfoDomain();
                 uid.setUserId(s.getStuId());
                 uid.setUserType(70);
@@ -72,14 +118,13 @@ public class UserInfoService {
     }
 
     /**
-     * 
-     * @Title: findByNameLike
-     * @Description: 按姓名、学院、专业、行政班搜索
      * @param name
      * @param pageNumber
      * @param pageSize
      * @param result
-     * @return: Map<String,Object>
+     * @Title: findByNameLike
+     * @Description: 按姓名、学院、专业、行政班搜索
+     * @return: Map<String               ,               Object>
      */
     public Map<String, Object> findByNameLike(Integer searchType, Integer pageNumber, Integer pageSize, Long sourseId, String name, Map<String, Object> result) {
         Pageable page = PageUtil.createNoErrorPageRequest(pageNumber, pageSize);
@@ -108,9 +153,9 @@ public class UserInfoService {
                 }
             }
         }
-        List<UserInfo> uifl=uil.getContent();
-        if (null!=uifl&&0<uifl.size()){
-            for (UserInfo userInfo:uifl){
+        List<UserInfo> uifl = uil.getContent();
+        if (null != uifl && 0 < uifl.size()) {
+            for (UserInfo userInfo : uifl) {
                 userInfo.setPhone(null);
             }
         }
@@ -120,7 +165,7 @@ public class UserInfoService {
         pd.setTotalElements(uil.getTotalElements());
         pd.setTotalPages(uil.getTotalPages());
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
-        result.put(ApiReturnConstants.DATA,uifl);
+        result.put(ApiReturnConstants.DATA, uifl);
         result.put(ApiReturnConstants.PAGE, pd);
         return result;
     }
@@ -163,8 +208,8 @@ public class UserInfoService {
                 userInfos.addAll(userInfoRepository.findByUserIdIn(userIds));
             }
         }
-        if (!userInfos.isEmpty()){
-            for (UserInfo userInfo:userInfos){
+        if (!userInfos.isEmpty()) {
+            for (UserInfo userInfo : userInfos) {
                 userInfo.setPhone(null);
             }
         }
@@ -173,7 +218,7 @@ public class UserInfoService {
 
     /**
      * 获取学生Id组
-     * 
+     *
      * @param orgId
      * @param collegeIds
      * @param proIds
@@ -220,14 +265,14 @@ public class UserInfoService {
         }
     }
 
-    public Map<Long,UserInfo> findUserIdIn(List<Long> userIds){
-        Map<Long,UserInfo> map=new HashMap<>();
-        List<UserInfo> userInfos=userInfoRepository.findByUserIdIn(userIds);
-        if (userInfos!=null&&0<userInfos.size()) {
-            for (UserInfo userInfo:userInfos){
-               map.put(userInfo.getUserId(),userInfo);
+    public Map<Long, UserInfo> findUserIdIn(List<Long> userIds) {
+        Map<Long, UserInfo> map = new HashMap<>();
+        List<UserInfo> userInfos = userInfoRepository.findByUserIdIn(userIds);
+        if (userInfos != null && 0 < userInfos.size()) {
+            for (UserInfo userInfo : userInfos) {
+                map.put(userInfo.getUserId(), userInfo);
             }
         }
-            return map;
+        return map;
     }
 }

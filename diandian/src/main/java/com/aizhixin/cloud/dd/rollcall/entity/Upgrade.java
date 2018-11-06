@@ -56,4 +56,9 @@ public class Upgrade extends AbstractEntity {
 	@Setter
 	private Boolean isRequired;
 
+	@Column(name = "is_remind")
+	@Getter
+	@Setter
+	private Boolean isRemind;
+
 }

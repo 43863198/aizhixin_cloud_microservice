@@ -34,6 +34,9 @@ public class TempGroupDomainV2 {
     @ApiModelProperty(value = "点名规则")
     private CounsellorRollcallRule rule;
 
+    @ApiModelProperty(value = "辅导员名称", notes = "辅导员名称")
+    private String teacherName;
+
     private String messageId;
 
     public TempGroupDomainV2() {
@@ -48,5 +51,17 @@ public class TempGroupDomainV2 {
         this.rollcallType = rollcallType;
         this.ruleId = ruleId;
         this.messageId = messageId;
+    }
+
+    public TempGroupDomainV2(Long id, String name, Integer subGroupNum, Integer rollcallNum, Boolean status, Integer rollcallType, Long ruleId, String messageId, String teacherName) {
+        this.id = id;
+        this.name = name;
+        this.subGroupNum = subGroupNum;
+        this.status = status;
+        this.rollcallNum = rollcallNum;
+        this.rollcallType = rollcallType;
+        this.ruleId = ruleId;
+        this.messageId = messageId;
+        this.teacherName = teacherName;
     }
 }

@@ -62,6 +62,9 @@ public interface OrgManagerRemoteClient {
     public TeacherDomain getTeacherInfo2(@ApiParam(value = "teacherId 教师ID", required = true) @RequestParam(value = "teacherId") Long teacherId);
 
 
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/students/setclassmonitor")
+    Map<String, Object> setClassMonitor(@RequestParam("stuId") Long stuId, @RequestParam("isMonitor") Boolean isMonitor);
+
     @RequestMapping(method = RequestMethod.GET, value = "/v1/students/get/{id}")
     String findByStudentId(@PathVariable("id") Long id);
 

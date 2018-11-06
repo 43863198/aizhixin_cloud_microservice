@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.aizhixin.cloud.dd.common.domain.PageData;
+import com.aizhixin.cloud.dd.common.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -214,13 +215,13 @@ public class OrgDataController {
     @ApiOperation(httpMethod = "GET", value = "获取用户详细信息", response = Void.class, notes = "获取用户详细信息<br>@author xiagen")
     public ResponseEntity<Map<String, Object>> findUserInfo(@RequestHeader("Authorization") String accessToken,
                                                             @ApiParam(value = "userId 用户id") @RequestParam(value = "userId", required = true) Long userId) {
-        AccountDTO adt = ddUserService.getUserInfoWithLogin(accessToken);
+//        AccountDTO adt = ddUserService.getUserInfoWithLogin(accessToken);
+//        if (null == adt) {
+//            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+//            result.put(ApiReturnConstants.CAUSE, "无权限");
+//            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
+//        }
         Map<String, Object> result = new HashMap<>();
-        if (null == adt) {
-            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
-            result.put(ApiReturnConstants.CAUSE, "无权限");
-            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
-        }
         UserInfoDomain uid = userInfoService.findByUserId(userId);
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         result.put(ApiReturnConstants.DATA, uid);
@@ -270,5 +271,18 @@ public class OrgDataController {
         }
         return new ResponseEntity<Map<String, Object>>(
                 ApiReturn.message(Boolean.TRUE, null, userInfoService.findUsers(orgId, collegeIds, proIds, classIds, teachingClassIds, showTeacher)), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/setClassMonitor", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "POST", value = "设为班长", response = Void.class, notes = "设为班长<br>@author hsh")
+    public ResponseEntity<?> setClassMonitor(@RequestHeader("Authorization") String accessToken,
+                                             @ApiParam(value = "stuId", required = true) @RequestParam(value = "stuId", required = true) Long stuId,
+                                             @ApiParam(value = "是否班长", required = true) @RequestParam(value = "Monitor", required = true) Boolean isMonitor) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        Map<String, Object> result = userInfoService.setClassMonitor(stuId, isMonitor);
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 }

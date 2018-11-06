@@ -89,7 +89,6 @@ public class RollcallServiceV5 {
                 scheduleRollCall.setLocaltion(scheduleRollCallRedisDomain.getLocaltion());
                 scheduleRollCall.setAttendance(scheduleRollCallRedisDomain.getAttendance());
                 scheduleRollCall.setCourseLaterTime(scheduleRollCallRedisDomain.getCourseLaterTime());
-//                scheduleRollCall.setAbsenteeismTime();
             }
         }
 

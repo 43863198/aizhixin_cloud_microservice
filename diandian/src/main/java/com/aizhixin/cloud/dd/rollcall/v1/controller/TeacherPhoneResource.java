@@ -139,7 +139,7 @@ public class TeacherPhoneResource {
 
         Map<String, Object> result = new HashMap<>();
         try {
-            rollCallService.additionaleRollcall(schedule_id);
+            rollCallService.additionaleRollcall(schedule_id, account);
             result.put(ApiReturnConstants.MESSAGE, "补录考勤成功！");
             result.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
         } catch (Exception e) {
@@ -291,7 +291,7 @@ public class TeacherPhoneResource {
      * @return
      */
     @RequestMapping(value = "/teacher/rollcall/cancleCurrentRollCall", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "取消正在进行的课程的考勤", httpMethod = "POST", response = Void.class, notes = "取消正在进行的课程的考勤<br>@author 李美华")
+    @ApiOperation(value = "取消正在进行的课程的考勤 取消本次考勤", httpMethod = "POST", response = Void.class, notes = "取消正在进行的课程的考勤<br>@author 李美华")
     public ResponseEntity<?> cancleCurrentRollCall(@RequestHeader("Authorization") String accessToken,
                                                    @ApiParam(value = "scheduleId 排课ID") @RequestParam Long scheduleId) {
 
@@ -301,7 +301,7 @@ public class TeacherPhoneResource {
         }
         Map<String, Object> result = new HashMap<>();
         try {
-            rollCallService.cancleRollCall(scheduleId, account.getId());
+            rollCallService.cancleRollCall(scheduleId, account);
             result.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
         } catch (Exception e) {
             e.printStackTrace();

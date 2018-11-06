@@ -2,15 +2,16 @@ package com.aizhixin.cloud.dd.counsellorollcall.v1.service;
 
 import java.util.*;
 
+import com.aizhixin.cloud.dd.counsellorollcall.domain.TempGroupDomainV2;
 import com.aizhixin.cloud.dd.counsellorollcall.entity.*;
-import com.aizhixin.cloud.dd.counsellorollcall.repository.CounsellorRollcallRepository;
-import com.aizhixin.cloud.dd.counsellorollcall.repository.CounsellorRollcallRuleRepository;
+import com.aizhixin.cloud.dd.counsellorollcall.repository.*;
 import com.aizhixin.cloud.dd.counsellorollcall.utils.CounsellorRollCallType;
+import com.aizhixin.cloud.dd.orgStructure.entity.UserInfo;
+import com.aizhixin.cloud.dd.orgStructure.repository.ClassesTeacherRepository;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,7 +23,6 @@ import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.counsellorollcall.domain.TempGroupDomain;
 import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallGroupDTO;
-import com.aizhixin.cloud.dd.counsellorollcall.repository.TempGroupRepository;
 import com.aizhixin.cloud.dd.orgStructure.service.UserInfoService;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.service.ClassesService;
@@ -63,6 +63,18 @@ public class TempGroupService {
     @Autowired
     private CounsellorRollcallRepository rollcallRepository;
 
+    @Autowired
+    private ClassesTeacherRepository classesTeacherRepository;
+
+    @Autowired
+    private TempGroupRuleTempRepository tempGroupRuleTempRepository;
+
+    @Autowired
+    private CounsellorRollcallRuleTempRepository ruleTempRepository;
+
+    @Autowired
+    private AlarmClockRepository clockRepository;
+
     /**
      * 获取所有点名组
      *
@@ -83,6 +95,67 @@ public class TempGroupService {
             tempGroupDomains = checkoutNewClass(tempGroupDomains, teacherId, teacherName, organId);
         }
         alarmClockService.complementAlarmInfo(tempGroupDomains);
+        return ApiReturn.message(Boolean.TRUE, null, tempGroupDomains);
+    }
+
+    /**
+     * 班长获取所有点名组
+     *
+     * @return
+     */
+    // @Transactional(readOnly = true)
+    public Map<String, Object> listCounsellorGroupByStu(Long organId, Long stuId) {
+        UserInfo userInfo = userInfoService.findById(stuId);
+        List<TempGroupDomainV2> tempGroupDomains = tempGroupRepository.findByClassIdAndDeleteFlag(userInfo.getClassesId(), DataValidity.VALID.getState());
+
+        List<CounsellorRollcallRuleTemp> ruleTemps = ruleTempRepository.findAll();
+        Map<Long, CounsellorRollcallRuleTemp> ruleMap = new HashMap<>();
+        if (ruleTemps != null && ruleTemps.size() > 0) {
+            for (CounsellorRollcallRuleTemp temp : ruleTemps) {
+                ruleMap.put(temp.getRuleId(), temp);
+            }
+        }
+        List<TempGroupRuleTemp> groupTemps = tempGroupRuleTempRepository.findAll();
+        Map<Long, TempGroupRuleTemp> groupMap = new HashMap<>();
+        if (groupTemps != null && groupTemps.size() > 0) {
+            for (TempGroupRuleTemp temp : groupTemps) {
+                groupMap.put(temp.getGroupId(), temp);
+            }
+        }
+        for (TempGroupDomainV2 tempGroupDomain : tempGroupDomains) {
+            TempGroup t = new TempGroup();
+            t.setId(tempGroupDomain.getId());
+            t.setMessageId(tempGroupDomain.getMessageId());
+            AlarmClock a = clockRepository.findByTempGroupAndDeleteFlag(t, DataValidity.VALID.getState());
+            if (a != null) {
+                tempGroupDomain.setAlarmTime(a.getClockTime());
+                tempGroupDomain.setAlarmModel(a.getClockMode());
+                tempGroupDomain.setStatus(a.getStatus());
+            }
+            if (tempGroupDomain.getRollcallNum() != null && tempGroupDomain.getRollcallNum().intValue() > 1 && tempGroupDomain.getRuleId() != null) {
+                TempGroupRuleTemp groupTemp = groupMap.get(tempGroupDomain.getId());
+                if (groupTemp != null) {
+                    tempGroupDomain.setRuleId(groupTemp.getRuleId());
+                }
+                CounsellorRollcallRule rule = ruleRepository.findOne(tempGroupDomain.getRuleId());
+                if (rule == null) {
+                    rule = new CounsellorRollcallRule();
+                    rule.setId(tempGroupDomain.getRuleId());
+                }
+                CounsellorRollcallRuleTemp temp = ruleMap.get(rule.getId());
+                if (temp != null) {
+                    rule.setStartTime(temp.getStartTime());
+                    rule.setStartFlexTime(temp.getStartFlexTime());
+                    rule.setLateTime(temp.getLateTime());
+                    rule.setEndTime(temp.getEndTime());
+                    rule.setEndFlexTime(temp.getEndFlexTime());
+                    rule.setStopTime(temp.getStopTime());
+                    rule.setDays(temp.getDays());
+                }
+                tempGroupDomain.setAlarmTime(rule.getStartTime() + "--" + rule.getEndTime());
+                tempGroupDomain.setRule(rule);
+            }
+        }
         return ApiReturn.message(Boolean.TRUE, null, tempGroupDomains);
     }
 
@@ -176,6 +249,10 @@ public class TempGroupService {
         return null;
     }
 
+    public Map<String, Object> saveTempGroupByTeacher(Long orgId, Long teacherId, String teacherName, CounRollcallGroupDTO counRollcallGroupDTO) {
+        return saveTempGroup(orgId, teacherId, teacherName, counRollcallGroupDTO, null, null);
+    }
+
     /**
      * 保存导员分组信息 ````````````````````````````````````````````
      *
@@ -184,7 +261,7 @@ public class TempGroupService {
      * @param counRollcallGroupDTO
      * @return
      */
-    public Map<String, Object> saveTempGroup(Long orgId, Long teacherId, String teacherName, CounRollcallGroupDTO counRollcallGroupDTO) {
+    private Map<String, Object> saveTempGroup(Long orgId, Long teacherId, String teacherName, CounRollcallGroupDTO counRollcallGroupDTO, Long stuId, Long classId) {
 
         Map<String, Object> map = checkTime(counRollcallGroupDTO.getAlarmTime());
         if (null != map) {
@@ -206,6 +283,12 @@ public class TempGroupService {
             TempGroup tempGroup = new TempGroup(counRollcallGroupDTO.getTempGroupName(), teacherId, teacherName, studentList.size(), Boolean.FALSE, orgId, UUID.randomUUID().toString());
             tempGroup.setRollcallType(CounsellorRollCallType.Other.getType());
             tempGroup.setRollcallNum(1);
+            if (stuId != null) {
+                tempGroup.setStuId(stuId);
+            }
+            if (classId != null) {
+                tempGroup.setClassId(classId);
+            }
             tempGroupRepository.save(tempGroup);
 
             // 保存定时点名信息
@@ -237,15 +320,16 @@ public class TempGroupService {
         return saveOrUpdateAlarmClock(tempGroup, alarmClock.getClockTime(), alarmClock.getClockMode(), alarmOnOff);
     }
 
+
+
     /**
      * 修改导员点名组
      *
      * @param teacherId
-     * @param teacherName
      * @param counRollcallGroupDTO
      * @return
      */
-    public Map<String, Object> updateTempGroup(Long teacherId, String teacherName, CounRollcallGroupDTO counRollcallGroupDTO) {
+    public Map<String, Object> updateTempGroup(Long teacherId, CounRollcallGroupDTO counRollcallGroupDTO) {
 
         Map<String, Object> map = checkTime(counRollcallGroupDTO.getAlarmTime());
         if (null != map) {
@@ -481,10 +565,10 @@ public class TempGroupService {
                     continue;
                 }
                 allStudentIds.addAll(studentIds);
-                saveTempGroup(organId, teacherId, teacherName, new CounRollcallGroupDTO(idNameDomain.getName(), studentIds));
+                saveTempGroupByTeacher(organId, teacherId, teacherName, new CounRollcallGroupDTO(idNameDomain.getName(), studentIds));
             }
             // 创建所有行政班集合分组
-            saveTempGroup(organId, teacherId, teacherName, new CounRollcallGroupDTO("所有行政班", allStudentIds));
+            saveTempGroupByTeacher(organId, teacherId, teacherName, new CounRollcallGroupDTO("所有行政班", allStudentIds));
             tempGroupDomains = tempGroupRepository.findAllByTeacherIdAndDeleteFlag(teacherId, DataValidity.VALID.getState());
         } else {
             tempGroupDomains = new ArrayList<>();

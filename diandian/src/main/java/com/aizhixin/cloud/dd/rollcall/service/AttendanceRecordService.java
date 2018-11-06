@@ -51,7 +51,7 @@ public class AttendanceRecordService {
     private RedisTemplate redisTemplate;
 
 
-    public PageData<AttendanceRecordDTO> searchAttendance(Long orgId, Long collegeId, String criteria, String startTime, String endTime, String teachingClassName, String teacherName, String courseName, Pageable pageable) {
+    public PageData<AttendanceRecordDTO> searchAttendance(Long orgId, Long collegeId, String criteria, String startTime, String endTime, String teachingClassName, String teacherName, String courseName, Integer type, Pageable pageable) {
         PageData<AttendanceRecordDTO> p = new PageData<>();
         Long count = 0L;
         try {
@@ -76,17 +76,23 @@ public class AttendanceRecordService {
                 condition.put("criteria", "%" + criteria + "%");
             }
 
+            if (type != null && type > 0) {
+                cql.append(" AND rc.type = :type");
+                sql.append(" AND rc.type = :type");
+                condition.put("type", type);
+            }
+
             if (startTime != null) {
                 Date date = DateFormatUtil.parse2(startTime, DateFormatUtil.FORMAT_SHORT);
-                cql.append(" AND rc.CREATED_DATE >= :startTime");
-                sql.append(" AND rc.CREATED_DATE >= :startTime");
+                cql.append(" AND sr.CREATED_DATE >= :startTime");
+                sql.append(" AND sr.CREATED_DATE >= :startTime");
                 condition.put("startTime", date);
             }
 
             if (endTime != null) {
                 Date date = DateFormatUtil.parse2(endTime + " 23:59:59", DateFormatUtil.FORMAT_LONG);
-                cql.append(" AND rc.CREATED_DATE <= :endTime");
-                sql.append(" AND rc.CREATED_DATE <= :endTime");
+                cql.append(" AND sr.CREATED_DATE <= :endTime");
+                sql.append(" AND sr.CREATED_DATE <= :endTime");
                 condition.put("endTime", date);
             }
 
@@ -273,8 +279,8 @@ public class AttendanceRecordService {
     }
 
     public String convert(int number) {
-        if (0 < number && number < 6) {
-            String[] num = {"已到", "旷课", "迟到", "请假", "早退"};
+        if (number > 0 && number < 10) {
+            String[] num = {"已到", "旷课", "迟到", "请假", "早退", "已提交", "未提交", "超出距离", "取消考勤"};
             return num[number - 1];
         } else {
             return "";

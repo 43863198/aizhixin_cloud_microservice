@@ -108,7 +108,7 @@ public class CounsellorRollcallController {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(tempGroupService.saveTempGroup(account.getOrganId(), account.getId(), account.getName(), counRollcallGroupDTO), HttpStatus.OK);
+        return new ResponseEntity(tempGroupService.saveTempGroupByTeacher(account.getOrganId(), account.getId(), account.getName(), counRollcallGroupDTO), HttpStatus.OK);
     }
 
     /**
@@ -122,7 +122,7 @@ public class CounsellorRollcallController {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(tempGroupService.updateTempGroup(account.getOrganId(), account.getName(), counRollcallGroupDTO), HttpStatus.OK);
+        return new ResponseEntity(tempGroupService.updateTempGroup(account.getOrganId(), counRollcallGroupDTO), HttpStatus.OK);
     }
 
     /**

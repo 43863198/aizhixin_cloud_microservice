@@ -475,13 +475,39 @@ public class LeaveServiceV2 {
     }
 
     private List<PeriodDTO> getStartPeriodList(Long stuId, Long orgId, Date date) {
-        return periodService.listPeriod(orgId);
+        List<PeriodDTO> result = null;
+        String dateStr = DateFormatUtil.formatShort(date);
+        List<DianDianDaySchoolTimeTableDomain> timeTableDomains = orgManagerRemoteClient.getStudentDaySchoolTimeTable(stuId, dateStr);
+        if (timeTableDomains != null && timeTableDomains.size() > 0) {
+            result = new ArrayList<>();
+            for (DianDianDaySchoolTimeTableDomain item : timeTableDomains) {
+                PeriodDTO periodDTO = new PeriodDTO();
+                periodDTO.setId(item.getPeriodId());
+                periodDTO.setOrgId(orgId);
+                periodDTO.setStartTime(item.getPeriodStarttime());
+                periodDTO.setEndTime(item.getPeriodEndtime());
+                periodDTO.setNo(item.getPeriodNo());
+                if (item.getPeriodNum() > 1) {
+                    periodDTO.setName("第" + item.getPeriodNo() + "--" + (item.getPeriodNo() + item.getPeriodNum()) + "节课");
+                } else {
+                    periodDTO.setName("第" + item.getPeriodNo() + "节课");
+                }
+                periodDTO.setCreatedDate(new Date());
+                periodDTO.setUserId(stuId);
+                result.add(periodDTO);
+            }
+        }
+        if (result != null && result.size() > 0) {
+            return result;
+        } else {
+            return periodService.listPeriod(orgId);
+        }
     }
 
     private List<PeriodDTO> getEndPeriodList(Long stuId, Long orgId, Date date) {
-        List<PeriodDTO> list = periodService.listPeriod(orgId);
-        Collections.reverse(list);
-        return list;
+        List<PeriodDTO> result = getStartPeriodList(stuId, orgId, date);
+        Collections.reverse(result);
+        return result;
     }
 
     private Long getStartPeriodId(Date startTime, List<PeriodDTO> list) {
@@ -512,12 +538,12 @@ public class LeaveServiceV2 {
             long end = endTime.getTime();
             String dayStr = DateFormatUtil.formatShort(endTime);
             for (PeriodDTO p : list) {
-                Date date = DateFormatUtil.parse2(dayStr + " " + p.getStartTime(), "yyyy-MM-dd HH:mm");
+                Date date = DateFormatUtil.parse2(dayStr + " " + p.getEndTime(), "yyyy-MM-dd HH:mm");
                 if (date != null) {
                     if (end >= date.getTime()) {
                         return p.getId();
                     } else {
-                        Date edate = DateFormatUtil.parse2(dayStr + " " + p.getEndTime(), "yyyy-MM-dd HH:mm");
+                        Date edate = DateFormatUtil.parse2(dayStr + " " + p.getStartTime(), "yyyy-MM-dd HH:mm");
                         if (edate != null) {
                             if (end >= edate.getTime()) {
                                 return p.getId();
@@ -533,6 +559,11 @@ public class LeaveServiceV2 {
     private Long getStartPeriodId2(Long stuId, Date startTime, List<PeriodDTO> list) {
         List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(stuId, DateFormatUtil.formatShort(startTime));
         if (ddt != null && ddt.size() > 0) {
+            Collections.sort(ddt, new Comparator<DianDianDaySchoolTimeTableDomain>() {
+                public int compare(DianDianDaySchoolTimeTableDomain h1, DianDianDaySchoolTimeTableDomain h2) {
+                    return h1.getPeriodStarttime().compareTo(h2.getPeriodStarttime());
+                }
+            });
             long start = startTime.getTime();
             String dayStr = DateFormatUtil.formatShort(startTime);
             for (DianDianDaySchoolTimeTableDomain d : ddt) {
@@ -559,15 +590,20 @@ public class LeaveServiceV2 {
     private Long getEndPeriodId2(Long stuId, Date endTime, List<PeriodDTO> list) {
         List<DianDianDaySchoolTimeTableDomain> ddt = orgManagerRemoteClient.getStudentDaySchoolTimeTable(stuId, DateFormatUtil.formatShort(endTime));
         if (ddt != null && ddt.size() > 0) {
+            Collections.sort(ddt, new Comparator<DianDianDaySchoolTimeTableDomain>() {
+                public int compare(DianDianDaySchoolTimeTableDomain h1, DianDianDaySchoolTimeTableDomain h2) {
+                    return h2.getPeriodStarttime().compareTo(h1.getPeriodStarttime());
+                }
+            });
             long end = endTime.getTime();
             String dayStr = DateFormatUtil.formatShort(endTime);
             for (DianDianDaySchoolTimeTableDomain d : ddt) {
-                Date date = DateFormatUtil.parse2(dayStr + " " + d.getPeriodStarttime(), "yyyy-MM-dd HH:mm");
+                Date date = DateFormatUtil.parse2(dayStr + " " + d.getPeriodEndtime(), "yyyy-MM-dd HH:mm");
                 if (date != null) {
                     if (end >= date.getTime()) {
                         return d.getPeriodId();
                     } else {
-                        Date edate = DateFormatUtil.parse2(dayStr + " " + d.getPeriodEndtime(), "yyyy-MM-dd HH:mm");
+                        Date edate = DateFormatUtil.parse2(dayStr + " " + d.getPeriodStarttime(), "yyyy-MM-dd HH:mm");
                         if (edate != null) {
                             if (end >= edate.getTime()) {
                                 return d.getPeriodId();
