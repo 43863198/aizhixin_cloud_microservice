@@ -579,11 +579,8 @@ public class ScheduleRollCallService {
                 stuSchlist.add(studentScheduleDTO);
             }
 
-            List<RollCall> rlist = null;
+            List<RollCall> rlist = rollCallRepository.findByScheduleRollcallIdInAndStudentId(scheduleRollCallIds, account.getId());
             // 添加签到信息
-            if (rlist == null) {
-                rlist = rollCallRepository.findByScheduleRollcallIdInAndStudentId(scheduleRollCallIds, account.getId());
-            }
             if (null != rlist && rlist.size() > 0) {
                 for (RollCall r : rlist) {
                     List<StudentScheduleDTO> tlist = spc.get(r.getScheduleRollcallId());
@@ -594,6 +591,7 @@ public class ScheduleRollCallService {
                             sc.setRollcallType(sc.getRollcallType());
                             sc.setSignTime(r.getSignTime() == null ? "" : sdf.format(r.getSignTime()));
                             sc.setDeviation(organSet.getDeviation());
+                            sc.setIsPublicLeave(r.getIsPublicLeave());
                         }
                     }
                 }
@@ -611,6 +609,7 @@ public class ScheduleRollCallService {
                             sc.setRollcallType(sc.getRollcallType());
                             sc.setSignTime(r.getSignTime() == null ? "" : sdf.format(r.getSignTime()));
                             sc.setDeviation(organSet.getDeviation());
+                            sc.setIsPublicLeave(r.getIsPublicLeave());
                         }
                     }
                 }
