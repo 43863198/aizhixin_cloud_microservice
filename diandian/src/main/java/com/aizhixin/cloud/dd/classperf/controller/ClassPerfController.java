@@ -36,12 +36,12 @@ public class ClassPerfController {
     @RequestMapping(value = "/teacher/batchRateStudent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "POST", value = "批量打分", response = Void.class, notes = "批量打分<br>@author hsh")
     public ResponseEntity<?> batchRateStudent(@RequestHeader("Authorization") String accessToken,
-                                         @ApiParam(value = "打分信息", required = true) @RequestBody ClassPerfBatchDTO dto) {
+                                              @ApiParam(value = "打分信息", required = true) @RequestBody ClassPerfBatchDTO dto) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-        Map<String, Object> result = classPerfService.batchRateStudent(dto);
+        Map<String, Object> result = classPerfService.batchRateStudent(dto, account.getOrganId());
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
