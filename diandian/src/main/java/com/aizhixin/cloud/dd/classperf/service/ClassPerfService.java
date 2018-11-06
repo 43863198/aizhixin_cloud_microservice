@@ -13,10 +13,12 @@ import com.aizhixin.cloud.dd.common.core.ApiReturnConstants;
 import com.aizhixin.cloud.dd.common.domain.PageData;
 import com.aizhixin.cloud.dd.common.domain.PageDomain;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
+import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallGroupDTO;
 import com.aizhixin.cloud.dd.orgStructure.entity.OrgInfo;
 import com.aizhixin.cloud.dd.orgStructure.entity.UserInfo;
 import com.aizhixin.cloud.dd.orgStructure.repository.OrgInfoRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
+import com.aizhixin.cloud.dd.orgStructure.service.UserInfoService;
 import com.aizhixin.cloud.dd.orgStructure.utils.UserType;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import org.springframework.beans.BeanUtils;
@@ -43,6 +45,8 @@ public class ClassPerfService {
     private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private OrgInfoRepository orgInfoRepository;
+    @Autowired
+    private UserInfoService userInfoService;
 
     public Map<String, Object> updateLimitScore(Long orgId, Long teacherId, Integer score) {
         Map<String, Object> result = new HashMap<>();
@@ -79,7 +83,16 @@ public class ClassPerfService {
         return result;
     }
 
-    public Map<String, Object> batchRateStudent(ClassPerfBatchDTO dto){
+    public Set<Long> getChooseStudents(ClassPerfBatchDTO dto) {
+        Set<Long> studentIds = dto.getStudentList();
+        if (studentIds == null) {
+            studentIds = new HashSet<>();
+        }
+        studentIds.addAll(userInfoService.findUserIds(dto.getOrgId(), dto.getCollegeIds(), dto.getProIds(), dto.getClassIds(), dto.getTeachingClassIds()));
+        return studentIds;
+    }
+
+    public Map<String, Object> batchRateStudent(ClassPerfBatchDTO dto, Long orgId) {
         Map<String, Object> result = new HashMap<>();
         //check
         ClassPerfTeacher teacher = classPerfTeacherRepository.findByTeacherId(dto.getTeacherId());
@@ -92,46 +105,53 @@ public class ClassPerfService {
             result.put(ApiReturnConstants.ERROR, "打分大于教师剩余分数");
             return result;
         }
-
+        //get student
+        Set<Long> students = getChooseStudents(dto);
+        Long semesterId = getSemesterId(orgId);
         //update student
-        UserInfo userInfo = userInfoRepository.findByUserId(dto.getStudentId());
-        Long semesterId = getSemesterId(userInfo.getOrgId());
-        ClassPerfStudent student = classPerfStudentRepository.findByStudentIdAndSemesterId(dto.getStudentId(), semesterId);
-        if (student == null) {
-            student = new ClassPerfStudent();
-            BeanUtils.copyProperties(userInfo, student);
-            student.setStudentId(userInfo.getUserId());
-            student.setSemesterId(semesterId);
-            student.setUpdateDate(DateFormatUtil.formatShort(new Date()));
-            student.setTotalScore(0);
-        }
-        if (dto.getType() == 10) {
-            student.setTotalScore(student.getTotalScore() + dto.getScore());
+        if (students != null && students.size() > 0) {
+            for (Long stuId : students) {
+                UserInfo userInfo = userInfoRepository.findByUserId(stuId);
+                ClassPerfStudent student = classPerfStudentRepository.findByStudentIdAndSemesterId(stuId, semesterId);
+                if (student == null) {
+                    student = new ClassPerfStudent();
+                    BeanUtils.copyProperties(userInfo, student);
+                    student.setStudentId(userInfo.getUserId());
+                    student.setSemesterId(semesterId);
+                    student.setUpdateDate(DateFormatUtil.formatShort(new Date()));
+                    student.setTotalScore(0);
+                }
+                if (dto.getType() == 10) {
+                    student.setTotalScore(student.getTotalScore() + dto.getScore());
+                } else {
+                    student.setTotalScore(student.getTotalScore() - dto.getScore());
+                }
+                student = classPerfStudentRepository.save(student);
+
+                //insert log
+                UserInfo teacherInfo = userInfoRepository.findByUserId(dto.getTeacherId());
+                ClassPerfLog log = new ClassPerfLog();
+                log.setStudentId(stuId);
+                log.setTeacherId(dto.getTeacherId());
+                log.setScore(dto.getScore());
+                log.setType(dto.getType());
+                log.setComment(dto.getComment());
+                log.setFiles(dto.getFiles());
+                log.setClassPerfId(student.getId());
+                log.setTeacherName(teacherInfo.getName());
+                log.setTeacherJobnum(teacherInfo.getJobNum());
+                log.setTeacherGender(teacherInfo.getSex());
+                log.setAvatar(teacherInfo.getAvatar());
+                classPerfLogRepository.save(log);
+            }
+            //update teacher
+            teacher.setResidualScore(teacher.getResidualScore() - score);
+            classPerfTeacherRepository.save(teacher);
+            result.put(ApiReturnConstants.SUCCESS, true);
         } else {
-            student.setTotalScore(student.getTotalScore() - dto.getScore());
+            result.put(ApiReturnConstants.SUCCESS, false);
+            result.put(ApiReturnConstants.MESSAGE, "没有待评分学生！");
         }
-        student = classPerfStudentRepository.save(student);
-
-        //insert log
-        UserInfo teacherInfo = userInfoRepository.findByUserId(dto.getTeacherId());
-        ClassPerfLog log = new ClassPerfLog();
-        log.setStudentId(dto.getStudentId());
-        log.setTeacherId(dto.getTeacherId());
-        log.setScore(dto.getScore());
-        log.setType(dto.getType());
-        log.setComment(dto.getComment());
-        log.setFiles(dto.getFiles());
-        log.setClassPerfId(student.getId());
-        log.setTeacherName(teacherInfo.getName());
-        log.setTeacherJobnum(teacherInfo.getJobNum());
-        log.setTeacherGender(teacherInfo.getSex());
-        log.setAvatar(teacherInfo.getAvatar());
-        classPerfLogRepository.save(log);
-
-        //update teacher
-        teacher.setResidualScore(teacher.getResidualScore() - score);
-        classPerfTeacherRepository.save(teacher);
-        result.put(ApiReturnConstants.SUCCESS, true);
         return result;
     }
 
@@ -322,7 +342,7 @@ public class ClassPerfService {
         return pageData;
     }
 
-    public ClassPerfStudent getStudent(Long orgId, Long stuId){
+    public ClassPerfStudent getStudent(Long orgId, Long stuId) {
         Long semesterId = getSemesterId(orgId);
         return classPerfStudentRepository.findByStudentIdAndSemesterId(stuId, semesterId);
     }
