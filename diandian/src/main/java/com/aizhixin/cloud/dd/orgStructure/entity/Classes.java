@@ -6,23 +6,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 
-@Document(collection="classes")
+@Document(collection = "classes")
 @Data
 public class Classes {
-	@Id
-	protected String id;
-	//行政班id
-	@Indexed
-	private Long classesId;
-	//行政班名称
-	private String classesName;
-	private Long pepleNumber;
-	@Indexed
-	private Long profId;
-	@Indexed
-	private Long collegeId;
-	@Indexed
-	private Long orgId;
-	
-	private String teachingYear;
+    @Id
+    protected String id;
+    //行政班id
+    @Indexed
+    private Long classesId;
+    //行政班名称
+    private String classesName;
+    private Long pepleNumber;
+    @Indexed
+    private Long profId;
+    @Indexed
+    private Long collegeId;
+    @Indexed
+    private Long orgId;
+
+    private String teachingYear;
 }

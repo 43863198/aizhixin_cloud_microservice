@@ -57,6 +57,20 @@ public class StudentsController {
     }
 
     /**
+     * 设为班长
+     *
+     * @return
+     */
+    @RequestMapping(value = "/setclassmonitor", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "PUT", value = "设为班长", response = Void.class, notes = "设为班长<br><br><b>@author hsh</b>")
+    public ResponseEntity<Map<String, Object>> setclassmonitor(
+            @ApiParam(value = "stuId", required = true) @RequestParam(value = "stuId", required = true) Long stuId,
+            @ApiParam(value = "isMonitor", required = true) @RequestParam(value = "isMonitor", required = true) Boolean isMonitor) {
+        Map<String, Object> result = userService.setClassMonitor(stuId, isMonitor);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
      * 添加学生
      *
      * @param student

@@ -15,6 +15,7 @@ import com.aizhixin.cloud.dd.orgStructure.repository.TeachingClassRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.TeachingClassStudentRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
+import com.aizhixin.cloud.dd.rollcall.JdbcTemplate.ScheduleRollCallJdbc;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.entity.*;
 import com.aizhixin.cloud.dd.rollcall.repository.ScheduleRepository;
@@ -57,6 +58,8 @@ public class InitScheduleService {
     private RedisTemplate redisTemplate;
     @Autowired
     private ScheduleRollCallRepository scheduleRollCallRepository;
+    @Autowired
+    private ScheduleRollCallJdbc scheduleRollCallJdbc;
     @Autowired
     private SemesterService semesterService;
     @Autowired
@@ -407,14 +410,14 @@ public class InitScheduleService {
             scheduleRollCall.setCourseLaterTime(null == lateTime ? courseRollCall.getLateTime() : lateTime);
             scheduleRollCall.setAbsenteeismTime(null == absenteeismTime ? courseRollCall.getAbsenteeismTime() : absenteeismTime);
             scheduleRollCall.setClassRoomRollCall(CourseRollCallConstants.NOT_OPEN_CLASSROOMROLLCALL);
-            scheduleRollCall.setIsOpenRollcall(Boolean.FALSE);
-            scheduleRollCall.setIsInClassroom(Boolean.FALSE);
             scheduleRollCall.setLocaltion("");
             if (isInClass) {
-                scheduleRollCall.setIsOpenRollcall(isInClass);
-                scheduleRollCall.setIsInClassroom(isInClass);
+                scheduleRollCall.setIsOpenRollcall(Boolean.TRUE);
+                scheduleRollCall.setIsInClassroom(Boolean.TRUE);
+            } else {
+                scheduleRollCall.setIsOpenRollcall(Boolean.FALSE);
+                scheduleRollCall.setIsInClassroom(Boolean.FALSE);
             }
-
             scheduleRollCallRepository.save(scheduleRollCall);
 
             // ==========================reidsRollCall==============================
@@ -469,12 +472,12 @@ public class InitScheduleService {
         Long teachingclassId = schedule.getTeachingclassId();
         Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
         Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
-        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate);
+        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate, endDate);
         if (null == studentList) {
             log.info("根据教学班id获取学生列表信息为空!" + schedule.getId());
             return false;
         }
-        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
+//        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
         RollCall rollCall = null;
         Map<Long, RollCall> rollCallMap = new HashMap();
         for (StudentDTO dto : studentList) {
@@ -497,19 +500,24 @@ public class InitScheduleService {
             rollCall.setCollegeName(dto.getCollegeName());
             rollCall.setTeachingYear(dto.getTeachingYear());
             rollCall.setOrgId(schedule.getOrganId());
+            rollCall.setStudentName(dto.getStudentName());
+            rollCall.setSemesterId(schedule.getSemesterId());
             // 判断该学生是否有请假
-            if (studentLeaves != null && studentLeaves.contains(dto.getStudentId())) {
+            rollCall.setIsPublicLeave(Boolean.FALSE);
+            if (dto.getIsPublicLeave()) {
+                rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                rollCall.setIsPublicLeave(Boolean.TRUE);
+                rollCall.setCanRollCall(Boolean.FALSE);
+            } else if (dto.getIsPrivateLeave()) {
                 rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
             } else {
                 rollCall.setType(RollCallConstants.TYPE_UNCOMMITTED);
             }
-            rollCall.setStudentName(dto.getStudentName());
-            rollCall.setSemesterId(schedule.getSemesterId());
             rollCallMap.put(studentId, rollCall);
         }
         redisTemplate.opsForHash().putAll(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCallMap);
         redisTemplate.expire(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), 24, TimeUnit.HOURS);
-        scheduleRollCallRepository.save(scheduleRollCall);
+//        scheduleRollCallRepository.save(scheduleRollCall);
         schedule.setIsInitRollcall(Boolean.TRUE);
         scheduleRepository.save(schedule);
         log.info("初始化学生签到信息完毕。" + schedule.getId());
@@ -555,9 +563,8 @@ public class InitScheduleService {
                                 Iterator<Long> schedueleIterator = scheduleIds.iterator();
                                 while (schedueleIterator.hasNext()) {
                                     Long scheduleRollCallId = schedueleIterator.next().longValue();
-                                    Set keys = redisTemplate.opsForHash().keys(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
-                                    if (null != keys && keys.size() >= countNum) {
-                                        List<LocaltionDTO> values = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
+                                    List<LocaltionDTO> values = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
+                                    if (values != null && values.size() >= countNum) {
                                         count(values, orgId, scheduleRollCallId);
                                     }
                                 }
@@ -593,21 +600,25 @@ public class InitScheduleService {
         }
         int level = gdMap.getConfiLevel(deviation);
         if (level < confilevel) {
-            log.info("计算中值，合格距离" + deviation + ",未满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课id为:" + scheduleRollCallId);
+            log.info("计算中值，合格距离" + deviation + ",未满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课点名任务id为:" + scheduleRollCallId);
             return;
         }
-
-        String midValu = gdMap.getMidValue();
-        log.info("计算中值，合格距离" + deviation + ",满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课id为:" + scheduleRollCallId + "中值为：" + midValu);
-
-        scheduleRollCallRepository.updateScheduleVerify(scheduleRollCallId, gdMap.getMidDistribution());
-        redisTemplate.opsForValue().set("l-" + scheduleRollCallId, gdMap.getMidDistribution(), 1, TimeUnit.DAYS);
+        String midValu = gdMap.getMidDistribution();
+        log.info("计算中值，合格距离" + deviation + ",满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课点名任务id为:" + scheduleRollCallId + "中值为：" + midValu);
+        scheduleRollCallJdbc.updateScheduleVerify(scheduleRollCallId, midValu);
+        redisTemplate.opsForValue().set("l-" + scheduleRollCallId, midValu, 1, TimeUnit.DAYS);
+        ScheduleRollCall scheduleRollCall = scheduleRollCallRepository.findOne(scheduleRollCallId);
+        if (scheduleRollCall != null) {
+            scheduleRollCall.setLocaltion(midValu);
+        }
+        redisTemplate.opsForValue().set(RedisUtil.getSchduleRollCallDominKey(scheduleRollCall.getSchedule().getId()), scheduleRollCall, 1, TimeUnit.DAYS);
+        log.info("中值更新成功，其中排课点名任务id为:" + scheduleRollCallId + "中值为：" + midValu);
         ScheduleRollCallIngDTO dto = (ScheduleRollCallIngDTO) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId), scheduleRollCallId);
 
         updateRollcall(organId, scheduleRollCallId, gdMap, deviation, dto);
     }
 
-
+    @Async("threadPool1")
     private void updateRollcall(Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
         List<LocaltionDTO> list = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
         for (LocaltionDTO localtionDTO : list) {
@@ -616,7 +627,6 @@ public class InitScheduleService {
         deleteRedisRollCallIng(organId, scheduleRollCallId);
     }
 
-    @Async("threadPool1")
     private void updateStuRollcall(LocaltionDTO localtionDTO, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
         Long studentId = localtionDTO.getId();
         RollCall rcs = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), studentId);

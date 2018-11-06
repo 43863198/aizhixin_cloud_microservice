@@ -589,10 +589,10 @@ public class QuestionnaireService {
                     question.setQuestionnaire(questionnaire);
                     question.setQuestionsChoice(null);
                     question.setId(null);
+                    question = questionsRepository.save(question);
                     if (!questionDto.getQuestionChioce().isEmpty()) {
                         for (QuestionsChoiceDTO questionsChoiceDTO : questionDto.getQuestionChioce()) {
                             QuestionsChoice qc = new QuestionsChoice();
-                            qc.setId(null);
                             BeanUtils.copyProperties(questionsChoiceDTO, qc);
                             qc.setId(null);
                             qc.setQuestions(question);
@@ -848,6 +848,7 @@ public class QuestionnaireService {
                     question.setQuestionnaire(questionnaire);
                     question.setQuestionsChoice(null);
                     question.setId(null);
+                    question = questionsRepository.save(question);
                     if (!questionDto.getQuestionChioce().isEmpty()) {
                         for (QuestionsChoiceDTO questionsChoiceDTO : questionDto.getQuestionChioce()) {
                             QuestionsChoice qc = new QuestionsChoice();

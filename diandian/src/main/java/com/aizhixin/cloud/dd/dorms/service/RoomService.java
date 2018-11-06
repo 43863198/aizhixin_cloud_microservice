@@ -87,6 +87,7 @@ public class RoomService {
             r.setRoomDesc(roomDomain.getRoomDesc());
             r.setUnitNo(roomDomain.getUnitNo());
             r.setBeds(roomDomain.getBedList().size());
+            r.setGrade(roomDomain.getGrade());
             List<Bed> bedUpdate = new ArrayList<>();
             List<Bed> bedDelete = new ArrayList<>();
             List<Bed> bedInsert = new ArrayList<>();
@@ -225,12 +226,12 @@ public class RoomService {
      */
     public Map<String, Object> findByRoom(Long orgId, List<Long> floorIds, List<String> unitNo, List<String> floorNo,
                                           Boolean full, Boolean open, Boolean isAssignment, Long profId, String no, Integer pageNumber, Integer pageSize,
-                                          Map<String, Object> result) {
+                                          Map<String, Object> result, String grade) {
         Integer pageStart = (pageNumber - 1) * pageSize;
-        Integer total = roomAssginJdbc.countRoomInfo(orgId, floorIds, unitNo, floorNo, full, open, isAssignment, profId, no);
+        Integer total = roomAssginJdbc.countRoomInfo(orgId, floorIds, unitNo, floorNo, full, open, isAssignment, profId, no, grade);
         PageDomainUtil pd = PageDomainUtil.getPage(total, pageNumber, pageSize);
         List<RoomInfoDomain> ridl = roomAssginJdbc.findRoomInfo(orgId, floorIds, unitNo, floorNo, full, open, isAssignment, profId,
-                no, pageStart, pageSize);
+                no, grade, pageStart, pageSize);
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         result.put(ApiReturnConstants.DATA, ridl);
         result.put(ApiReturnConstants.PAGE, pd);

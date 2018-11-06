@@ -83,6 +83,8 @@ public class StudentDomain {
     private String idNumber;
     @ApiModelProperty(value = "生源地", position=26)
     private String studentSource;
+    @ApiModelProperty(value = "是否班长", position=27)
+    private Boolean isMonitor;
 
     public StudentDomain() {}
 
@@ -108,6 +110,16 @@ public class StudentDomain {
         this.professionalName = professionalName;
         this.collegeId = collegeId;
         this.collegeName = collegeName;
+    }
+
+    public StudentDomain(Long id, String name, String phone, String email, String jobNumber, String sex, Long classesId, String classesName, Long professionalId,
+                         String professionalName, Long collegeId, String collegeName, Boolean isMonitor) {
+        this(id, name, phone, email, jobNumber, sex, classesId, classesName);
+        this.professionalId = professionalId;
+        this.professionalName = professionalName;
+        this.collegeId = collegeId;
+        this.collegeName = collegeName;
+        this.isMonitor = isMonitor;
     }
 
     public StudentDomain(Long id, String name, String phone, String email, String jobNumber, String sex, Long classesId, String classesName, Long professionalId,

@@ -68,7 +68,6 @@ public class DDUserServiceLogin {
                 log.warn("token Unauthorized");
                 return null;
             }
-
             if (obj.has("userName")) {
                 account.setName(obj.getString("userName"));
             }
@@ -86,6 +85,18 @@ public class DDUserServiceLogin {
             }
             if (obj.has("avatar")) {
                 account.setAvatar(obj.getString("avatar"));
+            }
+            if (obj.has("classesId")) {
+                account.setClassesId(obj.getLong("classesId"));
+            }
+            if (obj.has("classesName")) {
+                account.setClassesName(obj.getString("classesName"));
+            }
+            if (obj.has("professionalId")) {
+                account.setProfessionalId(obj.getLong("professionalId"));
+            }
+            if (obj.has("professionalName")) {
+                account.setProfessionalName(obj.getString("professionalName"));
             }
             try {
                 if (obj.has("roles")) {

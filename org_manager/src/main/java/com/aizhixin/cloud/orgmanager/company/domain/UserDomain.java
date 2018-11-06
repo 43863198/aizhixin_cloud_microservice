@@ -96,6 +96,8 @@ public class UserDomain implements java.io.Serializable {
 	private String idNumber;
 	@ApiModelProperty(value = "生源地", position=26)
 	private String studentSource;
+	@ApiModelProperty(value = "是否班长", position=27)
+	private Boolean isMonitor;
 
 	public UserDomain(User user, String roleGroup, String roleName) {
 		this.id = user.getId();

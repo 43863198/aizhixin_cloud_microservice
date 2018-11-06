@@ -178,8 +178,6 @@ public class StudentPhoneResource {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(),
                     HttpStatus.UNAUTHORIZED);
         }
-//        Object resBody = rollCallService.excuteReport(scheduleId, account);
-
         Map<String, Object> resBody = new HashMap<>();
         resBody.put("message", "success!");
         resBody.put("success", Boolean.TRUE);
@@ -227,7 +225,6 @@ public class StudentPhoneResource {
         }
         // 验证 验证码和经纬度是否合法
         Map<String, Object> resBody = new HashMap<>();
-//        Object resBody = rollCallServiceV2.excuteSignIn(account, signInDTO);
         rollCallServiceV3.excuteSignIn(account, signInDTO);
         resBody.put(ApiReturnConstants.MESSAGE, "签到结果确认中!");
         resBody.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
@@ -284,8 +281,7 @@ public class StudentPhoneResource {
 
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
-            return new ResponseEntity<Object>(TokenUtil.tokenValid(),
-                    HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
         Map<String, Object> resBody = new HashMap<>();
         if (requestType.equals(LeaveConstants.TYPE_DAY) && endDate == null) {

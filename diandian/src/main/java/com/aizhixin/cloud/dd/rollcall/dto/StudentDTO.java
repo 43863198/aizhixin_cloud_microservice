@@ -17,4 +17,6 @@ public class StudentDTO {
     String collegeName;
     String teachingYear;
     Long orgId;
+    Boolean isPublicLeave = false;
+    Boolean isPrivateLeave = false;
 }

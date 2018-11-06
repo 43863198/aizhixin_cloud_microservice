@@ -3,6 +3,7 @@ package com.aizhixin.cloud.dd.rollcall.serviceV2;
 import com.aizhixin.cloud.dd.common.core.ApiReturnConstants;
 import com.aizhixin.cloud.dd.constant.RollCallConstants;
 import com.aizhixin.cloud.dd.constant.ScheduleConstants;
+import com.aizhixin.cloud.dd.rollcall.JdbcTemplate.ScheduleRollCallJdbc;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.LocaltionDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.ScheduleRollCallIngDTO;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,24 +44,20 @@ public class RollCallServiceV2 {
 
     @Autowired
     private RedisTemplate redisTemplate;
-
     @Autowired
     private ScheduleRollCallService scheduleRollCallService;
-
     @Autowired
     private ScheduleService scheduleService;
-
     @Autowired
     private OrganSetService organSetService;
-
     @Autowired
     private StudentLeaveScheduleService studentLeaveScheduleService;
-
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-
     @Autowired
     private RollCallRecordService rollCallRecordService;
+    @Autowired
+    private ScheduleRollCallJdbc scheduleRollCallJdbc;
 
     /**
      * 学生签到
@@ -130,7 +128,11 @@ public class RollCallServiceV2 {
                 return resBody;
             }
             if (!rollCall.getCanRollCall()) {
-                resBody.put(ApiReturnConstants.MESSAGE, "老师已修改您的考勤,不能再次签到。请联系老师 !");
+                if (rollCall.getIsPublicLeave()) {
+                    resBody.put(ApiReturnConstants.MESSAGE, "请公假不能签到!");
+                } else {
+                    resBody.put(ApiReturnConstants.MESSAGE, "老师已修改您的考勤,不能再次签到。请联系老师 !");
+                }
                 resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_CHANGE);
                 resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
                 return resBody;
@@ -183,9 +185,10 @@ public class RollCallServiceV2 {
                     return resBody;
                 }
             } else if (ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC.equals(signInDTO.getRollCallType())) {
-                verify = (String) redisTemplate.opsForValue().get("l-"+scheduleRollCallId);
+                verify = (String) redisTemplate.opsForValue().get("l-" + scheduleRollCallId);
                 if (StringUtils.isBlank(verify)) {
-                    RollCallMapUtil.setValue(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId), account.getId(), new LocaltionDTO(account.getId(), rollCall.getGpsLocation(), rollCall.getSignTime()));
+                    //RollCallMapUtil.setValue(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId), account.getId(), );
+                    redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId), account.getId(), new LocaltionDTO(account.getId(), rollCall.getGpsLocation(), rollCall.getSignTime()));
                     rollCall.setType(RollCallConstants.TYPE_COMMITTED);
                 } else {
                     // verify 中值已计算出来。
@@ -327,14 +330,20 @@ public class RollCallServiceV2 {
             log.info("计算中值，合格距离" + deviation + ",未满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课id为:" + scheduleRollCallId);
             return;
         }
-
-        String midValu = gdMap.getMidValue();
+        String midValu = gdMap.getMidDistribution();
         log.info("计算中值，合格距离" + deviation + ",满足置信度:" + confilevel + ",实际置信度为:" + level + "。其中排课id为:" + scheduleRollCallId + "中值为：" + midValu);
-
         scheduleRollCallService.updateScheduleVerify(scheduleRollCallId, gdMap.getMidDistribution());
+        scheduleRollCallJdbc.updateScheduleVerify(scheduleRollCallId, midValu);
+        redisTemplate.opsForValue().set("l-" + scheduleRollCallId, midValu, 1, TimeUnit.DAYS);
+        log.info("中值更新成功，其中排课点名任务id为:" + scheduleRollCallId + "中值为：" + midValu);
 
         ScheduleRollCallIngDTO dto = (ScheduleRollCallIngDTO) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId), scheduleRollCallId);
+        updateRollcall(organId, scheduleRollCallId, gdMap, deviation, dto);
+    }
 
+    @Async("threadPool1")
+    private void updateRollcall(Long organId, Long scheduleRollCallId, GDMapUtil gdMap, int deviation, ScheduleRollCallIngDTO dto) {
+        List<LocaltionDTO> list = redisTemplate.opsForHash().values(RedisUtil.getScheduleRollCallIngKey(scheduleRollCallId.longValue()));
         for (LocaltionDTO localtionDTO : list) {
             Long studentId = localtionDTO.getId();
             RollCall rcs = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCallId), studentId);
@@ -380,18 +389,18 @@ public class RollCallServiceV2 {
     /**
      * 同步签到信息
      */
-    @Scheduled(fixedDelay = 5000)
-    public void synSignInfo() {
-        ConcurrentHashMap<String, Map<Long, LocaltionDTO>> map = RollCallMapUtil.getMap();
-        log.info("需要上传的签到信息数量为:" + map.size());
-        long start = System.currentTimeMillis();
-        if (map.size() > 0) {
-            for (Map.Entry<String, Map<Long, LocaltionDTO>> entry : map.entrySet()) {
-                redisTemplate.opsForHash().putAll(entry.getKey(), entry.getValue());
-            }
-            map.clear();
-            log.info("上传签到耗时:" + (System.currentTimeMillis() - start) / 1000);
-        }
-    }
+//    @Scheduled(fixedDelay = 5000)
+//    public void synSignInfo() {
+//        ConcurrentHashMap<String, Map<Long, LocaltionDTO>> map = RollCallMapUtil.getMap();
+//        log.info("需要上传的签到信息数量为:" + map.size());
+//        long start = System.currentTimeMillis();
+//        if (map.size() > 0) {
+//            for (Map.Entry<String, Map<Long, LocaltionDTO>> entry : map.entrySet()) {
+//                redisTemplate.opsForHash().putAll(entry.getKey(), entry.getValue());
+//            }
+//            map.clear();
+//            log.info("上传签到耗时:" + (System.currentTimeMillis() - start) / 1000);
+//        }
+//    }
 
 }

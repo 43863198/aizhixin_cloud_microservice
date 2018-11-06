@@ -1,22 +1,24 @@
 package com.aizhixin.cloud.dd.orgStructure.client;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.aizhixin.cloud.dd.classperf.entity.ClassPerfStudent;
+import com.aizhixin.cloud.dd.classperf.repository.ClassPerfStudentRepository;
+import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
+import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
+import com.aizhixin.cloud.dd.orgStructure.domain.UserInfoDomain;
 import com.aizhixin.cloud.dd.orgStructure.entity.*;
 import com.aizhixin.cloud.dd.orgStructure.repository.*;
 import com.aizhixin.cloud.dd.orgStructure.utils.TeacherType;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -58,6 +60,10 @@ public class SynchronizedDataService {
     private TeachingClassTeacherRepository teachingClassTeacherRepository;
     @Autowired
     private TeachingClassStudentRepository teachingClassStudentRepository;
+    @Autowired
+    private ClassPerfStudentRepository classPerfStudentRepository;
+    @Autowired
+    private RedisTokenStore redisTokenStore;
 
     private Map<Long, Boolean> teachingTeacherMap;
     private Map<Long, Boolean> classTeacherMap;
@@ -83,14 +89,8 @@ public class SynchronizedDataService {
                         if (null != map && null != map.get("logo")) {
                             oi.setLogo(map.get("logo").toString());
                         }
-                    } catch (JsonParseException e) {
-
-                        e.printStackTrace();
-                    } catch (JsonMappingException e) {
-
-                        e.printStackTrace();
-                    } catch (IOException e) {
-
+                    } catch (Exception e) {
+                        log.warn("getOrganByIdException", e);
                         e.printStackTrace();
                     }
                 }
@@ -406,6 +406,7 @@ public class SynchronizedDataService {
                 for (Map<String, Object> map : datas) {
                     NewStudent d = new NewStudent();
                     d.setOrgId(orgId);
+                    d.setOrgName(orgInfo.getName());
                     if (map.get("id") != null && !StringUtils.isEmpty(map.get("id").toString())) {
                         d.setStuId(Long.valueOf(map.get("id").toString()));
                         ids.add(d.getStuId());
@@ -478,6 +479,7 @@ public class SynchronizedDataService {
                     }
                 }
                 newStudentRepository.save(result);
+                cacheNewStudent(result);
             }
         }
         log.info("结束同步新生:" + orgId);
@@ -547,6 +549,11 @@ public class SynchronizedDataService {
                             if (null != map.get("studentSource") && !StringUtils.isEmpty(map.get("studentSource"))) {
                                 ui.setStudentSource(map.get("studentSource").toString());
                             }
+                            if (null != map.get("isMonitor")) {
+                                ui.setIsMonitor((Boolean) map.get("isMonitor"));
+                            } else {
+                                ui.setIsMonitor(false);
+                            }
                             if (null != ui) {
                                 uil.add(ui);
                             }
@@ -582,6 +589,8 @@ public class SynchronizedDataService {
                                 }
                             }
                             userInfoRepository.save(uil);
+                            cacheUserInfo(uil);
+                            updateClassPerfStudent(orgId, uil);
                         }
                     }
                 }
@@ -621,6 +630,7 @@ public class SynchronizedDataService {
                                 ui = new UserInfo();
                                 ui.setUserType(60);
                                 ui.setOrgId(orgId);
+                                ui.setOrgName(orgInfo.getName());
                                 ui.setUserId(Long.valueOf(map.get("id").toString()));
                                 ids.add(Long.valueOf(map.get("id").toString()));
                             }
@@ -865,5 +875,64 @@ public class SynchronizedDataService {
         if (!tcsl.isEmpty()) {
             teachingClassStudentRepository.save(tcsl);
         }
+    }
+
+    @Async("threadPool1")
+    private void updateClassPerfStudent(Long orgId, List<UserInfo> list) {
+        Long semesterId = getSemesterId(orgId);
+        String date = DateFormatUtil.formatShort(new Date());
+        List<ClassPerfStudent> students = new ArrayList<>();
+        for (UserInfo userInfo : list) {
+            ClassPerfStudent stu = classPerfStudentRepository.findByStudentIdAndSemesterId(userInfo.getUserId(), semesterId);
+            if (stu == null) {
+                stu = new ClassPerfStudent();
+                stu.setTotalScore(0);
+                stu.setStudentId(userInfo.getUserId());
+                stu.setSemesterId(semesterId);
+            }
+            String id = stu.getId();
+            BeanUtils.copyProperties(userInfo, stu);
+            stu.setUpdateDate(date);
+            stu.setId(id);
+            students.add(stu);
+        }
+        classPerfStudentRepository.save(students);
+        delOldClassPerfStudent(orgId, semesterId, date);
+    }
+
+    private void delOldClassPerfStudent(Long orgId, Long semesterId, String date) {
+        List<ClassPerfStudent> students = classPerfStudentRepository.findByOrgIdAndSemesterIdAndUpdateDateNot(orgId, semesterId, date);
+        if (students != null && students.size() > 0) {
+            classPerfStudentRepository.delete(students);
+        }
+    }
+
+    @Async("threadPool1")
+    private void cacheUserInfo(List<UserInfo> list) {
+        List<UserInfoDomain> ds = new ArrayList<>();
+        for (UserInfo u : list) {
+            UserInfoDomain ud = new UserInfoDomain();
+            BeanUtils.copyProperties(u, ud);
+            ds.add(ud);
+        }
+        redisTokenStore.setUserInfoDomainList(ds);
+    }
+
+    @Async("threadPool1")
+    private void cacheNewStudent(List<NewStudent> list) {
+        List<UserInfoDomain> ds = new ArrayList<>();
+        for (NewStudent u : list) {
+            UserInfoDomain ud = new UserInfoDomain();
+            ud.setUserId(u.getStuId());
+            ud.setUserType(70);
+            ud.setName(u.getName());
+            ud.setAvatar(u.getAvatar());
+            ud.setPhone(u.getPhone());
+            ud.setSex(u.getSex());
+            ud.setProfName(u.getProfessionalName());
+            ud.setCollegeName(u.getCollegeName());
+            ds.add(ud);
+        }
+        redisTokenStore.setUserInfoDomainList(ds);
     }
 }

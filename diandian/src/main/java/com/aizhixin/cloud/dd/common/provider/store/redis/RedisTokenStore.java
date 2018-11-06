@@ -4,6 +4,7 @@ import com.aizhixin.cloud.dd.counsellorollcall.domain.RollcallReportDomain;
 import com.aizhixin.cloud.dd.counsellorollcall.domain.StuTempGroupDomainV2;
 import com.aizhixin.cloud.dd.counsellorollcall.entity.CounsellorRollcallRule;
 import com.aizhixin.cloud.dd.homepage.domain.HomeDomain;
+import com.aizhixin.cloud.dd.orgStructure.domain.UserInfoDomain;
 import com.aizhixin.cloud.dd.rollcall.dto.PeriodDTO;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class RedisTokenStore {
 
     public static final String TYPE_GET_AD = "ddapp:getad:";
 
+    public static final String TYPE_USERINFO_DOMAIN = "userinfo:";
 
     private void setCacheValue(String type, Long key, Object value) {
         String str = JSON.toJSONString(value);
@@ -53,7 +55,23 @@ public class RedisTokenStore {
         redisTemplate.opsForHash().put(type, key, str);
     }
 
-    private List<RollcallReportDomain> getCacheValue(String type, Long key) {
+    private <T> List<T> getCacheValueList(String type, Long key, Class<T> clazz) {
+        String str = (String) redisTemplate.opsForHash().get(type, key.toString());
+        if (!StringUtils.isEmpty(str)) {
+            return JSON.parseArray(str, clazz);
+        }
+        return null;
+    }
+
+    private <T> T getCacheValue(String type, Long key, Class<T> clazz) {
+        String str = (String) redisTemplate.opsForHash().get(type, key.toString());
+        if (!StringUtils.isEmpty(str)) {
+            return JSON.parseObject(str, clazz);
+        }
+        return null;
+    }
+
+    private List<RollcallReportDomain> getCacheValueRollcallReportDomain(String type, Long key) {
         String str = (String) redisTemplate.opsForHash().get(type, key.toString());
         if (!StringUtils.isEmpty(str)) {
             return JSON.parseArray(str, RollcallReportDomain.class);
@@ -61,7 +79,7 @@ public class RedisTokenStore {
         return null;
     }
 
-    private List<StuTempGroupDomainV2> getCacheValueV2(String type, Long key) {
+    private List<StuTempGroupDomainV2> getCacheValueRollcallReportDomainV2(String type, Long key) {
         String str = (String) redisTemplate.opsForHash().get(type, key.toString());
         if (!StringUtils.isEmpty(str)) {
             return JSON.parseArray(str, StuTempGroupDomainV2.class);
@@ -183,11 +201,11 @@ public class RedisTokenStore {
      * @return
      */
     public List<RollcallReportDomain> readRedisData(Long key) {
-        return getCacheValue(TYPE_STUDENT_COUNSELLOR, key);
+        return getCacheValueRollcallReportDomain(TYPE_STUDENT_COUNSELLOR, key);
     }
 
     public List<StuTempGroupDomainV2> readRedisDataV2(Long key) {
-        return getCacheValueV2(TYPE_STUDENT_COUNSELLOR_V2, key);
+        return getCacheValueRollcallReportDomainV2(TYPE_STUDENT_COUNSELLOR_V2, key);
     }
 
     /**
@@ -354,5 +372,21 @@ public class RedisTokenStore {
             return JSON.parseArray(str, HomeDomain.class);
         }
         return null;
+    }
+
+    public UserInfoDomain getUserInfoDomain(Long userId) {
+        return getCacheValue(TYPE_USERINFO_DOMAIN, userId, UserInfoDomain.class);
+    }
+
+    public void setUserInfoDomain(UserInfoDomain d) {
+        setCacheValue(TYPE_USERINFO_DOMAIN, d.getUserId(), d);
+    }
+
+    public void setUserInfoDomainList(List<UserInfoDomain> ds) {
+        if (ds != null && ds.size() > 0) {
+            for (UserInfoDomain d : ds) {
+                setCacheValue(TYPE_USERINFO_DOMAIN, d.getUserId(), d);
+            }
+        }
     }
 }

@@ -16,12 +16,12 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class BaseDataCacheService {
-    public final  static String ORG_KEY = "org_api:first:org";
-    public final  static String COLLEGE_KEY = "org_api:first:college";
-    public final  static String PROFESSIONAL_KEY = "org_api:first:professional";
-    public final  static String CLASSES_KEY = "org_api:first:classes";
-    public final  static String USER_KEY = "org_api:first:user";
-    public final  static String ALL_ORG_KEY = "org_api:first:allorgs";
+    public final static String ORG_KEY = "org_api:first:org";
+    public final static String COLLEGE_KEY = "org_api:first:college";
+    public final static String PROFESSIONAL_KEY = "org_api:first:professional";
+    public final static String CLASSES_KEY = "org_api:first:classes";
+    public final static String USER_KEY = "org_api:first:user";
+    public final static String ALL_ORG_KEY = "org_api:first:allorgs";
 
     @Autowired
     private OrganizationService organizationService;
@@ -97,6 +97,7 @@ public class BaseDataCacheService {
             redisTemplate.expire(CLASSES_KEY, 1, TimeUnit.DAYS);
         }
     }
+
     public void clearAllOrg() {
         redisTemplate.delete(ORG_KEY);
         redisTemplate.delete(COLLEGE_KEY);
@@ -110,7 +111,7 @@ public class BaseDataCacheService {
     }
 
     public OrgDomain readOrg(Long id) {
-        return (OrgDomain)redisTemplate.opsForHash().get(ORG_KEY, id.toString());
+        return (OrgDomain) redisTemplate.opsForHash().get(ORG_KEY, id.toString());
     }
 
 
@@ -118,10 +119,12 @@ public class BaseDataCacheService {
     public void clearAllCollege() {
         redisTemplate.delete(COLLEGE_KEY);
     }
+
     public void cacheCollege(CollegeDomain c) {
         redisTemplate.opsForHash().put(COLLEGE_KEY, c.getId().toString(), c);
         redisTemplate.expire(COLLEGE_KEY, 1, TimeUnit.DAYS);
     }
+
     public void cacheCollege(List<CollegeDomain> cs) {
         Map<String, CollegeDomain> collegeDomainMap = new HashMap<>();
         for (CollegeDomain c : cs) {
@@ -132,8 +135,9 @@ public class BaseDataCacheService {
     }
 
     public CollegeDomain readCollege(Long id) {
-        return (CollegeDomain)redisTemplate.opsForHash().get(COLLEGE_KEY, id.toString());
+        return (CollegeDomain) redisTemplate.opsForHash().get(COLLEGE_KEY, id.toString());
     }
+
     /************************************************专业的相关操作********************************************************/
     public void clearAllProfessional() {
         redisTemplate.delete(PROFESSIONAL_KEY);
@@ -154,8 +158,9 @@ public class BaseDataCacheService {
     }
 
     public ProfessionnalDomain readProfessional(Long id) {
-        return (ProfessionnalDomain)redisTemplate.opsForHash().get(PROFESSIONAL_KEY, id.toString());
+        return (ProfessionnalDomain) redisTemplate.opsForHash().get(PROFESSIONAL_KEY, id.toString());
     }
+
     /************************************************班级的相关操作********************************************************/
     public void clearAllClasses() {
         redisTemplate.delete(CLASSES_KEY);
@@ -175,7 +180,7 @@ public class BaseDataCacheService {
     }
 
     public ClassesDomain readClasses(Long id) {
-        return (ClassesDomain)redisTemplate.opsForHash().get(CLASSES_KEY, id.toString());
+        return (ClassesDomain) redisTemplate.opsForHash().get(CLASSES_KEY, id.toString());
     }
 
 
@@ -189,14 +194,14 @@ public class BaseDataCacheService {
 
     public boolean cacheUser(UserDomain c) {
         redisTemplate.opsForHash().put(USER_KEY + (c.getId() % 20), c.getId().toString(), c);
-        redisTemplate.expire(USER_KEY+ (c.getId() % 20), 1, TimeUnit.DAYS);
+        redisTemplate.expire(USER_KEY + (c.getId() % 20), 1, TimeUnit.DAYS);
         return true;
     }
 
     public void cacheUser(List<UserDomain> cs) {
-        Map<Long,Map<String, UserDomain>> userMap = new HashMap<>();
+        Map<Long, Map<String, UserDomain>> userMap = new HashMap<>();
         for (UserDomain c : cs) {
-            Long m = c.getId()%20;
+            Long m = c.getId() % 20;
             Map<String, UserDomain> um = userMap.get(m);
             if (null == um) {
                 um = new HashMap<>();
@@ -204,7 +209,7 @@ public class BaseDataCacheService {
             }
             um.put(c.getId().toString(), c);
         }
-        for (Map.Entry<Long,Map<String, UserDomain>> e : userMap.entrySet()) {
+        for (Map.Entry<Long, Map<String, UserDomain>> e : userMap.entrySet()) {
             if (!e.getValue().isEmpty()) {
                 redisTemplate.opsForHash().putAll(USER_KEY + e.getKey(), e.getValue());
                 redisTemplate.expire(USER_KEY + e.getKey(), 1, TimeUnit.DAYS);
@@ -213,7 +218,10 @@ public class BaseDataCacheService {
     }
 
     public UserDomain readUser(Long id) {
-        return (UserDomain)redisTemplate.opsForHash().get(USER_KEY + (id % 20), id.toString());
+        if (id == null) {
+            return null;
+        }
+        return (UserDomain) redisTemplate.opsForHash().get(USER_KEY + (id % 20), id.toString());
     }
 
     public void deleteUser(Long id) {
@@ -237,7 +245,7 @@ public class BaseDataCacheService {
 
     public Set<Long> readAllOrgIds() {
         Set<Long> orgIds = new HashSet<>();
-        String str = (String)redisTemplate.opsForHash().get(ALL_ORG_KEY, ALL_ORG_KEY);
+        String str = (String) redisTemplate.opsForHash().get(ALL_ORG_KEY, ALL_ORG_KEY);
         if (!StringUtils.isEmpty(str)) {
             String[] ids = StringUtils.split(str, ",");
             for (String id : ids) {
@@ -249,8 +257,8 @@ public class BaseDataCacheService {
 
     @Transactional(readOnly = true)
     public void cacheAllOrgUser(Set<Long> orgids) {
-        Map<Long,Map<String, UserDomain>> userMap = new HashMap<>();
-        for(Long orgId : orgids) {
+        Map<Long, Map<String, UserDomain>> userMap = new HashMap<>();
+        for (Long orgId : orgids) {
             List<User> users = userService.findAllTeacherByOrgId(orgId);
             for (User u : users) {
                 UserDomain d = userService.initBatchCommitUserReturnData(u, null, null);
@@ -265,7 +273,7 @@ public class BaseDataCacheService {
                 if (cts > 0) {
                     d.addRole(RoleConfig.CLASSES_MASTER);
                 }
-                Long m = u.getId()%20;
+                Long m = u.getId() % 20;
                 Map<String, UserDomain> um = userMap.get(m);
                 if (null == um) {
                     um = new HashMap<>();
@@ -275,7 +283,7 @@ public class BaseDataCacheService {
             }
             users = userService.findAllStudentByOrgId(orgId);
             for (User u : users) {
-                Long m = u.getId()%20;
+                Long m = u.getId() % 20;
                 Map<String, UserDomain> um = userMap.get(m);
                 if (null == um) {
                     um = new HashMap<>();
@@ -285,7 +293,7 @@ public class BaseDataCacheService {
             }
         }
 
-        for (Map.Entry<Long,Map<String, UserDomain>> e : userMap.entrySet()) {
+        for (Map.Entry<Long, Map<String, UserDomain>> e : userMap.entrySet()) {
             if (!e.getValue().isEmpty()) {
                 redisTemplate.opsForHash().putAll(USER_KEY + e.getKey(), e.getValue());
                 redisTemplate.expire(USER_KEY + e.getKey(), 1, TimeUnit.DAYS);

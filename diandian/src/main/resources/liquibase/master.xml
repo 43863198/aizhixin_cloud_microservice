@@ -162,4 +162,9 @@
 	<include file="classpath:liquibase/changelog/201809211045_update_entity_QuestionnaireAssgin.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809211046_update_entity_QuestionAnswerRecord.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201809211459_update_entity_Questionnaire.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201810081727_update_entity_Room.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201810111117_update_entity_Questions.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201810171600_update_entity_Upgrade.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201810181646_update_entity_TempGroup.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201811020933_update_entity_RollCall.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

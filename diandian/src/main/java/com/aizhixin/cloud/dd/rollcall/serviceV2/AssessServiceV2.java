@@ -84,6 +84,7 @@ public class AssessServiceV2 {
         as.setRevertTotal(0);
         as.setClassId(ad.getClassesId());
         as.setCommentId(ad.getId());
+        as.setStudentId(as.getCommentId());
         as.setCommentName(ad.getName());
         as = assessRepository.save(as);
         //评论文件
@@ -105,8 +106,7 @@ public class AssessServiceV2 {
         revert.setFromUserId(as.getCommentId());
         revert.setFromUserName(as.getCommentName());
         if (as.getModule().equals(ModuleConstants.alc)) {
-            Long total = assessRepository.countBySourseIdAndModuleAndDeleteFlag(as.getSourseId(), as.getModule(),
-                    DataValidity.VALID.getState());
+            Long total = assessRepository.countBySourseIdAndModuleAndDeleteFlag(as.getSourseId(), as.getModule(), DataValidity.VALID.getState());
             AlumniCircle ac = alumniCircleService.findByAlumniCircle(as.getSourseId());
             if (null != ac) {
                 ac.setAssessTotal(Integer.parseInt(total + ""));
@@ -129,10 +129,9 @@ public class AssessServiceV2 {
             }
         }
         if (as.getModule().equals(ModuleConstants.dian)) {
-            Long total = assessRepository.countBySourseIdAndModuleAndDeleteFlag(as.getSourseId(), as.getModule(),
-                    DataValidity.VALID.getState());
+            Long total = assessRepository.countBySourseIdAndModuleAndDeleteFlag(as.getSourseId(), as.getModule(), DataValidity.VALID.getState());
             Announcement a = ar.findOne(as.getSourseId());
-            if(a != null){
+            if (a != null) {
                 a.setAssessTotal(Integer.parseInt(total + ""));
                 ar.save(a);
                 revert.setToUserId(a.getFromUserId());
@@ -146,14 +145,18 @@ public class AssessServiceV2 {
             revert.setToUserName(schedule.getTeacherNname());
             revert = revertRepository.save(revert);
         }
-        PushMessage pm = pushMessageService.createPushMessage("", revert.getFromUserName() + "回复你：" + revert.getContent(), "revert_notice", "revert", "回复通知", revert.getToUserId());
+        String fromUserName = revert.getFromUserName();
+        if (adt.isAnonymity()) {
+            fromUserName = "匿名";
+        }
+        PushMessage pm = pushMessageService.createPushMessage("", fromUserName + "回复你：" + revert.getContent(), "revert_notice", "revert", "回复通知", revert.getToUserId());
         //----新消息服务----start
         List<AudienceDTO> audiences = new ArrayList<>();
         AudienceDTO dto = new AudienceDTO();
         dto.setUserId(revert.getToUserId());
         dto.setData(revert);
         audiences.add(dto);
-        messageService.push("回复通知", revert.getFromUserName() + "回复你：" + revert.getContent(), "revert_notice", audiences);
+        messageService.push("回复通知", fromUserName + "回复你：" + revert.getContent(), "revert_notice", audiences);
         //----新消息服务----end
         return as;
     }
@@ -167,10 +170,8 @@ public class AssessServiceV2 {
      * @return: void
      */
     @Transactional(readOnly = true)
-    public Map<String, Object> findByAssessAndRevert(String module, Long sourseId, Pageable page,
-                                                     Map<String, Object> result) {
-        Page<AssessAndRevertDTO> pageAssess = assessRepository.findBySourseIdAndModuleAndDeleteFlag(page, sourseId,
-                module, DataValidity.VALID.getState());
+    public Map<String, Object> findByAssessAndRevert(String module, Long sourseId, Pageable page, Map<String, Object> result) {
+        Page<AssessAndRevertDTO> pageAssess = assessRepository.findBySourseIdAndModuleAndDeleteFlag(page, sourseId, module, DataValidity.VALID.getState());
         List<AssessAndRevertDTO> assessAndRevertDTOList = new ArrayList<>();
         PageDomain pageDomain = new PageDomain();
         pageDomain.setPageNumber(pageAssess.getNumber());
@@ -194,7 +195,6 @@ public class AssessServiceV2 {
                 try {
                     userInfo = ddUserService.getUserinfoByIdsV2(commentIds);
                 } catch (Exception e) {
-
                     log.warn("获取头像信息失败：" + e);
                 }
                 List<Revert> rl = revertRepository.findByAssessIdInAndDeleteFlagAndAssesOrderByCreatedDateAsc(ids,
@@ -207,17 +207,16 @@ public class AssessServiceV2 {
                                 RevertDTO rd = new RevertDTO();
                                 BeanUtils.copyProperties(revert, rd);
                                 if (revert.getFromUserId() != null) {
-                                    if (revert.getFromUserId().longValue() == assessAndRevertDTO.getCommentId()
-                                            .longValue()) {
+                                    if (revert.getFromUserId().longValue() == assessAndRevertDTO.getCommentId().longValue()) {
                                         if (assessAndRevertDTO.isAnonymity()) {
                                             rd.setFromUserName("匿名");
                                             rd.setAnonymity(assessAndRevertDTO.isAnonymity());
+                                            rd.setFromUserAvatar("");
                                         }
                                     }
                                 }
                                 if (null != revert.getToUserId()) {
-                                    if (revert.getToUserId().longValue() == assessAndRevertDTO.getCommentId()
-                                            .longValue()) {
+                                    if (revert.getToUserId().longValue() == assessAndRevertDTO.getCommentId().longValue()) {
                                         if (assessAndRevertDTO.isAnonymity()) {
                                             rd.setToUserName("匿名");
                                         }
@@ -242,7 +241,6 @@ public class AssessServiceV2 {
                             assessAndRevertDTO.setClassName(ui.getClassesName());
                         }
                     }
-
                 }
             }
         }

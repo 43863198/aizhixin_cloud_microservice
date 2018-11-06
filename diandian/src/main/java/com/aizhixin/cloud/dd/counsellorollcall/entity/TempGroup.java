@@ -80,6 +80,16 @@ public class TempGroup extends AbstractEntity {
     @Setter
     private Long practiceId;
 
+    @Column(name = "class_id")
+    @Getter
+    @Setter
+    private Long classId;
+
+    @Column(name = "stu_id")
+    @Getter
+    @Setter
+    private Long stuId;
+
 
     public TempGroup() {
 

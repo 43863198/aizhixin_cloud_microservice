@@ -68,6 +68,14 @@ public class Questions extends AbstractEntitytwo {
     @Setter
     private boolean radio;
 
+    /**
+     * 是否简答题
+     */
+    @Column(name = "is_qa")
+    @Getter
+    @Setter
+    private boolean isQA;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "questions")
     @Getter
     @Setter

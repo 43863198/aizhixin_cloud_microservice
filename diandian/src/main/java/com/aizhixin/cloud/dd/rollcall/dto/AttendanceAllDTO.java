@@ -21,4 +21,5 @@ public class AttendanceAllDTO {
     private String courseId;
     private String scheduleId;
     private String scheduleRollCallId;
+    private Boolean isPublicLeave;
 }

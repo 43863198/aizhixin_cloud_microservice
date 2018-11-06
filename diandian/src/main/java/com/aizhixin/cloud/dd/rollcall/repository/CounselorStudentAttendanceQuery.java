@@ -26,7 +26,7 @@ public class CounselorStudentAttendanceQuery {
         String sql = " SELECT   dr.`STUDENT_ID`,  dr.`STUDENT_NUM`,  dr.`STUDENT_NAME`," +
                 " SUM(    IF(dr.`TYPE` = 1, 1, IF(dr.`TYPE` = 4, 1, 0))  ) AS normal," +
                 " SUM(IF(dr.`TYPE` = 2,1,IF(dr.`TYPE` = 3, 1, IF(dr.`TYPE` = 5, 1, 0)))) AS exception" +
-                " FROM  dd_rollcall dr WHERE dr.delete_flag=0";
+                " FROM  dd_rollcall dr WHERE dr.delete_flag=0 AND dr.TYPE < 9";
 
         if (classId != null && classId > 0) {
             sql += " and dr.`CLASS_ID` ='" + classId + "'";
@@ -66,7 +66,7 @@ public class CounselorStudentAttendanceQuery {
         String sql = " SELECT   dr.`CLASS_ID`,dr.`class_name`,dr.semester_id," +
                 " SUM(    IF(dr.`TYPE` = 1, 1, IF(dr.`TYPE` = 4, 1, 0))  ) AS normal," +
                 " COUNT(1) AS total" +
-                " FROM  dd_rollcall dr WHERE dr.`CLASS_ID` IN (#classIds#) #semesterId# " +
+                " FROM  dd_rollcall dr WHERE dr.TYPE < 9 AND dr.`CLASS_ID` IN (#classIds#) #semesterId# " +
                 " GROUP BY dr.`CLASS_ID` order by dr.class_id asc";
 
         if (classIds != null) {

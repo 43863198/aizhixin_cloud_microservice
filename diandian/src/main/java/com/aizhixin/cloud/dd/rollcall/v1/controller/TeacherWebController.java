@@ -16,6 +16,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
@@ -419,11 +420,12 @@ public class TeacherWebController {
             cellt.setCellValue("学生考勤明细表");
 
             XSSFCellStyle cellStyle = wb.createCellStyle();
-            cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 居中
+            cellStyle.setAlignment(HorizontalAlignment.CENTER);
+//            cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 居中
 
             XSSFFont font = wb.createFont();
             font.setFontName("仿宋_GB2312");
-            font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);// 粗体显示
+            font.setBold(true);// 粗体显示
             font.setFontHeightInPoints((short)12);
             cellStyle.setFont(font);
             cellt.setCellStyle(cellStyle);

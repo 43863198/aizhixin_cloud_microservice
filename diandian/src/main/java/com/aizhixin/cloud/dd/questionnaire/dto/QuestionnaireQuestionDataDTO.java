@@ -17,6 +17,7 @@ public class QuestionnaireQuestionDataDTO {
 	private String score;
 	//试题平均分
 	private String avgScore;
+	private boolean isQA;
 	//试题选项
 	private List<QuestionnaireQuestionChoiceDTO> choices=new ArrayList<>();
 }

@@ -38,4 +38,6 @@ public class RollCallDTO {
 	private Boolean rollCall = false;
 
 	private Boolean classroomrollcall = false;
+
+	private Boolean isPublicLeave = false;
 }

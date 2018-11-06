@@ -18,7 +18,7 @@ public class RollCallMapUtil {
     private static ConcurrentHashMap <String, Map <Long, LocaltionDTO>> map_1 = new ConcurrentHashMap();
     private static ConcurrentHashMap <String, Map <Long, LocaltionDTO>> map_2 = new ConcurrentHashMap();
 
-    public static void setValue(String scheduleKey, Long studentId, LocaltionDTO dto) {
+    public static void setValue1(String scheduleKey, Long studentId, LocaltionDTO dto) {
         Map <String, Map <Long, LocaltionDTO>> map = null;
         if (status.get()) {
             map = map_1;
@@ -33,7 +33,7 @@ public class RollCallMapUtil {
         map.put(scheduleKey, tempMap);
     }
 
-    public static ConcurrentHashMap getMap() {
+    public static ConcurrentHashMap getMap1() {
         if (status.get()) {
             status.set(Boolean.FALSE);
             return map_1;

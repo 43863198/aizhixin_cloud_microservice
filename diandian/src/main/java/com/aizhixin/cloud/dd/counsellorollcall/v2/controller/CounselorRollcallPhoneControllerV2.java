@@ -1,8 +1,10 @@
 package com.aizhixin.cloud.dd.counsellorollcall.v2.controller;
 
 import com.aizhixin.cloud.dd.common.utils.TokenUtil;
+import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallGroupDTO;
 import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallGroupDTOV2;
 import com.aizhixin.cloud.dd.counsellorollcall.dto.CounRollcallRuleDTO;
+import com.aizhixin.cloud.dd.counsellorollcall.v1.service.TempGroupService;
 import com.aizhixin.cloud.dd.counsellorollcall.v2.service.CounselorRollcallStudentService;
 import com.aizhixin.cloud.dd.counsellorollcall.v2.service.CounselorRollcallTeacherService;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
@@ -29,6 +31,49 @@ public class CounselorRollcallPhoneControllerV2 {
     private CounselorRollcallTeacherService teacherService;
     @Autowired
     private CounselorRollcallStudentService studentService;
+    @Autowired
+    private TempGroupService tempGroupService;
+
+    /**
+     * 导员点名组查询
+     */
+    @RequestMapping(value = "/student/listCounsellorGroup", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "导员点名组查询", response = Void.class, notes = "导员点名组查询<br>@author hsh")
+    public ResponseEntity<?> listCounsellorGroup(@RequestHeader("Authorization") String accessToken) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(tempGroupService.listCounsellorGroupByStu(account.getOrganId(), account.getId()), HttpStatus.OK);
+    }
+
+    /**
+     * 添加导员点名组
+     */
+    @RequestMapping(value = "/student/addCounsellorGroup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "POST", value = "添加导员点名组", response = Void.class, notes = "添加导员点名组<br>@author hsh")
+    public ResponseEntity<?> addCounsellorGroup(@ApiParam(value = "counRollcallGroupDTO 导员点名") @RequestBody CounRollcallGroupDTOV2 counRollcallGroupDTO,
+                                                @RequestHeader("Authorization") String accessToken) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(teacherService.saveTempGroupByStu(account.getOrganId(), account.getId(), counRollcallGroupDTO), HttpStatus.OK);
+    }
+
+    /**
+     * 修改导员点名组
+     */
+    @RequestMapping(value = "/student/updateCounsellorGroup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "POST", value = "修改导员点名组", response = Void.class, notes = "修改导员点名组<br>@author hsh")
+    public ResponseEntity<?> updateCounsellorGroup(@ApiParam(value = "counRollcallGroupDTO 导员点名") @RequestBody CounRollcallGroupDTOV2 counRollcallGroupDTO,
+                                                   @RequestHeader("Authorization") String accessToken) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(teacherService.updateTempGroupByStu(account.getId(), counRollcallGroupDTO), HttpStatus.OK);
+    }
 
     /**
      * 学生查询导员点名列表
@@ -174,7 +219,7 @@ public class CounselorRollcallPhoneControllerV2 {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(teacherService.saveTempGroup(account, counRollcallGroupDTO), HttpStatus.OK);
+        return new ResponseEntity(teacherService.saveTempGroupByTeacher(account, counRollcallGroupDTO), HttpStatus.OK);
     }
 
     /**

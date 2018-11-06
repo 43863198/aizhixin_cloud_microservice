@@ -71,7 +71,7 @@ public class CreditService {
         if (dto.getRatingStus() != null && dto.getRatingStus().size() > 0) {
             credit.setRatingStuCount(dto.getRatingStus().size());
             credit = creditRepository.save(credit);
-            List<UserInfo> userInfos = userInfoRepository.findByUserIdIn(dto.getRatingStus());
+            List<UserInfo> userInfos = userInfoRepository.findByUserIdInAndUserType(dto.getRatingStus(), UserType.B_STUDENT.getState());
             if (userInfos != null && userInfos.size() > 0) {
                 Map<Long, CreditClass> classMap = new HashMap<>();
                 Set<CreditRatingPerson> personSet = new HashSet<>();
@@ -190,7 +190,7 @@ public class CreditService {
             List<CreditClass> addClassList = new ArrayList<>();
             List<CreditClass> delClassList = new ArrayList<>();
 
-            List<UserInfo> userInfos = userInfoRepository.findByUserIdIn(dto.getRatingStus());
+            List<UserInfo> userInfos = userInfoRepository.findByUserIdInAndUserType(dto.getRatingStus(), UserType.B_STUDENT.getState());
             Map<Long, UserInfo> stuMap = new HashMap<>();
             if (userInfos != null && userInfos.size() > 0) {
                 for (UserInfo stu : userInfos) {
@@ -375,7 +375,9 @@ public class CreditService {
                             CreditRatingPersonDomain pd = new CreditRatingPersonDomain();
                             BeanUtils.copyProperties(p, pd);
                             UserInfo u = userInfoMap.get(p.getStuId());
-                            BeanUtils.copyProperties(u, pd);
+                            if (u != null) {
+                                BeanUtils.copyProperties(u, pd);
+                            }
                             pd.setUserId(p.getStuId());
                             pd.setName(p.getStuName());
                             personDomains.add(pd);
@@ -503,6 +505,36 @@ public class CreditService {
             CreditStudent cs = list.get(0);
             cs.setAvgScore(score);
             studentRepository.save(cs);
+        }
+    }
+
+    @Transactional
+    public void updateCreditStudentRecordScore(Long creditId, Long stuId, Long quesId, String scoreStr) {
+        List<CreditStudentRecord> recordList = studentRecordRepository.findByCreditIdAndStuIdAndDeleteFlag(creditId, stuId, DataValidity.VALID.getState());
+        if (recordList != null && recordList.size() > 0) {
+            BigDecimal totalScore = new BigDecimal(0);
+            for (CreditStudentRecord record : recordList) {
+                if (record.getQuesId().longValue() == quesId.longValue()) {
+                    record.setScores(scoreStr);
+                    String[] scores = scoreStr.replaceAll("分", "").split(",");
+                    BigDecimal ts = new BigDecimal(0);
+                    BigDecimal tc = new BigDecimal(scores.length);
+
+                    for (String score : scores) {
+                        ts = ts.add(new BigDecimal(Float.parseFloat(score)));
+                    }
+                    BigDecimal ta = ts.divide(tc, 1, BigDecimal.ROUND_HALF_UP);
+                    record.setAvgScore(ta.floatValue());
+                    studentRecordRepository.save(record);
+                }
+                totalScore = totalScore.add(new BigDecimal(record.getAvgScore()));
+            }
+            List<CreditStudent> list = studentRepository.findByCreditIdAndStuIdAndDeleteFlag(creditId, stuId, DataValidity.VALID.getState());
+            if (list != null && list.size() > 0) {
+                CreditStudent cs = list.get(0);
+                cs.setAvgScore(totalScore.floatValue());
+                studentRepository.save(cs);
+            }
         }
     }
 

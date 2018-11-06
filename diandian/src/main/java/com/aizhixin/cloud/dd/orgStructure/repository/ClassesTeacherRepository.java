@@ -9,4 +9,5 @@ import com.aizhixin.cloud.dd.orgStructure.entity.ClassesTeacher;
 public interface ClassesTeacherRepository extends MongoRepository<ClassesTeacher, String>{
 	public void deleteByClassesId(Long classesId);
 	public List<ClassesTeacher> findByUserId(Long userId);
+	public List<ClassesTeacher> findByClassesId(Long classesId);
 }

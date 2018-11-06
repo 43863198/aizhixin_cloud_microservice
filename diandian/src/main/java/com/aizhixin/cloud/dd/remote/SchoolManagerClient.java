@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * hsh
+ * hsh mvn install -Dmaven.test.skip=true
  */
 //@FeignClient(name="school-manager", url="http://gateway.aizhixintest.com:80/school-manager")
 @FeignClient("school-manager")

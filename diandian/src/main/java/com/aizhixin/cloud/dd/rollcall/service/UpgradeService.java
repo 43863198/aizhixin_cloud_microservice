@@ -36,7 +36,7 @@ import com.aizhixin.cloud.dd.rollcall.utils.FtpUtil;
 public class UpgradeService {
 
     private final Logger log = LoggerFactory.getLogger(UpgradeService.class);
-    
+
     @Autowired
     private UpgradeRepository upgradeRepository;
 
@@ -46,24 +46,19 @@ public class UpgradeService {
     private static FTPClient ftp;
 
     public Object upgradeApk(String version, String versionDescrip,
-                             String type, String role, MultipartFile mulFile, String isRequired) {
+                             String type, String role, MultipartFile mulFile, String isRequired, String isRemind) {
 
         Map result = new HashMap();
         Upgrade upgrade = new Upgrade();
         try {
             // 获取FTP地址，将apk上传到ftp服务器，返回 下载地址
-            String ipAddr = env.getProperty("ftp.ipAddr", String.class,
-                    "172.16.23.30");
-            int port = Integer.parseInt(env.getProperty("ftp.port",
-                    String.class, "21"));
-            String userName = env.getProperty("ftp.userName", String.class,
-                    "admin");
-            String password = env.getProperty("ftp.password", String.class,
-                    "admin");
+            String ipAddr = env.getProperty("ftp.ipAddr", String.class, "172.16.23.30");
+            int port = Integer.parseInt(env.getProperty("ftp.port", String.class, "21"));
+            String userName = env.getProperty("ftp.userName", String.class, "admin");
+            String password = env.getProperty("ftp.password", String.class, "admin");
             String path = "";
             if (UpgradeConstants.UPGRADE_ANDROID.equals(type)) {
-                path = env.getProperty("ftp.androidPath", String.class,
-                        "Android");
+                path = env.getProperty("ftp.androidPath", String.class, "Android");
             } else {
                 path = env.getProperty("ftp.iosPath", String.class, "ios");
             }
@@ -79,15 +74,12 @@ public class UpgradeService {
             FtpUtil.upload(file);
             FtpUtil.closeFtp();
             file.delete();
-            String downloadPath = env.getProperty("ftp.downloadPath",
-                    String.class, "");
+            String downloadPath = env.getProperty("ftp.downloadPath", String.class, "");
             if (StringUtils.isBlank(downloadPath)) {
-                downloadPath = "ftp://" + ipAddr + ":" + port + "/" + path
-                        + "/" + name;
+                downloadPath = "ftp://" + ipAddr + ":" + port + "/" + path + "/" + name;
             } else {
                 downloadPath += name;
             }
-
             upgrade.setBuildNumber(buildNum);
             upgrade.setVersion(version);
             upgrade.setVersionDescrip(versionDescrip);
@@ -96,6 +88,7 @@ public class UpgradeService {
             upgrade.setDownloadUrl(downloadPath);
             upgrade.setDeleteFlag(DataValidity.VALID.getState());
             upgrade.setIsRequired("yes".equals(isRequired) ? true : false);
+            upgrade.setIsRemind("yes".equals(isRemind) ? true : false);
             upgradeRepository.save(upgrade);
             result.put("trueMSG", true);
         } catch (Exception e) {
@@ -109,12 +102,12 @@ public class UpgradeService {
     }
 
     @Cacheable(value = "CACHE.VERSIONINFO", key = "#role +'_'+ #type")
-    public Map <String, Object> getLatestVersionInfo(String type, String role) {
+    public Map<String, Object> getLatestVersionInfo(String type, String role) {
         Integer buildNum = upgradeRepository.findMaxBuildNumAnd(type, role);
         if (null == buildNum) {
             return null;
         }
-        Map <String, Object> result = new HashMap <String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>();
         try {
             Upgrade upgrade = upgradeRepository
                     .findOneByTypeAndRoleAndBuildNumberAndDeleteFlag(type,
@@ -124,6 +117,7 @@ public class UpgradeService {
                 result.put("version", upgrade.getVersion());
                 result.put("url", upgrade.getDownloadUrl());
                 result.put("versionDescrip", upgrade.getVersionDescrip());
+                result.put("isRemind", upgrade.getIsRemind());
             } else {
                 result.put("version", "there is no upgrade !");
             }

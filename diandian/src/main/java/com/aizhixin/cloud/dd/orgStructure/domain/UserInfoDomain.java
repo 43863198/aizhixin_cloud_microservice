@@ -16,4 +16,5 @@ public class UserInfoDomain {
 	private String profName;
 	private String orgName;
 	private Integer teacherType;
+	private Boolean isMonitor;
 }

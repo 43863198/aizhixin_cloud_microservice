@@ -21,24 +21,44 @@ public class QuestionnaireAssginStudentsJdbc {
 
     @Transactional
     public void insertQuestionnaireAssgin(List<QuestionnaireAssginStudentsDomain> qal) {
-        String sql = "insert into `dd_questionnaire_assgin_students` (`QUESTIONNAIRE_ASSGIN_ID`, `STUDENT_ID`, `STUDENT_NAME`, `CLASSES_ID`, `CLASSES_NAME`,  `STATUS`) values(?,?,?,?,?,?)";
-        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement arg0, int arg1) throws SQLException {
-                arg0.setLong(1, qal.get(arg1).getQuestionnaireAssginId());
-                arg0.setLong(2, qal.get(arg1).getStuId());
-                arg0.setString(3, qal.get(arg1).getStuName());
-                arg0.setLong(4, qal.get(arg1).getClassesId());
-                arg0.setString(5, qal.get(arg1).getClassesName());
-                arg0.setInt(6, qal.get(arg1).getStatus());
+        int size = 300;
+        int count = qal.size() / size;
+        if (qal.size() % size != 0) {
+            count++;
+        }
+        for (int i = 0; i < count; i++) {
+            String sql = "insert into `dd_questionnaire_assgin_students` (`QUESTIONNAIRE_ASSGIN_ID`, `STUDENT_ID`, `STUDENT_NAME`, `CLASSES_ID`, `CLASSES_NAME`,  `STATUS`) values ";
+            int index = i * size;
+            int endindex = (i + 1) * size;
+            if (i == count - 1) {
+                endindex = qal.size();
             }
-
-            @Override
-            public int getBatchSize() {
-
-                return qal.size();
+            for (; index < endindex; index++) {
+                QuestionnaireAssginStudentsDomain d = qal.get(index);
+                sql += "(" + d.getQuestionnaireAssginId() + "," + d.getStuId() + ",'" + d.getStuName() + "'," + d.getClassesId() + ",'" + d.getClassesName() + "'," + d.getStatus() + "),";
             }
-        });
+            sql = sql.substring(0, sql.length() - 1);
+            jdbcTemplate.execute(sql);
+        }
+//        String sql = "insert into `dd_questionnaire_assgin_students` (`QUESTIONNAIRE_ASSGIN_ID`, `STUDENT_ID`, `STUDENT_NAME`, `CLASSES_ID`, `CLASSES_NAME`,  `STATUS`) values(?,?,?,?,?,?)";
+//        int[] result = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+//            @Override
+//            public void setValues(PreparedStatement arg0, int arg1) throws SQLException {
+//                arg0.setLong(1, qal.get(arg1).getQuestionnaireAssginId());
+//                arg0.setLong(2, qal.get(arg1).getStuId());
+//                arg0.setString(3, qal.get(arg1).getStuName());
+//                arg0.setLong(4, qal.get(arg1).getClassesId());
+//                arg0.setString(5, qal.get(arg1).getClassesName());
+//                arg0.setInt(6, qal.get(arg1).getStatus());
+//            }
+//
+//            @Override
+//            public int getBatchSize() {
+//
+//                return qal.size();
+//            }
+//        });
+//        System.out.println(result);
     }
 
     public Map<String, Object> findAlertByNoCommitStudent(Long userId, Long orgId, String date, String role) {

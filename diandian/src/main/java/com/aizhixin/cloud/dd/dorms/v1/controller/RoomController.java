@@ -226,6 +226,7 @@ public class RoomController {
             @ApiParam(value = "isAssignment 是否分配", required = false) @RequestParam(value = "isAssignment", required = false) Boolean isAssignment,
             @ApiParam(value = "profId 专业id", required = false) @RequestParam(value = "profId", required = false) Long profId,
             @ApiParam(value = "no 宿舍号", required = false) @RequestParam(value = "no", required = false) String no,
+            @ApiParam(value = "年级", required = false) @RequestParam(value = "grade", required = false) String grade,
             @ApiParam(value = "pageNumber 起始页", required = false) @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @ApiParam(value = "pageSize 分页大小", required = false) @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @ApiParam(value = "floorIds 楼栋id集合", required = false) @RequestParam(value = "floorIds", required = false) List<Long> floorIds,
@@ -244,7 +245,7 @@ public class RoomController {
             pageSize = 10;
         }
         result = roomService.findByRoom(account.getOrganId(), floorIds, unitNo, floorNo, full, open, isAssignment, profId, no,
-                pageNumber, pageSize, result);
+                pageNumber, pageSize, result, grade);
         return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
     }
 

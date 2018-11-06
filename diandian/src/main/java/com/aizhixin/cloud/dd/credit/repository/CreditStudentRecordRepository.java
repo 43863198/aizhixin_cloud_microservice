@@ -9,7 +9,7 @@ import java.util.Set;
 public interface CreditStudentRecordRepository extends JpaRepository<CreditStudentRecord, Long> {
     public List<CreditStudentRecord> findByCreditIdAndStuIdAndDeleteFlag(Long creditId, Long stuId, Integer deleteFlag);
 
-    public List<CreditStudentRecord> findByCreditIdAndStuIdInAndDeleteFlag(Long creditId, Set<Long> stuIds, Integer deleteFlag);
+    public List<CreditStudentRecord> findByCreditIdAndStuIdInAndQuesIdAndDeleteFlag(Long creditId, Long stuId, Long quesId, Integer deleteFlag);
 
     public List<CreditStudentRecord> findByCreditIdAndDeleteFlag(Long creditId, Integer deleteFlag);
 }

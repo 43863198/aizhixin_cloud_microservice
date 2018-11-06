@@ -4,6 +4,9 @@
 package com.aizhixin.cloud.orgmanager.company.service;
 
 import com.aizhixin.cloud.orgmanager.classschedule.domain.TeachStudentDomain;
+import com.aizhixin.cloud.orgmanager.classschedule.entity.TeachingClassClasses;
+import com.aizhixin.cloud.orgmanager.classschedule.entity.TeachingClassStudents;
+import com.aizhixin.cloud.orgmanager.classschedule.repository.TeachingClassClassesRepository;
 import com.aizhixin.cloud.orgmanager.classschedule.service.TeachingClassStudentsService;
 import com.aizhixin.cloud.orgmanager.common.PageData;
 import com.aizhixin.cloud.orgmanager.common.PageDomain;
@@ -23,6 +26,7 @@ import com.aizhixin.cloud.orgmanager.company.core.RollCallType;
 import com.aizhixin.cloud.orgmanager.company.core.UserType;
 import com.aizhixin.cloud.orgmanager.company.domain.*;
 import com.aizhixin.cloud.orgmanager.company.domain.excel.*;
+import com.aizhixin.cloud.orgmanager.company.dto.UpdateStudentTeachingClassDTO;
 import com.aizhixin.cloud.orgmanager.company.entity.*;
 import com.aizhixin.cloud.orgmanager.company.repository.UserRepository;
 import com.aizhixin.cloud.orgmanager.remote.PayCallbackService;
@@ -115,6 +119,8 @@ public class UserService {
     private PayCallbackService payCallbackService;
     @Autowired
     private DataSynService dataSynService;
+    @Autowired
+    private TeachingClassClassesRepository teachingClassClassesRepository;
 
     /**
      * 保存实体
@@ -811,6 +817,7 @@ public class UserService {
             u.setUserType(user.getUserType());
             u.setIdNumber(user.getIdNumber());
             u.setStudentSource(user.getStudentSource());
+            u.setIsMonitor(user.getIsMonitor());
             if (null != user.getProfessional()) {
                 u.setProfessionalId(user.getProfessional().getId());
                 u.setProfessionalName(user.getProfessional().getName());
@@ -1057,7 +1064,8 @@ public class UserService {
         user.setCreatedBy(ud.getUserId());
         user.setLastModifiedBy(ud.getUserId());
         user = save(user);
-
+        List<UpdateStudentTeachingClassDTO> updateStudentTeachingClassDTOList = new ArrayList<>();
+        updateStudentTeachingClassDTOList.add(new UpdateStudentTeachingClassDTO(user.getId(), null, user.getClasses()));
         UserRole role = new UserRole();
         role.setUser(user);
         role.setRoleGroup(roleConfig.getRoleGroup2B());
@@ -1065,6 +1073,7 @@ public class UserService {
         userRoleService.save(role);
 
         baseDataCacheService.cacheUser(initBatchCommitUserReturnData(user, roleConfig.getRoleGroup2B(), roleConfig.getRoleStudent2B()));
+        updateStudentTeachingClass(updateStudentTeachingClassDTOList);
         return user;
     }
 
@@ -1156,7 +1165,7 @@ public class UserService {
         StringBuilder chql
                 = new StringBuilder("select count(c.id) from com.aizhixin.cloud.orgmanager.company.entity.User c join c.classes join c.professional join c.college where c.deleteFlag = :deleteFlag and c.userType = :userType");
         StringBuilder hql = new StringBuilder(
-                "select new com.aizhixin.cloud.orgmanager.company.domain.StudentDomain (c.id, c.name, c.phone, c.email, c.jobNumber, c.sex, c.classes.id, c.classes.name, c.professional.id, c.professional.name, c.college.id, c.college.name) from com.aizhixin.cloud.orgmanager.company.entity.User c where c.deleteFlag = :deleteFlag and c.userType = :userType");
+                "select new com.aizhixin.cloud.orgmanager.company.domain.StudentDomain (c.id, c.name, c.phone, c.email, c.jobNumber, c.sex, c.classes.id, c.classes.name, c.professional.id, c.professional.name, c.college.id, c.college.name, c.isMonitor) from com.aizhixin.cloud.orgmanager.company.entity.User c where c.deleteFlag = :deleteFlag and c.userType = :userType");
 
         if (!StringUtils.isEmpty(name)) {
             hql.append(" and (c.name like :name or c.jobNumber like :name)");
@@ -1562,26 +1571,53 @@ public class UserService {
         if (students.size() != studentdIds.size()) {
             throw new CommonException(ErrorCode.ID_IS_REQUIRED, "根据学生ID列表，查找不到部分学生的信息");
         }
-
+        List<UpdateStudentTeachingClassDTO> datas = new ArrayList<>();
         for (User student : students) {
+            datas.add(new UpdateStudentTeachingClassDTO(student.getId(), student.getClasses(), classes));
             student.setClasses(classes);
             student.setProfessional(classes.getProfessional());
             student.setCollege(classes.getCollege());
         }
         save(students);
+        updateStudentTeachingClass(datas);
         //清理缓存
         for (User student : students) {
             baseDataCacheService.deleteUser(student.getId());
         }
     }
 
-    public Boolean changeProf(Long stuId, Long profId){
+    public void updateStudentTeachingClass(List<UpdateStudentTeachingClassDTO> list) {
+        if (list != null && list.size() > 0) {
+            for (UpdateStudentTeachingClassDTO dto : list) {
+                //delete old
+                if (dto.getOldClass() != null) {
+                    List<TeachingClassClasses> oldClassList = teachingClassClassesRepository.findByClasses(dto.getOldClass());
+                    if (oldClassList != null && oldClassList.size() > 0) {
+                        for (TeachingClassClasses item : oldClassList) {
+                            teachingClassStudentsService.delete(item.getTeachingClass().getId(), dto.getStuId());
+                        }
+                    }
+                }
+                //add new
+                Set<Long> studentIds = new HashSet<>();
+                studentIds.add(dto.getStuId());
+                List<TeachingClassClasses> newClassList = teachingClassClassesRepository.findByClasses(dto.getNewClass());
+                if (newClassList != null && newClassList.size() > 0) {
+                    for (TeachingClassClasses item : newClassList) {
+                        teachingClassStudentsService.save(item.getTeachingClass(), studentIds);
+                    }
+                }
+            }
+        }
+    }
+
+    public Boolean changeProf(Long stuId, Long profId) {
         Professional professional = professionalService.findById(profId);
-        if(professional == null){
+        if (professional == null) {
             return false;
         }
         User user = userRepository.findByIdAndDeleteFlag(stuId, DataValidity.VALID.getState());
-        if(user == null){
+        if (user == null) {
             return false;
         }
         user.setProfessional(professional);
@@ -2515,6 +2551,8 @@ public class UserService {
         // 再次验证
         List<User> dataForAdd = new ArrayList<>();// 新增部分
         List<User> dataForUpdate = new ArrayList<>();// 修改部分
+        List<UpdateStudentTeachingClassDTO> updateStudentTeachingClassDTOList = new ArrayList<>();
+        Map<String, UpdateStudentTeachingClassDTO> updateStudentTeachingClassDTOMap = new HashMap<>();
         Map<String, User> studentForUpdateCache = new HashMap<>();// 修改学生数据的中间结果
         Map<String, StudentExcelDomain> cache = new HashMap<>();
         for (StudentExcelDomain d : excelDatas) {
@@ -2593,6 +2631,7 @@ public class UserService {
             roles.add(userRole);
             student.setIsChooseDormitory(Boolean.FALSE);
             dataSave.add(student);
+            updateStudentTeachingClassDTOMap.put(student.getJobNumber(), new UpdateStudentTeachingClassDTO(null, null, student.getClasses()));
         }
 
         for (User student : dataForUpdate) {
@@ -2606,7 +2645,7 @@ public class UserService {
                 if (StringUtils.isEmpty(student.getEmail()) && !StringUtils.isEmpty(user.getEmail())) {
                     student.setEmail(user.getEmail());
                 }
-
+                updateStudentTeachingClassDTOList.add(new UpdateStudentTeachingClassDTO(student.getId(), student.getClasses(), user.getClasses()));
                 student.setIdNumber(user.getIdNumber());
                 student.setClasses(user.getClasses());
                 student.setProfessional(user.getProfessional());
@@ -2631,15 +2670,13 @@ public class UserService {
             if (null != d) {
                 d.setId(c.getId());
             }
+            UpdateStudentTeachingClassDTO dto = updateStudentTeachingClassDTOMap.get(c.getJobNumber());
+            if (dto != null) {
+                dto.setStuId(c.getId());
+                updateStudentTeachingClassDTOList.add(dto);
+            }
         }
-
-        // List<UserDomain> cacheList = new ArrayList<>();
-        // for (User user : dataSave) {
-        // cacheList.add(initBatchCommitUserReturnData(user, roleConfig.getRoleGroup2B(), roleConfig.getRoleStudent2B()));
-        // }
-        // if (cacheList.size() > 0) {
-        // baseDataCacheService.cacheUser(cacheList);
-        // }
+        updateStudentTeachingClass(updateStudentTeachingClassDTOList);
     }
 
     @Transactional(readOnly = true)
@@ -3190,8 +3227,21 @@ public class UserService {
     public List<User> findProfIds(Set<Long> profIds) {
         return userRepository.findByProfessional_IdInAndDeleteFlagAndUserType(profIds, DataValidity.VALID.getState(), 70);
     }
-    
-    public List<TeachStudentDomain> findTeacherByIds(Set<Long> ids){
-    	return userRepository.findTeacherByIds(ids);
+
+    public List<TeachStudentDomain> findTeacherByIds(Set<Long> ids) {
+        return userRepository.findTeacherByIds(ids);
+    }
+
+    public Map<String, Object> setClassMonitor(Long stuId, Boolean isMonitor) {
+        Map<String, Object> result = new HashMap<>();
+        User user = userRepository.findOne(stuId);
+        if (user != null) {
+            user.setIsMonitor(isMonitor);
+            userRepository.save(user);
+            result.put(ApiReturnConstants.RESULT, true);
+        } else {
+            result.put(ApiReturnConstants.RESULT, false);
+        }
+        return result;
     }
 }

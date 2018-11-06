@@ -308,6 +308,7 @@ public class WebAttendanceController {
             @ApiParam(value = "教学班名称") @RequestParam(value = "teachingClassName", required = false) String teachingClassName,
             @ApiParam(value = "教师姓名") @RequestParam(value = "teacherName", required = false) String teacherName,
             @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
+            @ApiParam(value = "type") @RequestParam(value = "type", required = false) Integer type,
 
             @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
@@ -323,7 +324,7 @@ public class WebAttendanceController {
                 }
             }
         }
-        return attendanceRecordService.searchAttendance(orgId, collegeId, criteria, startTime, endTime, teachingClassName, teacherName, courseName, PageUtil.createNoErrorPageRequest(pageNumber, pageSize));
+        return attendanceRecordService.searchAttendance(orgId, collegeId, criteria, startTime, endTime, teachingClassName, teacherName, courseName, type, PageUtil.createNoErrorPageRequest(pageNumber, pageSize));
     }
 
     /**

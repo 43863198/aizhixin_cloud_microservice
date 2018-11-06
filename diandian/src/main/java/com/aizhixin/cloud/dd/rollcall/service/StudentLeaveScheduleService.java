@@ -82,18 +82,4 @@ public class StudentLeaveScheduleService {
         }
         return stList;
     }
-
-    public Boolean findByScheduleIdAndStudentId(Long scheduleId, Long studentId) {
-        List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findByScheduleIdAndStudentId(scheduleId, studentId);
-        if (null != list && list.size() > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public List<Long> findStudentIdByScheduleIdNoCache(Long scheduleId) {
-        return null;// studentLeaveScheduleRepository.findStudentIdByScheduleId(scheduleId);
-
-    }
-
 }

@@ -634,8 +634,9 @@ public class LeaveService {
                                                 if (null != rollCall) {
                                                     rollCall.setLastType(rollCall.getType());
                                                     if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                                        rollCall.setDeleteFlag(DataValidity.INVALID.getState());
-                                                        redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                        rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                                        rollCall.setIsPublicLeave(true);
+                                                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
                                                     } else {
                                                         rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                                         redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
@@ -652,8 +653,9 @@ public class LeaveService {
                                                 if (null != rollCall) {
                                                     rollCall.setLastType(rollCall.getType());
                                                     if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                                        rollCall.setDeleteFlag(DataValidity.INVALID.getState());
-                                                        redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                        rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                                        rollCall.setIsPublicLeave(true);
+                                                        redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
                                                     } else {
                                                         rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                                         redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
@@ -669,8 +671,9 @@ public class LeaveService {
                                             if (null != rollCall) {
                                                 rollCall.setLastType(rollCall.getType());
                                                 if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                                    rollCall.setDeleteFlag(DataValidity.INVALID.getState());
-                                                    redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                    rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                                    rollCall.setIsPublicLeave(true);
+                                                    redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
                                                 } else {
                                                     rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                                     redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
@@ -687,8 +690,9 @@ public class LeaveService {
                                         if (null != rollCall) {
                                             rollCall.setLastType(rollCall.getType());
                                             if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                                rollCall.setDeleteFlag(DataValidity.INVALID.getState());
-                                                redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                                rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                                rollCall.setIsPublicLeave(true);
+                                                redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
                                             } else {
                                                 rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                                 redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
@@ -710,7 +714,7 @@ public class LeaveService {
                         // 修改学生的签到状态
                         if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
                             if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                rollCallRepository.deleteByStudentIdAndScheduleRollcallIdIn(leave.getStudentId(), scheduleRollCallIds);
+                                rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_CANCEL_ROLLCALL, true, leave.getStudentId(), scheduleRollCallIds);
                             } else {
                                 rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
                             }
@@ -750,8 +754,9 @@ public class LeaveService {
                                     if (null != rollCall) {
                                         rollCall.setLastType(rollCall.getType());
                                         if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                                            rollCall.setDeleteFlag(DataValidity.INVALID.getState());
-                                            redisTemplate.opsForHash().delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId());
+                                            rollCall.setType(RollCallConstants.TYPE_CANCEL_ROLLCALL);
+                                            rollCall.setIsPublicLeave(true);
+                                            redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
                                         } else {
                                             rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                                             redisTemplate.opsForHash().put(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCall.getStudentId(), rollCall);
@@ -773,7 +778,7 @@ public class LeaveService {
                     // 修改学生的签到状态
                     if (null != scheduleRollCallIds && scheduleRollCallIds.size() > 0) {
                         if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
-                            rollCallRepository.deleteByStudentIdAndScheduleRollcallIdIn(leave.getStudentId(), scheduleRollCallIds);
+                            rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_CANCEL_ROLLCALL, true, leave.getStudentId(), scheduleRollCallIds);
                         } else {
                             rollCallRepository.updateRollCallByStudentIdAndScheduleRollCall(RollCallConstants.TYPE_ASK_FOR_LEAVE, leave.getStudentId(), scheduleRollCallIds);
                         }

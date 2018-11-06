@@ -59,6 +59,7 @@ public class UpgradeController {
             @ApiParam(value = "type ios/android") @RequestParam(value = "type", required = true) String type,
             @ApiParam(value = "role teacher/student") @RequestParam(value = "role", required = true) String role,
             @ApiParam(value = "isRequired yes/no") @RequestParam(value = "isRequired", required = true) String isRequired,
+            @ApiParam(value = "isRemind yes/no") @RequestParam(value = "isRemind", required = true) String isRemind,
             @ApiParam(value = "file 升级包") @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestHeader("Authorization") String accessToken) {
 
@@ -77,7 +78,7 @@ public class UpgradeController {
             resBody.put(ApiReturnConstants.MESSAGE, "role is error");
             return new ResponseEntity<Object>(resBody, HttpStatus.BAD_REQUEST);
         }
-        Object result = upgradeService.upgradeApk(version, versionDescrip, type, role, file, isRequired);
+        Object result = upgradeService.upgradeApk(version, versionDescrip, type, role, file, isRequired, isRemind);
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
 

@@ -53,7 +53,7 @@ public class CounselorRollcallPracticeController {
         account.setId(teacherId);
         account.setName(teacherName);
         account.setOrganId(orgId);
-        return new ResponseEntity(teacherService.saveTempGroup(account, counRollcallGroupDTO), HttpStatus.OK);
+        return new ResponseEntity(teacherService.saveTempGroupByTeacher(account, counRollcallGroupDTO), HttpStatus.OK);
     }
 
     /**
