@@ -217,8 +217,14 @@ public class DistributeLock {
         CuratorFramework client = CuratorFrameworkFactory.newClient(zkConnectString, new RetryNTimes(ZOOKEEPER_RETRY_TIMES, ZOOKEEPER_RETRY_SLEEP_TIMES));
         try {
             client.start();
-            client.delete().deletingChildrenIfNeeded().forPath(lockPath.toString());
-            client.delete().deletingChildrenIfNeeded().forPath(taskPath.toString());
+            try {
+                client.delete().deletingChildrenIfNeeded().forPath(lockPath.toString());
+            } catch (Exception e) {
+            }
+            try {
+                client.delete().deletingChildrenIfNeeded().forPath(taskPath.toString());
+            } catch (Exception e) {
+            }
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);

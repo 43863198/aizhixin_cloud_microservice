@@ -12,6 +12,7 @@ public class StudentAttendanceDTO implements Comparable<StudentAttendanceDTO> {
     private String type;
     private String signTime;
     private String distance;
+    private Boolean isPublicLeave = false;
 
     public int compareTo(StudentAttendanceDTO o) {
         if (null != jobNumber) {
