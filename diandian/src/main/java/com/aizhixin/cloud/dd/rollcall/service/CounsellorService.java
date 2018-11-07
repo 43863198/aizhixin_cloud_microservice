@@ -333,6 +333,7 @@ public class CounsellorService {
                                     studentAttendanceDTO.setType(rollcall.getType());
                                     studentAttendanceDTO.setSignTime(rollcall.getSignTime() == null ? "" : df.format(rollcall.getSignTime()));
                                     studentAttendanceDTO.setDistance(rollcall.getDistance() == null ? "" : rollcall.getDistance());
+                                    studentAttendanceDTO.setIsPublicLeave(rollcall.getIsPublicLeave());
                                     if (inClass) {
                                         if ("7".equals(rollcall.getType())) {
                                             uncommitStudent++;
@@ -494,6 +495,7 @@ public class CounsellorService {
                                     studentAttendanceDTO.setType(rollcall.getType());
                                     studentAttendanceDTO.setSignTime(rollcall.getSignTime() == null ? "" : df.format(rollcall.getSignTime()));
                                     studentAttendanceDTO.setDistance(rollcall.getDistance() == null ? "" : rollcall.getDistance());
+                                    studentAttendanceDTO.setIsPublicLeave(rollcall.getIsPublicLeave());
                                     if ("7".equals(rollcall.getType())) {
                                         uncommitStudent++;
                                     } else {
