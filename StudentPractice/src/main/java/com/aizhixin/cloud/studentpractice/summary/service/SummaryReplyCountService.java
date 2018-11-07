@@ -109,9 +109,9 @@ public class SummaryReplyCountService {
 			}
 			QueryCommentTotalDomain queryCountDTO = new QueryCommentTotalDomain();
 			queryCountDTO.setSourceIds(idList);
-			queryCountDTO.setModule(PushMessageConstants.MODULE_SUMMARY);
+			queryCountDTO.setModule(PushMessageConstants.MODULE_TASK);
 			HashMap<String, Integer> commentTotalMap = authUtilService
-					.getCommentTotalCount(queryCountDTO,PushMessageConstants.MODULE_SUMMARY);
+					.getCommentTotalCount(queryCountDTO,PushMessageConstants.MODULE_TASK);
 			if (null != commentTotalMap && !commentTotalMap.isEmpty()) {
 				for (SummaryReplyCount replyCount : list) {
 					if (null != commentTotalMap.get(replyCount.getId())) {
@@ -287,7 +287,7 @@ public class SummaryReplyCountService {
 			}
 			QueryCommentTotalDomain queryCountDTO = new QueryCommentTotalDomain();
 			queryCountDTO.setSourceIds(idList);
-			queryCountDTO.setModule(PushMessageConstants.MODULE_SUMMARY);
+			queryCountDTO.setModule(PushMessageConstants.MODULE_TASK);
 
 			HashMap<String, Integer> commentTotalMap = authUtilService
 					.getCommentTotalCount(queryCountDTO, token);

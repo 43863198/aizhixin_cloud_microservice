@@ -501,7 +501,13 @@ public class ScoreService {
 
 		String querySql = "SELECT pcd.SIGNIN_TOTAL_NUM,pcd.GROUP_NAME,ts.UNCOMMIT_NUM,ts.CHECK_PENDING_NUM,ts.BACK_TO_NUM,pcd.SIGNIN_TOTAL_NUM,pcd.LEAVE_NUM,pcd.DAILY_NUM,pcd.WEEKLY_NUM,pcd.MONTHLY_NUM,pcd.GROUP_ID,pcd.STUDENT_ID,pcd.JOB_NUM,pcd.STUDENT_NAME,pcd.SUMMARY_TOTAL_NUM,pcd.SIGNIN_NORMAL_NUM,pcd.REPORT_STATUS,ts.PASS_NUM,ts.AVG_SCORE FROM `sp_people_count_detail` pcd LEFT JOIN `sp_task_statistical` ts ON pcd.STUDENT_ID = ts.STUDENT_ID and pcd.GROUP_ID = ts.GROUP_ID where ts.STUDENT_ID = "+studentId+" and ts.GROUP_ID ="+groupId+" ";
 
-		return pageJdbcUtil.getInfo(querySql, scoreRm).get(0);
+		
+		List<ScoreDetailDomain> resultList = pageJdbcUtil.getInfo(querySql, scoreRm);
+		if(null != resultList && !resultList.isEmpty()){
+			return resultList.get(0);
+		}else{
+			return null;
+		}
 	}
 	
 }

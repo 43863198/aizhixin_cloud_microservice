@@ -68,7 +68,7 @@ public class QuerySummaryDomain {
 	@ApiModelProperty(value = "排序字段(SUMMARY_TYPE:类型(日报[daily]，周报[weekly]，月报[monthly]),PUBLISH_STATUS:布状态:公开[open],非公开]private,保存[save])", required = false)
 	private String sortField;
 	
-	@ApiModelProperty(value = "筛选类型:当天(1)一周(7)三个月(90)", required = false)
+	@ApiModelProperty(value = "筛选类型:当天(1)一周(7)一个月(30)", required = false)
 	private Integer dayNum;
 	
 	@ApiModelProperty(value = "创建者名称", required = false)

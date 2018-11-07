@@ -116,8 +116,8 @@ public class PushMessage extends AbstractEntity {
 	@Setter
 	private String reportId;
 	
-	@Column(name = "COMMIT_USER_NAME")
+	@Column(name = "GROUP_ID")
 	@Getter
 	@Setter
-	private String commitUserName;
+	private Long groupId;
 }

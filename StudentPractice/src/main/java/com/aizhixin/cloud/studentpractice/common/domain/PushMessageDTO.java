@@ -51,8 +51,8 @@ public class PushMessageDTO {
 	private String summaryId;
 	@ApiModelProperty(value = "实践报告id")
 	private String reportId;
-	@ApiModelProperty(value = "提交人姓名")
-	private String commitUserName;
+	@ApiModelProperty(value = "实践计划id")
+	private Long groupId;
 	
 	@ApiModelProperty(value = "消息接收人id集合")
     List<Long> userIds = new ArrayList<Long>();
