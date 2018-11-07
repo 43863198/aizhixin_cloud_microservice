@@ -858,9 +858,10 @@ public class ScheduleRollCallService {
         return false;
     }
 
-    public void save(ScheduleRollCall scheduleRollCall, Long scheduleId) {
-        scheduleRollCallRepository.save(scheduleRollCall);
+    public ScheduleRollCall save(ScheduleRollCall scheduleRollCall, Long scheduleId) {
+        scheduleRollCall = scheduleRollCallRepository.save(scheduleRollCall);
         redisTemplate.opsForValue().set(RedisUtil.getSchduleRollCallDominKey(scheduleId), scheduleRollCall, 1, TimeUnit.DAYS);
+        return scheduleRollCall;
     }
 
     public ScheduleRollCall findOne(Long id) {

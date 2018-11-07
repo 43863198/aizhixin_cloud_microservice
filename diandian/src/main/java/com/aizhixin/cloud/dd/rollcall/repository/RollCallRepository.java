@@ -46,6 +46,8 @@ public interface RollCallRepository extends JpaRepository<RollCall, Long> {
 
     public void deleteByStudentIdAndScheduleRollcallIdIn(Long studentId, Set<Long> scheduleRollCallIds);
 
+    public void deleteByScheduleRollcallId(Long scheduleRollCallId);
+
     List<RollCall> findByIdIn(Set<Long> ids);
 
     // List<RollCall> findByScheduleIdAndStudentId(Long scheduleId, Long

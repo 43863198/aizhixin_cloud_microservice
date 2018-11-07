@@ -1179,6 +1179,7 @@ public class RollCallService {
      * 补录考勤
      */
     public void additionaleRollcall(Long scheduleId, AccountDTO accountDTO) {
+        List list = new ArrayList();
         try {
             log.info("补录考勤开始!{}", scheduleId);
             Schedule schedule = scheduleService.findOne(scheduleId);
@@ -1196,7 +1197,7 @@ public class RollCallService {
             scheduleRollCall.setLocaltion("补录考勤");
             scheduleRollCall.setIsOpenRollcall(Boolean.TRUE);
             scheduleRollCall.setIsInClassroom(Boolean.FALSE);
-            scheduleRollCallService.save(scheduleRollCall, scheduleId);
+            scheduleRollCall = scheduleRollCallService.save(scheduleRollCall, scheduleId);
             Long teachingclassId = schedule.getTeachingclassId();
             Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
             Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
@@ -1205,8 +1206,6 @@ public class RollCallService {
                 log.info("根据教学班id获取学生列表信息为空!");
                 return;
             }
-//        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
-            List list = new ArrayList();
             for (StudentDTO dto : studentList) {
                 RollCall rollCall = new RollCall();
                 rollCall.setId(RedisUtil.getRollCallId());
@@ -1243,20 +1242,27 @@ public class RollCallService {
                 }
                 list.add(rollCall);
             }
+            rollCallRepository.deleteByScheduleRollcallId(scheduleRollCall.getId());
             list = rollCallRepository.save(list);
             schedule.setIsInitRollcall(Boolean.TRUE);
             scheduleService.save(schedule);
-            //保存修改记录
-            saveRollCallLog(list, accountDTO, "补录考勤");
             log.info("补录考勤结束!{}", scheduleId);
         } catch (Exception e) {
             log.warn("additionaleRollcallException", e);
         }
+        //保存修改记录
+        saveRollCallLog(list, accountDTO, "补录考勤");
     }
 
     @Async
     private void saveRollCallLog(List<RollCall> list, AccountDTO accountDTO, String type) {
-        modifyAttendanceLogService.modifyAttendances(list, accountDTO.getName(), accountDTO.getId(), type);
+        try {
+            if (!list.isEmpty()) {
+                modifyAttendanceLogService.modifyAttendances(list, accountDTO.getName(), accountDTO.getId(), type);
+            }
+        } catch (Exception e) {
+            log.warn("saveRollCallLogException", e);
+        }
     }
 
     /**
