@@ -380,11 +380,9 @@ public class ScheduleRollCallService {
                     for (StudentScheduleDTO dto : studentSignCourse) {
                         RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(dto.getScheduleRollCallId()), studentId);
                         if (rollCall != null) {
-                            dto.setType(rollCall.getType());
                             dto.setIsPublicLeave(rollCall.getIsPublicLeave());
-                            if (rollCall.getType() != null && rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
-                                dto.setCanReport(false);
-                            }
+                        } else {
+                            dto.setCanReport(false);
                         }
                     }
                 }
@@ -564,10 +562,6 @@ public class ScheduleRollCallService {
                         studentScheduleDTO.setHaveReport(rollCall.getHaveReport());
                         studentScheduleDTO.setSignTime(rollCall.getSignTime() == null ? "" : sdf.format(rollCall.getSignTime()));
                         studentScheduleDTO.setIsPublicLeave(rollCall.getIsPublicLeave());
-
-                        if (rollCall.getType() != null && rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL)) {
-                            studentScheduleDTO.setCanReport(false);
-                        }
                     } else {
                         studentScheduleDTO.setType(RollCallConstants.TYPE_UNCOMMITTED);
                         studentScheduleDTO.setRollcallType(scheduleRollCall.getRollCallType());
