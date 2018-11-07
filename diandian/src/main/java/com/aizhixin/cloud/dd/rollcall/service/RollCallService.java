@@ -1238,7 +1238,7 @@ public class RollCallService {
                 } else if (dto.getIsPrivateLeave()) {
                     rollCall.setType(RollCallConstants.TYPE_ASK_FOR_LEAVE);
                 } else {
-                    rollCall.setType(RollCallConstants.TYPE_UNCOMMITTED);
+                    rollCall.setType(RollCallConstants.TYPE_NORMA);
                 }
                 list.add(rollCall);
             }
