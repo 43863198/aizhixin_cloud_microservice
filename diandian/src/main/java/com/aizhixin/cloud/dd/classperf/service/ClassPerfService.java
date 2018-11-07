@@ -165,7 +165,12 @@ public class ClassPerfService {
         }
         if (score > teacher.getResidualScore()) {
             result.put(ApiReturnConstants.SUCCESS, false);
-            result.put(ApiReturnConstants.ERROR, "打分大于教师剩余分数");
+            result.put(ApiReturnConstants.ERROR, "打分大于教师剩余分数!");
+            return result;
+        }
+        if (dto.getStudentId() == null || dto.getStudentId() < 1) {
+            result.put(ApiReturnConstants.SUCCESS, false);
+            result.put(ApiReturnConstants.ERROR, "待评分学生必填!");
             return result;
         }
 
