@@ -3,7 +3,9 @@ package com.aizhixin.cloud.dd.orgStructure.v1.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.aizhixin.cloud.dd.orgStructure.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,47 +30,66 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("/api/web/v1")
 @Api(description = "手机端组织架构API手动刷新")
 public class SynDataController {
-	@Autowired
-	private DDUserService ddUserService;
-	@Autowired
-	private SynchronizedDataService  sds;
-	
-	@RequestMapping(value = "/org/synData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(httpMethod = "GET", value = "刷新组织架构数据", response = Void.class, notes = "刷新组织架构数据<br>@author xiagen")
-	public ResponseEntity<Map<String, Object>> synData(@RequestHeader("Authorization") String accessToken){
-		AccountDTO adt=	ddUserService.getUserInfoWithLogin(accessToken);
-		Map<String, Object> result=new HashMap<>();
-		if (null == adt) {
-			result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
-			result.put(ApiReturnConstants.CAUSE, "无权限");
-			return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
-		}
-		new Thread(){
-			public void run() {
-				sds.synData();
-			};
-		}.start();
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/org/synData/orgId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(httpMethod = "GET", value = "刷新一个学校组织架构数据", response = Void.class, notes = "刷新组织架构数据<br>@author xiagen")
-	public ResponseEntity<Map<String, Object>> synData(@RequestHeader("Authorization") String accessToken,
-		@ApiParam(value="orgId",required=true)@RequestParam(value="orgId",required=true)Long orgId
-			){
-		AccountDTO adt=	ddUserService.getUserInfoWithLogin(accessToken);
-		Map<String, Object> result=new HashMap<>();
-		if (null == adt) {
-			result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
-			result.put(ApiReturnConstants.CAUSE, "无权限");
-			return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
-		}
-		new Thread(){
-			public void run() {
-				sds.refOrg(orgId);
-			};
-		}.start();
-		return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-	}
-	
+    @Autowired
+    private DDUserService ddUserService;
+    @Autowired
+    private SynchronizedDataService sds;
+    @Autowired
+    private UserInfoService userInfoService;
+
+    @RequestMapping(value = "/org/synData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "刷新组织架构数据", response = Void.class, notes = "刷新组织架构数据<br>@author xiagen")
+    public ResponseEntity<Map<String, Object>> synData(@RequestHeader("Authorization") String accessToken) {
+        AccountDTO adt = ddUserService.getUserInfoWithLogin(accessToken);
+        Map<String, Object> result = new HashMap<>();
+        if (null == adt) {
+            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+            result.put(ApiReturnConstants.CAUSE, "无权限");
+            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
+        }
+        new Thread() {
+            public void run() {
+                sds.synData();
+            }
+
+            ;
+        }.start();
+        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/org/synData/orgId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "刷新一个学校组织架构数据", response = Void.class, notes = "刷新组织架构数据<br>@author xiagen")
+    public ResponseEntity<Map<String, Object>> synData(@RequestHeader("Authorization") String accessToken,
+                                                       @ApiParam(value = "orgId", required = true) @RequestParam(value = "orgId", required = true) Long orgId) {
+        AccountDTO adt = ddUserService.getUserInfoWithLogin(accessToken);
+        Map<String, Object> result = new HashMap<>();
+        if (null == adt) {
+            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+            result.put(ApiReturnConstants.CAUSE, "无权限");
+            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
+        }
+        new Thread() {
+            public void run() {
+                sds.refOrg(orgId);
+            }
+        }.start();
+        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/org/synData/updateStudentCache", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "更新学生缓存", response = Void.class, notes = "更新学生缓存<br>@author hsh")
+    public ResponseEntity<Map<String, Object>> updateStudentCache(@RequestHeader("Authorization") String accessToken,
+                                                                  @ApiParam(value = "orgId", required = true) @RequestParam(value = "orgId", required = true) Long orgId,
+                                                                  @ApiParam(value = "studentIds", required = true) @RequestParam(value = "studentIds", required = true) Set<Long> studentIds) {
+        Map<String, Object> result = new HashMap<>();
+        if (studentIds == null || studentIds.size() == 0) {
+            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+            result.put(ApiReturnConstants.CAUSE, "无数据");
+            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
+        }
+        userInfoService.updateStudentCache(orgId, studentIds);
+        result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
+        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+    }
+
 }

@@ -223,26 +223,6 @@ public class TeachersController {
         return new ResponseEntity<>(userService.queryTeacherByCollege(PageUtil.createNoErrorPageRequest(pageNumber, pageSize), collegeId, name), HttpStatus.OK);
     }
 
-
-    //	@RequestMapping(value = "/addall", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	@ApiOperation(httpMethod = "POST", value = "批量保存老师信息", response = Void.class, notes = "批量保存老师信息，仅用于数据同步<br><br><b>@author zhen.pan</b>")
-//	public List<TeacherDomain> addAll(
-//			@ApiParam(value = "<b>必填:name、jobNumber、sex、collegeCode、orgId、userId</b>") @RequestBody List<TeacherDomain> teacherDomains) {
-//		return userService.saveAllTeachers(teacherDomains);
-//	}
-//
-//	@RequestMapping(value = "/updateall", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-//	@ApiOperation(httpMethod = "PUT", value = "批量修改老师信息", response = Void.class, notes = "批量修改老师信息，仅用于数据同步<br><br><b>@author zhen.pan</b>")
-//	public List<TeacherDomain> updateAll(
-//			@ApiParam(value = "<b>必填:id、name、jobNumber、sex、collegeCode、orgId、userId</b>") @RequestBody List<TeacherDomain> teacherDomains) {
-//		return userService.updateAllTeachers(teacherDomains);
-//	}
-//
-//	@RequestMapping(value = "/deleteall", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-//	@ApiOperation(httpMethod = "DELETE", value = "批量删除老师信息", response = Void.class, notes = "批量删除老师信息，仅用于数据同步<br><br><b>@author zhen.pan</b>")
-//	public List<TeacherDomain> deleteAll(@ApiParam(value = "<b>必填:id、userId</b>") @RequestBody List<TeacherDomain> teacherDomains) {
-//		return userService.deleteAllTeachers(teacherDomains);
-//	}
     @RequestMapping(value = "/import", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "POST", value = "根据Excel模板批量导入老师信息", response = Void.class, notes = "根据Excel模板批量导入老师信息<br><br><b>@author panzhen</b>")
     public ResponseEntity<Void> imporTeacher(

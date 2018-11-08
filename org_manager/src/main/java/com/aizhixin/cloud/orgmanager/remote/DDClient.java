@@ -35,4 +35,20 @@ public class DDClient {
         }
 
     }
+
+    @Async
+    public void updateStuCache(Long orgId, Set<Long> studentIds) {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            logger.warn("updateStuCacheException", e);
+        }
+        try {
+            UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(diandianApi + "/org/synData/updateStudentCache").queryParam("orgId", orgId).queryParam("studentIds", studentIds).build();
+            restUtil.get(uriComponents.toString(), "111");
+        } catch (Exception e) {
+            logger.warn("updateStuCacheException", e);
+        }
+
+    }
 }

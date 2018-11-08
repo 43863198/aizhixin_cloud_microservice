@@ -7,6 +7,8 @@ import com.aizhixin.cloud.dd.orgStructure.entity.NewStudent;
 import com.aizhixin.cloud.dd.orgStructure.repository.NewStudentRepository;
 import com.aizhixin.cloud.dd.orgStructure.utils.UserType;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
+import com.aizhixin.cloud.dd.rollcall.dto.PeriodDTO;
+import com.aizhixin.cloud.dd.rollcall.service.PeriodService;
 import org.apache.catalina.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class UserInfoService {
     private OrgManagerRemoteClient orgManagerRemoteClient;
     @Autowired
     private RedisTokenStore redisTokenStore;
+    @Autowired
+    private PeriodService periodService;
 
     public Map<String, Object> setClassMonitor(Long stuId, Boolean isMonitor) {
         Map<String, Object> result = new HashMap<>();
@@ -76,7 +80,7 @@ public class UserInfoService {
         return d;
     }
 
-    public List<UserInfo> findByClassId(Long classId){
+    public List<UserInfo> findByClassId(Long classId) {
         return userInfoRepository.findByClassesIdAndUserType(classId, UserType.B_STUDENT.getState());
     }
 
@@ -124,7 +128,7 @@ public class UserInfoService {
      * @param result
      * @Title: findByNameLike
      * @Description: 按姓名、学院、专业、行政班搜索
-     * @return: Map<String               ,               Object>
+     * @return: Map<String                               ,                               Object>
      */
     public Map<String, Object> findByNameLike(Integer searchType, Integer pageNumber, Integer pageSize, Long sourseId, String name, Map<String, Object> result) {
         Pageable page = PageUtil.createNoErrorPageRequest(pageNumber, pageSize);
@@ -274,5 +278,14 @@ public class UserInfoService {
             }
         }
         return map;
+    }
+
+    public void updateStudentCache(Long orgId, Set<Long> studentIds) {
+        if (studentIds != null && studentIds.size() > 0) {
+            for (Long id : studentIds) {
+                List<PeriodDTO> scheduleList = periodService.findAllByOrganIdAndStatusV2(id, orgId, new Date());
+                redisTokenStore.setScheduleStudentToday(id, scheduleList);
+            }
+        }
     }
 }
