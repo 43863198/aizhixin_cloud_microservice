@@ -286,7 +286,7 @@ public class HomePagePhoneService {
 
             ScheduleRollCall scheduleRollCall = findBySchedule(schedule.getId());
             if (null != scheduleRollCall) {
-                if(!flag){
+                if (!flag) {
                     flag = scheduleRollCall.getIsInClassroom();
                 }
                 if (scheduleRollCall.getIsOpenRollcall()) {
@@ -330,13 +330,19 @@ public class HomePagePhoneService {
                     List<RollCall> rollCalls = null;
                     // 计算该节课的考勤率
                     rollCalls = listRollCallBySRCIdInRedis(scheduleRollCall.getId());
+                    if (rollCalls != null && rollCalls.size() > 0) {
+                        teacherScheduleDTO.setTotalStu(Long.valueOf(rollCalls.size()));
+                    }
                     teacherScheduleDTO.setAttendance(calculateAttendanceRollCall(rollCalls, organSet.getArithmetic() == null ? 10 : organSet.getArithmetic()));
                     teacherScheduleDTO.setRollcallStu(calculateRollCallStu(rollCalls, organSet.getArithmetic() == null ? 10 : organSet.getArithmetic()));
                 }
             } else {
                 teacherScheduleDTO.setClassrommRollCall(Boolean.FALSE);
-                if(scheduleRollCall != null){
+                if (scheduleRollCall != null) {
                     List<RollCall> rollCalls = rollCallRepository.findByScheduleRollcallId(scheduleRollCall.getId());
+                    if (rollCalls != null && rollCalls.size() > 0) {
+                        teacherScheduleDTO.setTotalStu(Long.valueOf(rollCalls.size()));
+                    }
                     teacherScheduleDTO.setRollcallStu(calculateRollCallStu(rollCalls, organSet.getArithmetic() == null ? 10 : organSet.getArithmetic()));
                 }
             }
