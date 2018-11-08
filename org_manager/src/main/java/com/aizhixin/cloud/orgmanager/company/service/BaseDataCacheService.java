@@ -198,6 +198,14 @@ public class BaseDataCacheService {
         return true;
     }
 
+    public void clearUsers(Set<Long> userIds) {
+        if (!userIds.isEmpty()) {
+            for (Long id : userIds) {
+                redisTemplate.opsForHash().delete(USER_KEY + (id % 20), id.toString());
+            }
+        }
+    }
+
     public void cacheUser(List<UserDomain> cs) {
         Map<Long, Map<String, UserDomain>> userMap = new HashMap<>();
         for (UserDomain c : cs) {

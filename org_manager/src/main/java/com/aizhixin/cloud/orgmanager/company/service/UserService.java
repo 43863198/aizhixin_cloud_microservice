@@ -29,6 +29,7 @@ import com.aizhixin.cloud.orgmanager.company.domain.excel.*;
 import com.aizhixin.cloud.orgmanager.company.dto.UpdateStudentTeachingClassDTO;
 import com.aizhixin.cloud.orgmanager.company.entity.*;
 import com.aizhixin.cloud.orgmanager.company.repository.UserRepository;
+import com.aizhixin.cloud.orgmanager.remote.DDClient;
 import com.aizhixin.cloud.orgmanager.remote.PayCallbackService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -121,6 +122,8 @@ public class UserService {
     private DataSynService dataSynService;
     @Autowired
     private TeachingClassClassesRepository teachingClassClassesRepository;
+    @Autowired
+    private DDClient ddClient;
 
     /**
      * 保存实体
@@ -940,8 +943,6 @@ public class UserService {
         }
 
         user.setUserType(UserType.B_TEACHER.getState());
-        // user.setPhone(ud.getPhone());
-        // user.setEmail(ud.getEmail());
         user.setJobNumber(ud.getJobNumber());
         user.setSex(ud.getSex());
         user.setName(ud.getName());
@@ -961,7 +962,7 @@ public class UserService {
         if (cts > 0) {
             d.addRole(RoleConfig.CLASSES_MASTER);
         }
-        baseDataCacheService.cacheUser(d);
+        baseDataCacheService.deleteUser(user.getId());
         /************************************************ 更新角色缓存 *******************************************************/
         return user;
     }
@@ -1056,8 +1057,6 @@ public class UserService {
         }
         user.setInSchoolDate(ud.getInSchoolDate());
         user.setUserType(UserType.B_STUDENT.getState());
-        // user.setPhone(ud.getPhone());
-        // user.setEmail(ud.getEmail());
         user.setJobNumber(ud.getJobNumber());
         user.setSex(ud.getSex());
         user.setName(ud.getName());
@@ -1092,6 +1091,8 @@ public class UserService {
                 throw new CommonException(ErrorCode.ID_NOT_FOUND_OBJECT, "根据班级ID[" + ud.getClass() + "]没有查找到对应的班级信息");
             }
         }
+        List<UpdateStudentTeachingClassDTO> updateStudentTeachingClassDTOList = new ArrayList<>();
+        updateStudentTeachingClassDTOList.add(new UpdateStudentTeachingClassDTO(user.getId(), user.getClasses(), classes));
         user.setClasses(classes);
         user.setProfessional(classes.getProfessional());
         user.setCollege(classes.getCollege());
@@ -1123,8 +1124,6 @@ public class UserService {
         }
         user.setInSchoolDate(ud.getInSchoolDate());
         user.setUserType(UserType.B_STUDENT.getState());
-        // user.setPhone(ud.getPhone());
-        // user.setEmail(ud.getEmail());
         user.setJobNumber(ud.getJobNumber());
         user.setSex(ud.getSex());
         user.setName(ud.getName());
@@ -1132,6 +1131,7 @@ public class UserService {
         user.setLastModifiedDate(new Date());
         user = save(user);
         baseDataCacheService.cacheUser(initBatchCommitUserReturnData(user, roleConfig.getRoleGroup2B(), roleConfig.getRoleStudent2B()));
+        updateStudentTeachingClass(updateStudentTeachingClassDTOList);
         return user;
     }
 
@@ -1588,12 +1588,17 @@ public class UserService {
 
     public void updateStudentTeachingClass(List<UpdateStudentTeachingClassDTO> list) {
         if (list != null && list.size() > 0) {
+            Set<Long> ids = new HashSet<>();
+            Long orgId = 0l;
             for (UpdateStudentTeachingClassDTO dto : list) {
                 //delete old
                 if (dto.getOldClass() != null) {
                     List<TeachingClassClasses> oldClassList = teachingClassClassesRepository.findByClasses(dto.getOldClass());
                     if (oldClassList != null && oldClassList.size() > 0) {
                         for (TeachingClassClasses item : oldClassList) {
+                            if (orgId == 0) {
+                                orgId = item.getOrgId();
+                            }
                             teachingClassStudentsService.delete(item.getTeachingClass().getId(), dto.getStuId());
                         }
                     }
@@ -1601,13 +1606,21 @@ public class UserService {
                 //add new
                 Set<Long> studentIds = new HashSet<>();
                 studentIds.add(dto.getStuId());
+                ids.add(dto.getStuId());
                 List<TeachingClassClasses> newClassList = teachingClassClassesRepository.findByClasses(dto.getNewClass());
                 if (newClassList != null && newClassList.size() > 0) {
                     for (TeachingClassClasses item : newClassList) {
+                        if (orgId == 0) {
+                            orgId = item.getOrgId();
+                        }
                         teachingClassStudentsService.save(item.getTeachingClass(), studentIds);
                     }
                 }
             }
+            //更新org缓存
+            baseDataCacheService.clearUsers(ids);
+            //更新点点缓存
+            ddClient.updateStuCache(orgId, ids);
         }
     }
 
