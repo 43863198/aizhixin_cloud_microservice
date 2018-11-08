@@ -261,9 +261,15 @@ public class LeaveServiceV2 {
                 l.setStatus(LeaveConstants.STATUS_REQUEST);
                 l.setStudentId(account.getId());
                 l.setStudentName(account.getName());
-                l.setStudentJobNum(stu.getJobNum());
-                l.setClassName(stu.getClassesName());
-                l.setOrgId(stu.getOrgId());
+                if (stu != null) {
+                    l.setStudentJobNum(stu.getJobNum());
+                    l.setClassName(stu.getClassesName());
+                    l.setOrgId(stu.getOrgId());
+                } else {
+                    l.setStudentJobNum(account.getPersonId());
+                    l.setClassName(account.getClassesName());
+                    l.setOrgId(account.getOrganId());
+                }
                 if (teacher != null) {
                     l.setTeacherJobNum(teacher.getJobNum());
                 }
@@ -295,9 +301,15 @@ public class LeaveServiceV2 {
                 l.setLeavePictureUrls(leavePictureUrls);
                 l.setStudentId(account.getId());
                 l.setStudentName(account.getName());
-                l.setStudentJobNum(stu.getJobNum());
-                l.setClassName(stu.getClassesName());
-                l.setOrgId(stu.getOrgId());
+                if (stu != null) {
+                    l.setStudentJobNum(stu.getJobNum());
+                    l.setClassName(stu.getClassesName());
+                    l.setOrgId(stu.getOrgId());
+                } else {
+                    l.setStudentJobNum(account.getPersonId());
+                    l.setClassName(account.getClassesName());
+                    l.setOrgId(account.getOrganId());
+                }
                 if (teacher != null) {
                     l.setTeacherJobNum(teacher.getJobNum());
                 }
@@ -341,9 +353,15 @@ public class LeaveServiceV2 {
                             l.setLeaveSchool(true);
                             l.setStudentId(account.getId());
                             l.setStudentName(account.getName());
-                            l.setStudentJobNum(stu.getJobNum());
-                            l.setClassName(stu.getClassesName());
-                            l.setOrgId(stu.getOrgId());
+                            if (stu != null) {
+                                l.setStudentJobNum(stu.getJobNum());
+                                l.setClassName(stu.getClassesName());
+                                l.setOrgId(stu.getOrgId());
+                            } else {
+                                l.setStudentJobNum(account.getPersonId());
+                                l.setClassName(account.getClassesName());
+                                l.setOrgId(account.getOrganId());
+                            }
                             if (user != null) {
                                 l.setTeacherJobNum(user.getJobNum());
                             }
@@ -390,9 +408,15 @@ public class LeaveServiceV2 {
                             l.setStatus(LeaveConstants.STATUS_REQUEST);
                             l.setStudentId(account.getId());
                             l.setStudentName(account.getName());
-                            l.setStudentJobNum(stu.getJobNum());
-                            l.setClassName(stu.getClassesName());
-                            l.setOrgId(stu.getOrgId());
+                            if (stu != null) {
+                                l.setStudentJobNum(stu.getJobNum());
+                                l.setClassName(stu.getClassesName());
+                                l.setOrgId(stu.getOrgId());
+                            } else {
+                                l.setStudentJobNum(account.getPersonId());
+                                l.setClassName(account.getClassesName());
+                                l.setOrgId(account.getOrganId());
+                            }
                             if (user != null) {
                                 l.setTeacherJobNum(user.getJobNum());
                             }
