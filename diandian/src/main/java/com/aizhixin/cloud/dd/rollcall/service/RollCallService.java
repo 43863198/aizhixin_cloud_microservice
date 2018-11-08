@@ -150,7 +150,6 @@ public class RollCallService {
         } else {
             authCode = scheduleRollCall.getLocaltion() == null ? "" : scheduleRollCall.getLocaltion();
         }
-
         List<RollCall> rollCallList = null;
         // 课堂内的签到数据在redis库中查询
         if (inClass || scheduleRollCall.getIsInClassroom()) {
@@ -174,9 +173,19 @@ public class RollCallService {
             return null;
         }
         if (StringUtils.isNotBlank(type)) {
-            rollCallList = Lists.newArrayList(Collections2.filter(rollCallList, (rollCall) -> {
-                return rollCall.getType().equals(type) ? true : false;
-            }));
+            if (type.equals("10")) {
+                rollCallList = Lists.newArrayList(Collections2.filter(rollCallList, (rollCall) -> {
+                    if (rollCall.getType().equals(RollCallConstants.TYPE_CANCEL_ROLLCALL) && rollCall.getIsPublicLeave() != null && rollCall.getIsPublicLeave()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }));
+            } else {
+                rollCallList = Lists.newArrayList(Collections2.filter(rollCallList, (rollCall) -> {
+                    return rollCall.getType().equals(type) ? true : false;
+                }));
+            }
         }
 
         if (StringUtils.isNotBlank(name)) {

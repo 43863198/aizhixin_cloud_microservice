@@ -102,7 +102,7 @@ public class TeacherPhoneResource {
             @ApiParam(value = "schedule_id 排课表id(必填)") @RequestParam(value = "schedule_id", required = true) Long schedule_id,
             @ApiParam(value = "name 名称 (模糊查询)") @RequestParam(value = "name", required = false) String name,
             @ApiParam(value = "isSchoolTime 是否上课时间") @RequestParam(value = "isSchoolTime", required = true) boolean isSchoolTime,
-            @ApiParam(value = "type 点名结果,1:已到；2：旷课；3：迟到；4：请假；5：早退(选填，不填则为全部)") @RequestParam(value = "type", required = false) String type,
+            @ApiParam(value = "type 点名结果,1:已到；2：旷课；3：迟到；4：请假；5：早退(选填，不填则为全部); 10:公假") @RequestParam(value = "type", required = false) String type,
             @RequestHeader("Authorization") String accessToken) {
 
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
