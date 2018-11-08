@@ -567,6 +567,7 @@ public class ScheduleRollCallService {
                         studentScheduleDTO.setRollcallType(scheduleRollCall.getRollCallType());
                         studentScheduleDTO.setRollCall(scheduleRollCall.getIsOpenRollcall());
                         studentScheduleDTO.setLocaltion(scheduleRollCall.getLocaltion());
+                        studentScheduleDTO.setCanReport(false);
                     }
                 }
                 tlist.add(studentScheduleDTO);
