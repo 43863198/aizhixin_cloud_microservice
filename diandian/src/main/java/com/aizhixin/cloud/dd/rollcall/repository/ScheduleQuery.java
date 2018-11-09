@@ -36,7 +36,7 @@ public class ScheduleQuery {
         String sql = " SELECT  * FROM  ( "
                 + " SELECT dsc.id,dsc.teachingclass_id,dsc.teachingclass_name,dsr.id as scheduleRollcallId,dsc.`WEEK_NAME`,dsc.`DAY_OF_WEEK`,dsc.`COURSE_NAME`,dsc.`TEACHER_NAME`,dsc.`CLASSROOM_NAME`, "
                 + "  dsc.`START_TIME`,dsc.`END_TIME`,dsc.`TEACH_DATE`,dsr.`ROLL_CALL_TYPE`,dsr.localtion,dsr.course_later_time, "
-                + " DATE_SUB(STR_TO_DATE(CONCAT(DATE_FORMAT(dsc.teach_date, '%Y-%m-%d'),\" \",dsc.start_time),'%Y-%m-%d%H:%i:%s'),INTERVAL 3 MINUTE "
+                + " DATE_SUB(STR_TO_DATE(CONCAT(DATE_FORMAT(dsc.teach_date, '%Y-%m-%d'),\" \",dsc.start_time),'%Y-%m-%d%H:%i:%s'),INTERVAL 4 MINUTE "
                 + "     ) AS teachBeginBeforeTime, " + "     STR_TO_DATE(CONCAT(DATE_FORMAT(dsc.teach_date, '%Y-%m-%d'),\" \",dsc.start_time),'%Y-%m-%d%H:%i:%s') AS teachBeginTime, "
                 + "     STR_TO_DATE(CONCAT(DATE_FORMAT(dsc.teach_date, '%Y-%m-%d'),\" \",dsc.end_time),'%Y-%m-%d%H:%i:%s') AS teachEndTime  "
                 + "   FROM dd_schedule dsc  LEFT JOIN dd_schedule_rollcall dsr ON dsr.schedule_id = dsc.id WHERE  dsr.is_open_roll_call = true "
