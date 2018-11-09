@@ -20,7 +20,6 @@ import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.entity.*;
 import com.aizhixin.cloud.dd.rollcall.repository.*;
-import com.aizhixin.cloud.dd.rollcall.utils.CourseUtils;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
 import com.google.common.collect.Sets;
@@ -68,8 +67,6 @@ public class LeaveService {
     private RollCallRepository rollCallRepository;
     @Autowired
     private LeaveRequestQuery leaveRequestQuery;
-    @Autowired
-    private UserService userService;
     @Autowired
     private InitScheduleService initScheduleService;
     @Autowired
@@ -934,24 +931,20 @@ public class LeaveService {
         } else {
             leaves = leaveRepository.findAllByheadTeacherIdAndStatusAndDeleteFlag(new Sort(new Order(Direction.DESC, "lastModifiedDate")), headTeacherId, status, DataValidity.VALID.getState());
         }
-
-        Map<Long, AccountDTO> map = new HashMap();
-        AccountDTO account = new AccountDTO();
-        LeaveForTeacherDTO dto = null;
+        Map<Long, UserInfo> map = new HashMap();
         for (Leave leave : leaves) {
-            if (!map.containsKey(leave.getStudentId())) {
-                userService.getUserInfo(account, leave.getStudentId());
-                map.put(leave.getStudentId(), account);
-            } else {
-                account = map.get(leave.getStudentId());
+            UserInfo user = map.get(leave.getStudentId());
+            if(user==null){
+                user = userInfoRepository.findByUserId(leave.getStudentId());
+                map.put(leave.getStudentId(), user);
             }
-            dto = new LeaveForTeacherDTO();
+            LeaveForTeacherDTO dto = new LeaveForTeacherDTO();
             dto.setLeaveId(leave.getId());
             dto.setCreatedDate(DateFormatUtil.format(leave.getCreatedDate(), DateFormatUtil.FORMAT_MINUTE));
             dto.setLastModifyDate(DateFormatUtil.format(leave.getLastModifiedDate()));
-            dto.setClassName(account.getClassesName());
-            dto.setMajorName(account.getProfessionalName());
-            dto.setCollegeName(account.getCollegeName());
+            dto.setClassName(user.getClassesName());
+            dto.setMajorName(user.getProfName());
+            dto.setCollegeName(user.getCollegeName());
 
             String startDate = DateFormatUtil.formatShort(leave.getStartDate());
             String endDate = DateFormatUtil.formatShort(leave.getEndDate());
@@ -966,7 +959,7 @@ public class LeaveService {
             dto.setRequestContent(leave.getRequestContent());
             dto.setRequestType(leave.getRequestType());
             dto.setStudentId(leave.getStudentId());
-            dto.setStudentName(account.getName());
+            dto.setStudentName(user.getName());
             dto.setStartPeriodId(leave.getStartPeriodId() == null ? 0 : leave.getStartPeriodId());
             dto.setEndPeriodId(leave.getEndPeriodId() == null ? 0 : leave.getEndPeriodId());
             dto.setLeavePictureUrls(leave.getLeavePictureUrls());
