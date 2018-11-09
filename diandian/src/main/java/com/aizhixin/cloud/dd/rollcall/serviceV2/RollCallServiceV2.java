@@ -130,10 +130,11 @@ public class RollCallServiceV2 {
             if (!rollCall.getCanRollCall() || RollCallConstants.TYPE_CANCEL_ROLLCALL.equals(rollCall.getType())) {
                 if (rollCall.getIsPublicLeave()) {
                     resBody.put(ApiReturnConstants.MESSAGE, "请公假不能签到!");
+                    resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_ASKFORLEAVE);
                 } else {
                     resBody.put(ApiReturnConstants.MESSAGE, "老师已修改您的考勤,不能再次签到。请联系老师 !");
+                    resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_CHANGE);
                 }
-                resBody.put(ApiReturnConstants.CODE, RollCallConstants.ROLL_CALL_ANTICHEATING);
                 resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
                 return resBody;
             }

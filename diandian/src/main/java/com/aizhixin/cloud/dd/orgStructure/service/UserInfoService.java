@@ -280,11 +280,10 @@ public class UserInfoService {
         return map;
     }
 
-    public void updateStudentCache(Long orgId, Set<Long> studentIds) {
+    public void updateStudentCache(Set<Long> studentIds) {
         if (studentIds != null && studentIds.size() > 0) {
             for (Long id : studentIds) {
-                List<PeriodDTO> scheduleList = periodService.findAllByOrganIdAndStatusV2(id, orgId, new Date());
-                redisTokenStore.setScheduleStudentToday(id, scheduleList);
+                redisTokenStore.delScheduleStudentToday(id);
             }
         }
     }

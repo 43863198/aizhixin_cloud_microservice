@@ -87,7 +87,7 @@ public class SynDataController {
             result.put(ApiReturnConstants.CAUSE, "无数据");
             return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
         }
-        userInfoService.updateStudentCache(orgId, studentIds);
+        userInfoService.updateStudentCache(studentIds);
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
     }
