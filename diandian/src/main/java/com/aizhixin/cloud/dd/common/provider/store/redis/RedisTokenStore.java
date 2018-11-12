@@ -293,7 +293,7 @@ public class RedisTokenStore {
     }
 
     public void delScheduleStudentToday(Long userId) {
-        redisTemplate.opsForValue().set(TYPE_SCHEDULE_STUDENT_TODAY + userId.toString(), "", 1, TimeUnit.DAYS);
+        redisTemplate.delete(TYPE_SCHEDULE_STUDENT_TODAY + userId.toString());
     }
 
     public List<PeriodDTO> getScheduleStudentToday(Long userId) {
