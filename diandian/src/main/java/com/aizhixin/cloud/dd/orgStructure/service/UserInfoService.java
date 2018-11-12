@@ -10,6 +10,8 @@ import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.PeriodDTO;
 import com.aizhixin.cloud.dd.rollcall.service.PeriodService;
 import org.apache.catalina.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,7 @@ import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 
 @Service
 public class UserInfoService {
+    private final static Logger log = LoggerFactory.getLogger(UserInfoService.class);
     @Autowired
     private UserInfoRepository userInfoRepository;
     @Autowired
@@ -128,7 +131,7 @@ public class UserInfoService {
      * @param result
      * @Title: findByNameLike
      * @Description: 按姓名、学院、专业、行政班搜索
-     * @return: Map<String                               ,                               Object>
+     * @return: Map<String                                                               ,                                                               Object>
      */
     public Map<String, Object> findByNameLike(Integer searchType, Integer pageNumber, Integer pageSize, Long sourseId, String name, Map<String, Object> result) {
         Pageable page = PageUtil.createNoErrorPageRequest(pageNumber, pageSize);
@@ -281,8 +284,10 @@ public class UserInfoService {
     }
 
     public void updateStudentCache(Set<Long> studentIds) {
+        log.info("updateStudentCache:{}", studentIds);
         if (studentIds != null && studentIds.size() > 0) {
             for (Long id : studentIds) {
+                log.info("updateStudentCache:  schedule:studenttoday:{}", studentIds);
                 redisTokenStore.delScheduleStudentToday(id);
             }
         }
