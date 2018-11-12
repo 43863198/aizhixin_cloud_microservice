@@ -1,11 +1,9 @@
 package com.aizhixin.cloud.dd.orgStructure.v1.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.aizhixin.cloud.dd.orgStructure.service.UserInfoService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -80,14 +78,32 @@ public class SynDataController {
     @ApiOperation(httpMethod = "GET", value = "更新学生缓存", response = Void.class, notes = "更新学生缓存<br>@author hsh")
     public ResponseEntity<Map<String, Object>> updateStudentCache(@RequestHeader("Authorization") String accessToken,
                                                                   @ApiParam(value = "orgId", required = true) @RequestParam(value = "orgId", required = true) Long orgId,
-                                                                  @ApiParam(value = "studentIds", required = true) @RequestParam(value = "studentIds", required = true) Set<Long> studentIds) {
+                                                                  @ApiParam(value = "studentIds", required = true) @RequestParam(value = "studentIds", required = true) String studentIds) {
         Map<String, Object> result = new HashMap<>();
-        if (studentIds == null || studentIds.size() == 0) {
+        if (StringUtils.isEmpty(studentIds)) {
             result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
             result.put(ApiReturnConstants.CAUSE, "无数据");
             return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
         }
-        userInfoService.updateStudentCache(studentIds);
+        studentIds = studentIds.replace("[", "").replace("]", "");
+        String[] idStrs = studentIds.split(",");
+        if (idStrs == null || idStrs.length == 0) {
+            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+            result.put(ApiReturnConstants.CAUSE, "无数据");
+            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
+        }
+        Set<Long> ids = new HashSet<>();
+        for (String idStr : idStrs) {
+            if (StringUtils.isNotEmpty(idStr)) {
+                ids.add(Long.parseLong(idStr));
+            }
+        }
+        if (ids.size() == 0) {
+            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+            result.put(ApiReturnConstants.CAUSE, "无数据");
+            return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
+        }
+        userInfoService.updateStudentCache(ids);
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
     }
