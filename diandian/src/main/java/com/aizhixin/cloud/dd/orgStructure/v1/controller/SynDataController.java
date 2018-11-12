@@ -85,7 +85,7 @@ public class SynDataController {
             result.put(ApiReturnConstants.CAUSE, "无数据");
             return new ResponseEntity<Map<String, Object>>(result, HttpStatus.UNAUTHORIZED);
         }
-        studentIds = studentIds.replace("[", "").replace("]", "");
+        studentIds = studentIds.replace("[", "").replace("]", "").replace(" ", "");
         String[] idStrs = studentIds.split(",");
         if (idStrs == null || idStrs.length == 0) {
             result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
