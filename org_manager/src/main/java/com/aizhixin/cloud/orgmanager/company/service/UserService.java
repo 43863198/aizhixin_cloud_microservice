@@ -1620,6 +1620,7 @@ public class UserService {
             //更新org缓存
             baseDataCacheService.clearUsers(ids);
             //更新点点缓存
+            LOG.info("更新点点缓存");
             ddClient.updateStuCache(orgId, ids);
         }
     }

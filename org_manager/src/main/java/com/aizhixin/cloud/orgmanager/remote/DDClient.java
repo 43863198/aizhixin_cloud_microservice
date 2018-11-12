@@ -44,7 +44,7 @@ public class DDClient {
             logger.warn("updateStuCacheException", e);
         }
         try {
-            UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(diandianApi + "/org/synData/updateStudentCache").queryParam("orgId", orgId).queryParam("studentIds", studentIds).build();
+            UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(diandianApi + "/api/web/v1/org/synData/updateStudentCache").queryParam("orgId", orgId).queryParam("studentIds", studentIds).build();
             restUtil.get(uriComponents.toString(), "111");
         } catch (Exception e) {
             logger.warn("updateStuCacheException", e);
