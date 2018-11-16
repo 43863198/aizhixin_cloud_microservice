@@ -934,7 +934,7 @@ public class LeaveService {
         Map<Long, UserInfo> map = new HashMap();
         for (Leave leave : leaves) {
             UserInfo user = map.get(leave.getStudentId());
-            if(user==null){
+            if (user == null) {
                 user = userInfoRepository.findByUserId(leave.getStudentId());
                 map.put(leave.getStudentId(), user);
             }
@@ -942,10 +942,15 @@ public class LeaveService {
             dto.setLeaveId(leave.getId());
             dto.setCreatedDate(DateFormatUtil.format(leave.getCreatedDate(), DateFormatUtil.FORMAT_MINUTE));
             dto.setLastModifyDate(DateFormatUtil.format(leave.getLastModifiedDate()));
-            dto.setClassName(user.getClassesName());
-            dto.setMajorName(user.getProfName());
-            dto.setCollegeName(user.getCollegeName());
-
+            if (user != null) {
+                dto.setClassName(user.getClassesName());
+                dto.setMajorName(user.getProfName());
+                dto.setCollegeName(user.getCollegeName());
+                dto.setStudentName(user.getName());
+            } else {
+                dto.setStudentName(leave.getStudentName());
+                dto.setClassName(leave.getClassName());
+            }
             String startDate = DateFormatUtil.formatShort(leave.getStartDate());
             String endDate = DateFormatUtil.formatShort(leave.getEndDate());
             dto.setStartDate(startDate);
@@ -959,7 +964,7 @@ public class LeaveService {
             dto.setRequestContent(leave.getRequestContent());
             dto.setRequestType(leave.getRequestType());
             dto.setStudentId(leave.getStudentId());
-            dto.setStudentName(user.getName());
+
             dto.setStartPeriodId(leave.getStartPeriodId() == null ? 0 : leave.getStartPeriodId());
             dto.setEndPeriodId(leave.getEndPeriodId() == null ? 0 : leave.getEndPeriodId());
             dto.setLeavePictureUrls(leave.getLeavePictureUrls());
