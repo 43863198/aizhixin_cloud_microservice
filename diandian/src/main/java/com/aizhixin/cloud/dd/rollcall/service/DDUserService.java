@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
+import com.aizhixin.cloud.dd.orgStructure.domain.UserInfoDomain;
+import com.aizhixin.cloud.dd.orgStructure.entity.UserInfo;
+import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +68,12 @@ public class DDUserService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private UserInfoRepository userInfoRepository;
+
+    @Autowired
+    private RedisTokenStore redisTokenStore;
 
     @Autowired
     DDUserServiceLogin ddUserServiceLogin;
@@ -260,6 +270,17 @@ public class DDUserService {
                 case 201:
                     log.info("update avatar success.");
                     redisTemplate.opsForValue().set("avatarFile:" + userId, ioDTO.getFileUrl(), 1, TimeUnit.HOURS);
+                    //update cache
+                    UserInfo userInfo = userInfoRepository.findByUserId(userId);
+                    if (userInfo != null) {
+                        userInfo.setAvatar(ioDTO.getFileUrl());
+                        userInfoRepository.save(userInfo);
+                    }
+                    UserInfoDomain d = redisTokenStore.getUserInfoDomain(userId);
+                    if (d != null) {
+                        d.setAvatar(ioDTO.getFileUrl());
+                        redisTokenStore.setUserInfoDomain(d);
+                    }
                     return true;
                 default:
                     log.warn("Invalid response code (" + put.getStatusCode()
