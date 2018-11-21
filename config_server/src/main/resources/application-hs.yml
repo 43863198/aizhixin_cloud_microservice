@@ -1,0 +1,41 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://218.197.16.56:1111/eureka/,http://218.197.16.57:1111/eureka/
+spring:
+  cloud:
+    inetutils:
+      ignored-interfaces:
+        - eth1
+        - em1
+        - em3
+        - em4
+        - usb0
+    config:
+      server:
+        git:
+          uri: http://122.188.209.159/aizhixin/zx-global-config.git
+          search-paths: config-repo
+          username: root
+          password: aizhixinops
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+    stream:
+      kafka:
+        binder:
+          zk-nodes: 218.197.16.55:2181,218.197.16.56:2181,218.197.16.57:2181
+          brokers: 218.197.16.55:9092,218.197.16.56:9092,218.197.16.57:9092
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /dinglicom/pay_access_log
+      pattern: '%h %l %u [%{yyyy-MM-dd HH:mm:ss.SSS}t] "%r" %s %b %D'
+      prefix: config_access_log
+      suffix: .log
+    basedir: /dinglicom/tmp/config
