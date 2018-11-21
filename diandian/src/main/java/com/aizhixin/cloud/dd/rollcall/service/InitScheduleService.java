@@ -461,6 +461,7 @@ public class InitScheduleService {
 
     public boolean initRollCall(ScheduleRollCall scheduleRollCall) {
         if (null == scheduleRollCall) {
+            log.info("scheduleRollCall null");
             throw new NullPointerException();
         }
         List<RollCall> rollCallList = listRollCallBySRCIdInRedis(scheduleRollCall.getId());
@@ -469,13 +470,15 @@ public class InitScheduleService {
             redisTemplate.delete(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()));
         }
         Schedule schedule = scheduleRollCall.getSchedule();
-        Long teachingclassId = schedule.getTeachingclassId();
+        Long teachingClassId = schedule.getTeachingclassId();
         Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
         Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
-        List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate, endDate);
+        List<StudentDTO> studentList = studentService.listStudents2(teachingClassId, startDate, endDate);
         if (null == studentList) {
-            log.info("根据教学班id获取学生列表信息为空!" + schedule.getId());
+            log.info("根据教学班id获取学生列表信息为空! scheduleId:{} teachingClassId:{}", schedule.getId(), teachingClassId);
             return false;
+        } else {
+            log.info("学生列表 {}", studentList);
         }
 //        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
         RollCall rollCall = null;
@@ -490,7 +493,7 @@ public class InitScheduleService {
             rollCall.setStudentNum(dto.getSutdentNum());
             rollCall.setClassId(dto.getClassesId());
             rollCall.setClassName(dto.getClassesName());
-            rollCall.setTeachingClassId(teachingclassId);
+            rollCall.setTeachingClassId(teachingClassId);
             rollCall.setCourseId(schedule.getCourseId());
             rollCall.setCanRollCall(Boolean.TRUE);
             rollCall.setHaveReport(Boolean.FALSE);

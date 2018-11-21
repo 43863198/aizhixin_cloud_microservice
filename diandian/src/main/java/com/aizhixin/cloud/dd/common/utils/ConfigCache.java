@@ -23,7 +23,6 @@ public class ConfigCache {
     private static Map<Long, ConfigDTO> configMapFromId;
     private static Map<String, Object> configMapFromKey;
     private static Map<ConfigDTO, Object> configMapFromTree;
-    static int count = 0;
 
     @Autowired
     public static JdbcTemplate jdbcTemplate;

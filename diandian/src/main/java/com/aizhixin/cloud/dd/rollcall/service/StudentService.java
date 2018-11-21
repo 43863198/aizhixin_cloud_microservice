@@ -67,6 +67,7 @@ public class StudentService {
 
     public List<StudentDTO> listStudents2(Long teachingClassesId, Date startDate, Date endDate) {
         String str = orgManagerRemoteService.listNotIncludeException(teachingClassesId, 1, Integer.MAX_VALUE);
+        log.info("listStudents2: {}", str);
         if (null == str) {
             return null;
         }
