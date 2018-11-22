@@ -28,6 +28,7 @@
         <module>rollcall</module>
         <module>paycallback</module>
         <module>cqaq</module>
+        <module>sqzd_data_import</module>
     </modules>
 
     <parent>
