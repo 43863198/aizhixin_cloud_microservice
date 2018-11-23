@@ -42,7 +42,7 @@ public class StudentAttendanceDetailQueryPaginationSQL implements PaginationSQL 
             + "     ON dsr.`ID` = dro.`SCHEDULE_ROLLCALL_ID`  "
             + "   LEFT JOIN dd_schedule dsc                   "
             + "     ON dsr.`schedule_id` = dsc.`id`           "
-            + " WHERE dro.`type` IN ('5', '4', '3', '2', '1') ";
+            + " WHERE dro.delete_flag=0 and dro.`type` IN ('5', '4', '3', '2', '1') ";
 
     public static String FIND_COUNT_SQL = " SELECT   count(*)           FROM      "
             + "   dd_rollcall dro                             "
@@ -50,7 +50,7 @@ public class StudentAttendanceDetailQueryPaginationSQL implements PaginationSQL 
             + "     ON dsr.`ID` = dro.`SCHEDULE_ROLLCALL_ID`  "
             + "   LEFT JOIN dd_schedule dsc                   "
             + "     ON dsr.`schedule_id` = dsc.`id`           "
-            + " WHERE dro.`type` IN ('5', '4', '3', '2', '1') ";
+            + " WHERE dro.delete_flag=0 and dro.`type` IN ('5', '4', '3', '2', '1') ";
 
     @Override
     public String getFindCountSql() {
@@ -63,10 +63,10 @@ public class StudentAttendanceDetailQueryPaginationSQL implements PaginationSQL 
             sql += " and dro.type = " + type;
         }
         if (StringUtils.isNotBlank(beginTime)) {
-            sql += " and dro.last_modified_date >= '" + beginTime + "' ";
+            sql += " and dsr.CREATED_DATE >= '" + beginTime + "' ";
         }
         if (StringUtils.isNotBlank(endTime)) {
-            sql += " and dro.last_modified_date <= '" + endTime + "'";
+            sql += " and dsr.CREATED_DATE <= '" + endTime + "'";
         }
         if (courseIds.size() == 1) {
             sql += " and dro.course_id = " + courseIds.iterator().next();
@@ -92,10 +92,10 @@ public class StudentAttendanceDetailQueryPaginationSQL implements PaginationSQL 
             sql += " and dro.type = " + type;
         }
         if (StringUtils.isNotBlank(beginTime)) {
-            sql += " and dro.last_modified_date >= '" + beginTime + "' ";
+            sql += " and dsr.CREATED_DATE >= '" + beginTime + "' ";
         }
         if (StringUtils.isNotBlank(endTime)) {
-            sql += " and dro.last_modified_date <= '" + endTime + "' ";
+            sql += " and dsr.CREATED_DATE <= '" + endTime + "' ";
         }
         if (courseIds.size() == 1) {
             sql += " and dro.course_id = " + courseIds.iterator().next();

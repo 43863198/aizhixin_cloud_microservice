@@ -1,6 +1,5 @@
 package com.aizhixin.cloud.dd.rollcall.v1.controller;
 
-import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.common.utils.TokenUtil;
 import com.aizhixin.cloud.dd.constant.ReturnConstants;
@@ -23,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -214,13 +212,10 @@ public class TeacherWebController {
     @ApiOperation(value = "教师导出考勤execle,包含汇总以及明细", httpMethod = "GET", response = Void.class, notes = "教师导出考勤execle,包含汇总以及明细<br>@author 李美华")
     public ResponseEntity<?> exportRollcallByTeacherExecle(@ApiParam(value = "courseId 课程id") @RequestParam(value = "courseId", required = false) Long courseId,
                                                            @RequestHeader("Authorization") String accessToken) {
-//        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
-//        if (account == null) {
-//            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
-//        }
-        AccountDTO account = new AccountDTO();
-        account.setId(420434l);
-        account.setOrganId(116l);
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
         // 考勤汇总
         List<RollCallExport> rcList = rollCallService.exportRollCallExecl(account.getId(), null, null, courseId, false, null);
 
@@ -355,12 +350,6 @@ public class TeacherWebController {
         Iterator<RollCallExport> it = dataset.iterator();
         int index = 1;
         XSSFRow rowTemp = sheet.getRow(1);
-        // HSSFCell cellTemp = rowTemp.getCell(0);
-        // String valueInfo = cellTemp.getStringCellValue();
-        // valueInfo = valueInfo.replace("#beginTime#", beginTime);
-        // valueInfo = valueInfo.replace("#endTime#", endTime);
-        // valueInfo = valueInfo.replace("#nowTime#", DateFormatUtil.format(new Date(), "yyyy-MM-dd HH:mm"));
-        // cellTemp.setCellValue(valueInfo);
         while (it.hasNext()) {
             index++;
             XSSFRow row = sheet.createRow(index);
@@ -582,9 +571,10 @@ public class TeacherWebController {
                                                        @DateTimeFormat(pattern = "yyyy-MM-dd") @ApiParam(value = "beginTime 开始时间") @RequestParam(value = "beginTime", required = true) Date beginTime,
                                                        @DateTimeFormat(pattern = "yyyy-MM-dd") @ApiParam(value = "endTime 结束时间") @RequestParam(value = "endTime", required = true) Date endTime,
                                                        @RequestHeader("Authorization") String accessToken) {
-        AccountDTO account = new AccountDTO();
-        account.setId(420434l);
-        account.setOrganId(116l);
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
         // get export data
         Map map = getAssessGather(account.getId(), courseId, beginTime, endTime);
         Map<String, Object> result = new HashMap<>();
