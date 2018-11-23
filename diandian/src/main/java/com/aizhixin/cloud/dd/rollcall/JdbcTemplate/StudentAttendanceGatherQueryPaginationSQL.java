@@ -27,7 +27,7 @@ public class StudentAttendanceGatherQueryPaginationSQL {
                 + " END) AS late, SUM(CASE WHEN drc.`type` = 4 THEN 1 ELSE 0 END) AS ASKFORLEAVE, SUM(CASE WHEN  "
                 + " drc.`type` = 5 THEN 1 ELSE 0 END) AS typeLeave FROM dd_rollcall drc  "
                 + " LEFT JOIN dd_schedule_rollcall dsr     ON dsr.`ID` = drc.`SCHEDULE_ROLLCALL_ID`       "
-                + " LEFT JOIN dd_schedule dsc     ON dsc.`ID` = dsr.`SCHEDULE_ID`  WHERE drc.`student_id` = #studentId# #courseId# #time# GROUP BY   "
+                + " LEFT JOIN dd_schedule dsc     ON dsc.`ID` = dsr.`SCHEDULE_ID`  WHERE drc.delete_flag=0 and drc.type<9 and drc.`student_id` = #studentId# #courseId# #time# GROUP BY   "
                 + " drc.`course_id`, drc.`teacher_id` ORDER BY drc.course_id";
 
         if (null != studentId) {
@@ -51,7 +51,7 @@ public class StudentAttendanceGatherQueryPaginationSQL {
         }
 
         if (StringUtils.isNotBlank(beginTime) && StringUtils.isNotBlank(endTime)) {
-            sql = sql.replaceAll("#time#", "AND drc.`created_date` > '" + beginTime + "' AND drc.`created_date` < '"
+            sql = sql.replaceAll("#time#", "AND dsr.`created_date` > '" + beginTime + "' AND dsr.`created_date` < '"
                     + endTime + "'");
         } else {
             sql = sql.replaceAll("#time#", "");
