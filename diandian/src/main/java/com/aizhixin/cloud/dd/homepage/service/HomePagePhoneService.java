@@ -416,7 +416,7 @@ public class HomePagePhoneService {
             ls.add(homePage);
             pageInfo.setData(ls);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
 
         return pageInfo;

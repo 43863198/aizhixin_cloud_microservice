@@ -14,7 +14,6 @@ import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.constant.CourseRollCallConstants;
 import com.aizhixin.cloud.dd.constant.RollCallConstants;
 import com.aizhixin.cloud.dd.constant.ScheduleConstants;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.RollCallClassDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.RollCallDTO;
 import com.aizhixin.cloud.dd.rollcall.entity.RollCall;
@@ -41,8 +40,8 @@ public class RollcallServiceV5 {
     private ScheduleService scheduleService;
     @Autowired
     private ScheduleRollCallService scheduleRollCallService;
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
+//    @Autowired
+//    private RollCallRemoteClient rollCallRemoteClient;
 
     @Autowired
     private RollCallRepository rollCallRepository;
@@ -83,7 +82,7 @@ public class RollcallServiceV5 {
                 && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
 
         if (inClass) {
-            ScheduleRollCallRedisDomain scheduleRollCallRedisDomain = rollCallRemoteClient.getScheduleRollCall(orgId, scheduleId);
+            ScheduleRollCallRedisDomain scheduleRollCallRedisDomain = null;//rollCallRemoteClient.getScheduleRollCall(orgId, scheduleId);
             if (scheduleRollCall != null) {
                 scheduleRollCall.setRollCallType(scheduleRollCallRedisDomain.getRollCallType());
                 scheduleRollCall.setLocaltion(scheduleRollCallRedisDomain.getLocaltion());
@@ -97,8 +96,7 @@ public class RollcallServiceV5 {
             authCode = String.valueOf(RollCallService.getRandomAuthCode());
             scheduleRollCall.setLocaltion(authCode);
             scheduleRollCallService.save(scheduleRollCall, scheduleId);
-            rollCallRemoteClient.upadteRuler(schedule.getOrganId(), schedule.getTeacherId(), schedule.getCourseId(), scheduleRollCall.getRollCallType(),
-                    scheduleRollCall.getCourseLaterTime(), CourseRollCallConstants.OPEN_ROLLCALL, authCode);
+//            rollCallRemoteClient.upadteRuler(schedule.getOrganId(), schedule.getTeacherId(), schedule.getCourseId(), scheduleRollCall.getRollCallType(), scheduleRollCall.getCourseLaterTime(), CourseRollCallConstants.OPEN_ROLLCALL, authCode);
 
         } else {
             authCode = scheduleRollCall.getLocaltion() == null ? "" : scheduleRollCall.getLocaltion();
@@ -107,7 +105,7 @@ public class RollcallServiceV5 {
         List<RollCall> rollCallList = null;
         // 课堂内的签到数据在redis库中查询
         if (inClass) {
-            rollCallList = rollCallRemoteClient.listRollCall(orgId, scheduleId);
+//            rollCallList = rollCallRemoteClient.listRollCall(orgId, scheduleId);
         } else {
             rollCallList = rollCallRepository.findByScheduleRollcallId(scheduleRollCall.getId());
         }
@@ -250,10 +248,10 @@ public class RollcallServiceV5 {
 
             scheduleRollCallService.save(scheduleRollCall, scheduleId);
 
-            rollCallRemoteClient.open(orgId, scheduleId, scheduleRollCall.getId(), rollcallType, authCode);
+//            rollCallRemoteClient.open(orgId, scheduleId, scheduleRollCall.getId(), rollcallType, authCode);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             result.put(ApiReturnConstants.MESSAGE, "开启随堂点失败!");
         }
@@ -273,7 +271,7 @@ public class RollcallServiceV5 {
             scheduleRollCallService.save(scheduleRollCall, scheduleId);
 
             // 通知rollcall服务
-            rollCallRemoteClient.close(orgId, scheduleRollCall.getId());
+//            rollCallRemoteClient.close(orgId, scheduleRollCall.getId());
             List<RollCall> rollCallList = listRollCallBySRCIdInRedis(scheduleRollCall.getId());
 
             // 2.将未提交的学生状态改为旷课。
@@ -291,7 +289,7 @@ public class RollcallServiceV5 {
             }
             redisTemplate.opsForHash().putAll(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCallMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return false;
         }
         return true;
@@ -314,7 +312,7 @@ public class RollcallServiceV5 {
         RollCall rollCall = null;
 
         if (DateFormatUtil.formatShort(new Date()).equals(schedule.getTeachDate())) {
-            rollCallRemoteClient.updateRollcall(orgId, scheduleRollCall.getId(), Sets.newHashSet(rollcallDTO.getUserId().toString()), rollcallDTO.getType());
+//            rollCallRemoteClient.updateRollcall(orgId, scheduleRollCall.getId(), Sets.newHashSet(rollcallDTO.getUserId().toString()), rollcallDTO.getType());
             if (scheduleRollCall.getIsInClassroom()) {
                 return;
             }
@@ -345,7 +343,7 @@ public class RollcallServiceV5 {
             for (Long studentId : studentIds) {
                 stuIds.add(String.valueOf(studentId));
             }
-            rollCallRemoteClient.updateRollcall(orgId, scheduleRollcallId, stuIds, type);
+//            rollCallRemoteClient.updateRollcall(orgId, scheduleRollcallId, stuIds, type);
             if (scheduleRollCall.getIsInClassroom()) {
                 return;
             }

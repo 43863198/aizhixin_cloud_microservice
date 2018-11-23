@@ -2,6 +2,7 @@ package com.aizhixin.cloud.dd.rollcall.service;
 
 import com.aizhixin.cloud.dd.rollcall.entity.OrganSet;
 import com.aizhixin.cloud.dd.rollcall.repository.OrganSetRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 public class OrganSetService {
 
     @Autowired
@@ -21,7 +23,7 @@ public class OrganSetService {
         try {
             os = organSetRepository.findByOrganId(organId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         if (null == os) {
             os = new OrganSet();
@@ -45,7 +47,7 @@ public class OrganSetService {
         try {
             os = organSetRepository.findByOrganId(organId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         if (null == os) {
             os = new OrganSet();
@@ -66,7 +68,7 @@ public class OrganSetService {
         try {
             organSetRepository.deleteByOrganId(organId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
     }
 

@@ -60,7 +60,7 @@ public class RollCallRecordService {
             rollCallList = new Vector <>();
             rollCallRecordRepository.save(templist);
         } catch (Exception e) {
-            log.warn("写签到记录异常", e.getMessage());
+            log.warn("写签到记录异常", e);
         } finally {
             templist = null;
         }

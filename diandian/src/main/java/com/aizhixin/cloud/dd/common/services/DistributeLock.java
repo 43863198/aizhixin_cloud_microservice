@@ -54,7 +54,6 @@ public class DistributeLock {
             }
         } catch (Exception e) {
             LOG.warn("获取锁失败", e);
-            e.printStackTrace();
         } finally {
             if (null != lock) {
                 try {
@@ -63,7 +62,6 @@ public class DistributeLock {
                     client.close();
                 } catch (Exception e) {
                     LOG.warn("释放锁失败", e);
-                    e.printStackTrace();
                 }
             }
         }
@@ -79,7 +77,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", zkLockPath, zkTaskPath, e);
-            e.printStackTrace();
         }
     }
 
@@ -114,7 +111,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -151,7 +147,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -186,7 +181,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -228,7 +222,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -264,7 +257,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -299,7 +291,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -334,7 +325,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -369,7 +359,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -404,7 +393,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -439,7 +427,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -474,14 +461,8 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
-
-    // @Scheduled(cron = "* 58 23 * * ?")
-    // public void cleanZookeeperTaskData() {
-    // delete();
-    // }
 
     /**
      * 在线选宿舍
@@ -512,7 +493,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -533,7 +513,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 
@@ -567,7 +546,6 @@ public class DistributeLock {
             client.close();
         } catch (Exception e) {
             LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
-            e.printStackTrace();
         }
     }
 }

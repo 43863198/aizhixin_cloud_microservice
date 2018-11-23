@@ -107,13 +107,13 @@ public class DDUserServiceLogin {
                     }
                 }
             } catch (Exception e) {
-                log.warn("获取用户角色异常", e.getMessage());
+                log.warn("获取用户角色异常", e);
             }
             fillingAccount(account);
 
         } catch (Exception e) {
             account = null;
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("token认证异常,token:" + authorization, e);
         }
         if (redisTemplate.opsForValue().setIfAbsent(authorization, account)) {
@@ -182,7 +182,7 @@ public class DDUserServiceLogin {
             OrganSet organSet = organSetService.findByOrganId(accountDto.getOrganId());
             accountDto.setAntiCheating(organSet == null ? Boolean.TRUE : organSet.getAnti_cheating());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
 
     }
@@ -194,7 +194,7 @@ public class DDUserServiceLogin {
             response = get.get(configCache.getConfigValueByParm("user.service.host") + "/api/currentuser", "", authorization);
             System.out.println(configCache.getConfigValueByParm("user.service.host") + "/api/currentuser");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         String s = response.getResponseBody();
         JSONObject obj = JSONObject.fromString(s);

@@ -3,6 +3,7 @@ package com.aizhixin.cloud.dd.communication.utils;
 import com.aizhixin.cloud.dd.common.utils.ConfigCache;
 import com.aizhixin.cloud.dd.common.utils.http.HttpResponse;
 import com.aizhixin.cloud.dd.common.utils.http.OauthGet;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 @Component
 public class HttpSimpleUtils {
     @Autowired
@@ -84,10 +86,8 @@ public class HttpSimpleUtils {
             String id = (String) s.get("id");
             if (null != id) {
                 s.put("avatar", null == avartMap.get(id + "avatar") ? "null" : avartMap.get(id + "avatar"));
-//                if (!org.springframework.util.StringUtils.isEmpty(avartMap.get("phone"))) {
                 String phone = avartMap.get(id + "phone");
                 s.put("phone", org.springframework.util.StringUtils.isEmpty(phone) ? "" : ("null".equals(phone) ? "" : phone));
-//                }
             } else {
                 s.put("avatar", "null");
             }
@@ -101,7 +101,7 @@ public class HttpSimpleUtils {
                 Map<String, String> listMap = HttpGet(sb.substring(1));
                 pushAvater(listMap, outdata);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
     }
@@ -119,7 +119,7 @@ public class HttpSimpleUtils {
                 }
                 out.put("success", Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
                 out.put("success", Boolean.FALSE);
             }
         }

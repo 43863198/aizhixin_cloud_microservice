@@ -31,9 +31,9 @@ import java.util.Map;
  * 切换去掉new，注释掉以前旧接口
  * @date 2017/12/26
  */
-@RestController
-@RequestMapping("/api/phone/v1/new")
-@Api(value = "手机学生端API", description = "针对手机端的相关API")
+//@RestController
+//@RequestMapping("/api/phone/v1/new")
+//@Api(value = "手机学生端API", description = "针对手机端的相关API")
 public class StudentPhoneResourceV5 {
 
     private final Logger log = LoggerFactory.getLogger(StudentPhoneResourceV5.class);
@@ -72,7 +72,7 @@ public class StudentPhoneResourceV5 {
         try {
             page = scheduleRollCallServiceV5.getStudentCourseListDay(PageUtil.createNoErrorPageRequest(offset, limit), account, teachTime);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<PageInfo>(page, HttpStatus.OK);
     }
@@ -95,7 +95,7 @@ public class StudentPhoneResourceV5 {
         try {
             page = scheduleRollCallServiceV5.getStudentCourseListDay_VS2(PageUtil.createNoErrorPageRequest(offset, limit), account, teachTime);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<PageInfo>(page, HttpStatus.OK);
     }

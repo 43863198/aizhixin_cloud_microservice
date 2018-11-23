@@ -210,13 +210,16 @@ public class CounsellorService {
             if (p.getId().intValue() == periodId.intValue()) {
                 try {
                     date = df.parse(p.getStartTime());
-                    Date d = new Date();
-                    date.setYear(d.getYear());
-                    date.setMonth(d.getMonth());
-                    date.setDate(d.getDate());
-                    date.setMinutes(date.getMinutes() + 5);
+                    Calendar currCalendar = Calendar.getInstance();
+                    currCalendar.setTime(new Date());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    calendar.set(Calendar.YEAR, currCalendar.get(Calendar.YEAR));
+                    calendar.set(Calendar.MONTH, currCalendar.get(Calendar.MONTH));
+                    calendar.set(Calendar.DAY_OF_MONTH, currCalendar.get(Calendar.DAY_OF_MONTH));
+                    calendar.set(Calendar.MINUTE, currCalendar.get(Calendar.MINUTE) + 5);
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                     date = null;
                 }
                 break;
@@ -529,23 +532,4 @@ public class CounsellorService {
         return result;
     }
 
-    private PeriodDTO createPeroid(Integer no, String start, String end) {
-        PeriodDTO d = new PeriodDTO();
-        d.setNo(no);
-        d.setStartTime(start);
-        d.setEndTime(end);
-        return d;
-    }
-
-    // public static void main(String[] args) throws ParseException {
-    // CounsellorService t = new CounsellorService();
-    // List<PeriodDTO> periodDTOS = new ArrayList<>();
-    // periodDTOS.add(t.createPeroid(1, "08:00", "08:45"));
-    // periodDTOS.add(t.createPeroid(2, "08:50", "09:35"));
-    // periodDTOS.add(t.createPeroid(3, "09:55", "10:50"));
-    // periodDTOS.add(t.createPeroid(4, "10:55", "11:40"));
-    //
-    // Date date = DateFormatUtil.parse("2017-10-26 09:35", "yyyy-MM-dd HH:mm");
-    // System.out.println(t.getCurrentPeriodStr(periodDTOS, date));
-    // }
 }

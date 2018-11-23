@@ -22,7 +22,7 @@
 //            try {
 //                Thread.sleep(1000);
 //            } catch (InterruptedException e) {
-//                e.printStackTrace();
+//                log.warn("Exception", e);
 //            }
 //            cachedThreadPool.execute(new Employee("test"));
 //            i++;
@@ -48,7 +48,7 @@
 //                try {
 //                    TimeUnit.SECONDS.sleep(1);
 //                } catch (InterruptedException e) {
-//                    e.printStackTrace();
+//                    log.warn("Exception", e);
 //                }
 //            }
 //        }

@@ -1,6 +1,5 @@
 package com.aizhixin.cloud.dd.questionnaire.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.Map;
 
 import com.aizhixin.cloud.dd.questionnaire.utils.QuestionnaireType;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +31,8 @@ import com.aizhixin.cloud.dd.questionnaire.repository.QuestionnaireRepository;
 import com.aizhixin.cloud.dd.questionnaire.repository.QuestionsRepository;
 import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
 import com.aizhixin.cloud.dd.rollcall.utils.MathUtil;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
+@Slf4j
 @Service
 @Transactional
 public class QuestionnaireExport {
@@ -252,15 +251,8 @@ public class QuestionnaireExport {
                                                     }
                                                 }
                                             }
-                                        } catch (JsonParseException e) {
-
-                                            e.printStackTrace();
-                                        } catch (JsonMappingException e) {
-
-                                            e.printStackTrace();
-                                        } catch (IOException e) {
-
-                                            e.printStackTrace();
+                                        } catch (Exception e) {
+                                            log.warn("Exception", e);
                                         }
                                     }
                                 }
@@ -559,15 +551,8 @@ public class QuestionnaireExport {
                                                     }
                                                 }
                                             }
-                                        } catch (JsonParseException e) {
-
-                                            e.printStackTrace();
-                                        } catch (JsonMappingException e) {
-
-                                            e.printStackTrace();
-                                        } catch (IOException e) {
-
-                                            e.printStackTrace();
+                                        } catch (Exception e) {
+                                            log.warn("Exception", e);
                                         }
                                     }
                                 }

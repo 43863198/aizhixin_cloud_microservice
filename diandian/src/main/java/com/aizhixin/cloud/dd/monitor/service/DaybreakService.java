@@ -6,6 +6,7 @@ import com.aizhixin.cloud.dd.monitor.entity.DayBreak;
 import com.aizhixin.cloud.dd.monitor.repository.DaybreakRepository;
 import com.aizhixin.cloud.dd.monitor.utils.StatusEnum;
 import com.aizhixin.cloud.dd.rollcall.service.InitScheduleService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -17,6 +18,7 @@ import java.util.*;
  * @author LIMH
  * @date 2017/12/11
  */
+@Slf4j
 @Service
 public class DaybreakService {
 
@@ -37,7 +39,7 @@ public class DaybreakService {
 
     /**
      * 删除重复数据
-     * 
+     *
      * @param orgId
      * @param date
      */
@@ -47,7 +49,7 @@ public class DaybreakService {
 
     /**
      * 某学校某天课程列表
-     * 
+     *
      * @param orgName
      * @param teachDate
      * @return
@@ -68,7 +70,7 @@ public class DaybreakService {
         for (DayBreak dayBreak : dayBreakList) {
             if (!map.containsKey(dayBreak.getOrgId())) {
                 daybreakDomain = new DaybreakDomain(dayBreak.getOrgId(), dayBreak.getOrgName(), 1, dayBreak.getSuccessFlag(),
-                    ((StatusEnum.Success.getStatus() == dayBreak.getSuccessFlag()) ? 0 : 1), dayBreak.getTeachDate(), dayBreak.getUseTime());
+                        ((StatusEnum.Success.getStatus() == dayBreak.getSuccessFlag()) ? 0 : 1), dayBreak.getTeachDate(), dayBreak.getUseTime());
                 map.put(dayBreak.getOrgId(), daybreakDomain);
                 daybreakDomains.add(daybreakDomain);
                 continue;
@@ -93,7 +95,7 @@ public class DaybreakService {
 
     /**
      * 某学校某天课程列表
-     * 
+     *
      * @param orgId
      * @param successFlag
      * @param teachDate
@@ -118,6 +120,7 @@ public class DaybreakService {
         try {
             initScheduleService.executeTask(orgId, orgName);
         } catch (Exception e) {
+            log.warn("Exception", e);
             return ApiReturn.message(Boolean.FALSE, e.getMessage(), null);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);

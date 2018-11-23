@@ -2,11 +2,13 @@ package com.aizhixin.cloud.dd.common.utils.http;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+@Slf4j
 public class OauthGet implements ResponseUtil {
 
 	@SuppressWarnings("finally")
@@ -26,7 +28,7 @@ public class OauthGet implements ResponseUtil {
 				response = getHttpResponse(chr);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("Exception", e);
 		} finally {
 			return response;
 		}
@@ -49,7 +51,7 @@ public class OauthGet implements ResponseUtil {
 				response = getHttpResponse(chr);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("Exception", e);
 		} finally {
 			return response;
 		}
@@ -64,7 +66,7 @@ public class OauthGet implements ResponseUtil {
 	// System.out.print(get.get(host, url, authorization).getResponseBody());
 	// } catch (IOException e) {
 	//
-	// e.printStackTrace();
+	// log.warn("Exception", e);
 	// }
 	// }
 }

@@ -6,7 +6,6 @@ import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.common.utils.TokenUtil;
 import com.aizhixin.cloud.dd.constant.CourseRollCallConstants;
 import com.aizhixin.cloud.dd.constant.ScheduleConstants;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.PageInfo;
 import com.aizhixin.cloud.dd.rollcall.dto.RollCallClassDTO;
@@ -43,10 +42,9 @@ import static com.aizhixin.cloud.dd.rollcall.service.RollCallService.getRandomAu
  * @author LIMH
  * @date 2017/12/26
  */
-@RestController
-@RequestMapping("/api/phone/v1/new")
-@Api(value = "手机教师端API", description = "针对手机教师端的相关API")
-
+//@RestController
+//@RequestMapping("/api/phone/v1/new")
+//@Api(value = "手机教师端API", description = "针对手机教师端的相关API")
 public class TeacherPhoneResourceV5 {
     private final Logger log = LoggerFactory.getLogger(TeacherPhoneResourceV5.class);
 
@@ -62,8 +60,8 @@ public class TeacherPhoneResourceV5 {
     @Autowired
     private CourseRollCallService courseRollCallService;
 
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
+//    @Autowired
+//    private RollCallRemoteClient rollCallRemoteClient;
 
     @Autowired
     private ScheduleService scheduleService;
@@ -137,7 +135,7 @@ public class TeacherPhoneResourceV5 {
         try {
             rollcallServiceV5.closeClassrommRollcall(account.getOrganId(), scheduleId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             result.put(ApiReturnConstants.MESSAGE, "关闭随堂点失败!");
             return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -219,12 +217,12 @@ public class TeacherPhoneResourceV5 {
                     }
                 }
             }
-            rollCallRemoteClient.upadteRuler(account.getOrganId(), account.getId(), courseId, rollCallType, lateTime, isOpen, authCode);
+//            rollCallRemoteClient.upadteRuler(account.getOrganId(), account.getId(), courseId, rollCallType, lateTime, isOpen, authCode);
             result.put(ApiReturnConstants.SUCCESS, true);
         } catch (Exception e) {
             result.put(ApiReturnConstants.SUCCESS, false);
             result.put(ApiReturnConstants.MESSAGE, "修改点名设置异常," + e);
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
@@ -282,7 +280,7 @@ public class TeacherPhoneResourceV5 {
             rollcallServiceV5.updateRollCallResult(account.getOrganId(), account.getId(), scheduleRollcallId, studentIds, type);
             result.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -305,7 +303,7 @@ public class TeacherPhoneResourceV5 {
             rollcallServiceV5.updateRollCallResult(account.getOrganId(), rollcallDTO);
             result.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("success", Boolean.FALSE);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);

@@ -10,7 +10,6 @@ import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
 import com.aizhixin.cloud.dd.common.schedule.MyScheduleService;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.entity.Schedule;
 import com.aizhixin.cloud.dd.rollcall.entity.ScheduleRollCall;
@@ -58,8 +57,6 @@ public class TempAdjustCourseScheduleService {
     private WeekService weekService;
     @Autowired
     private OrgManagerRemoteClient orgManagerRemoteService;
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
     @Autowired
     private TempAdjustCourseMessageService tempAdjustCourseMessageService;
     @Autowired
@@ -520,23 +517,10 @@ public class TempAdjustCourseScheduleService {
                     redisTokenStore.delScheduleStudentToday(item.getStudentId());
                 }
             }
-            try {
-                rollCallRemoteClient.stopSchedule(schedule.getOrganId(), schedule.getId());
-            } catch (Exception e) {
-
-            }
         } catch (Exception e) {
             log.warn("删除原始排课信息失败！", e);
             return false;
         }
-
-        // 点点签到重构优化
-        try {
-            rollCallRemoteClient.stopSchedule(schedule.getOrganId(), schedule.getId());
-        } catch (Exception e) {
-            log.warn("通知rollcall失败。");
-        }
-
         return true;
     }
 
@@ -554,22 +538,10 @@ public class TempAdjustCourseScheduleService {
             }
             List<PeriodDTO> periods = periodService.listPeriod(orgId);
             initScheduleService.addSchedule(orgId, DateFormatUtil.formatShort(new Date()), periods, ddDomain);
-            try {
-                List<Schedule> schedules = scheduleRepository.findAllByTeachingclassIdAndTeachDateAndPeriodNoAndPeriodNumAndDeleteFlag(ddDomain.getTeachingClassId(),
-                        DateFormatUtil.formatShort(new Date()), ddDomain.getPeriodNo(), ddDomain.getPeriodNum(), DataValidity.VALID.getState());
-                if (schedules != null) {
-                    for (Schedule schedule : schedules) {
-                        rollCallRemoteClient.addSchedule(schedule.getOrganId(), schedule.getId());
-                    }
-                }
-            } catch (Exception e) {
-            }
-
         } catch (Exception e) {
             log.warn("初始化目标课程信息失败！", e);
             return false;
         }
-
         // 点点签到重构优化
         try {
             List<Schedule> schedules = scheduleRepository.findAllByTeachingclassIdAndTeachDateAndPeriodNoAndPeriodNumAndDeleteFlag(ddDomain.getTeachingClassId(),
@@ -595,16 +567,16 @@ public class TempAdjustCourseScheduleService {
                 }
             }
         } catch (Exception e) {
-            log.warn("通知rollcall失败。");
+            log.warn("Exception", e);
         }
         return true;
     }
 
-    public boolean isDesSchedulePassed(String desDate) {
+    private boolean isDesSchedulePassed(String desDate) {
         return !compare_date(DateFormatUtil.format(new Date((System.currentTimeMillis() + 30 * 60 * 1000)), "yyyy-MM-dd HH:mm"), desDate);
     }
 
-    public static boolean compare_date(String DATE1, String DATE2) {
+    private boolean compare_date(String DATE1, String DATE2) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
             Date dt1 = df.parse(DATE1);
@@ -614,8 +586,8 @@ public class TempAdjustCourseScheduleService {
             } else {
                 return false;
             }
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            log.warn("Exception", e);
         }
         return false;
     }

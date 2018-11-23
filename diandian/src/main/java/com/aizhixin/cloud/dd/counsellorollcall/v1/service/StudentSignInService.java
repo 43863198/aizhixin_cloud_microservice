@@ -509,9 +509,9 @@ public class StudentSignInService {
             }
             return ApiReturn.message(Boolean.TRUE, null, result);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn(reportDTO.toString());
-            log.warn("siginException" + e.getMessage(), e);
+            log.warn("siginException" + e, e);
             return ApiReturn.message(Boolean.FALSE, null, null);
         }
     }
@@ -544,7 +544,7 @@ public class StudentSignInService {
         try {
             return format.parse(timeStr);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return null;
         }
     }
@@ -593,13 +593,13 @@ public class StudentSignInService {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.warn("Exception", e);
                     }
                     list.add(dto);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         Map<String, Object> message = ApiReturn.message(Boolean.TRUE, null, list);
         List<Double> center = new ArrayList<>();
@@ -640,7 +640,7 @@ public class StudentSignInService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return isCan;
     }

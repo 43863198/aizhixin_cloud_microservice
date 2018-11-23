@@ -51,7 +51,7 @@ public class PushService {
             pushQueue.put(new PushMessage(authorization, text, ticker, title, userIds));
         } catch (InterruptedException e) {
             log.warn("添加消息到推送队列异常。", e);
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return true;
     }
@@ -74,7 +74,7 @@ public class PushService {
                 } catch (Exception e) {
                     ERROR_NUM.incrementAndGet();
                     log.warn("推送消息异常。");
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
                 // 防止推送消息异常缓慢，导致队列增大，从而引起调用服务阻塞。
                 if (ERROR_NUM.get() > 20 && pushQueue.size() > PUSH_QUEUE_OVER_SIZE) {
@@ -89,7 +89,7 @@ public class PushService {
             try {
                 Thread.sleep(seconds);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
 
@@ -107,7 +107,7 @@ public class PushService {
             } catch (IOException e) {
                 ERROR_NUM.incrementAndGet();
                 log.warn("调用推送消息接口异常,消息：" + paramsStr);
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
             if (response.getStatusCode() != HttpStatus.OK.value()) {
                 log.warn("推送消息失败,返回值：" + response.getStatusCode() + ",消息："

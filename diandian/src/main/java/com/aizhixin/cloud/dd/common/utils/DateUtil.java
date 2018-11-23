@@ -3,6 +3,8 @@
  */
 package com.aizhixin.cloud.dd.common.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +16,7 @@ import java.util.Map;
  * @author zhen.pan
  *
  */
+@Slf4j
 public class DateUtil {
 	private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 	private static SimpleDateFormat formatMinute = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -271,7 +274,7 @@ public class DateUtil {
 		try {
 			return format.parse(dateStr);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("Exception", e);
 		}
 		return null;
 	}
@@ -279,7 +282,7 @@ public class DateUtil {
 		try {
 			return formatMinute.parse(dateStr);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("Exception", e);
 		}
 		return null;
 	}

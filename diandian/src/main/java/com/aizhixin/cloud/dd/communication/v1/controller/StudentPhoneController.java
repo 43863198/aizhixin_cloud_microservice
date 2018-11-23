@@ -1,7 +1,6 @@
 package com.aizhixin.cloud.dd.communication.v1.controller;
 
 import com.aizhixin.cloud.dd.common.core.ApiReturnConstants;
-import com.aizhixin.cloud.dd.common.core.UserConstants;
 import com.aizhixin.cloud.dd.common.exception.DlEduException;
 import com.aizhixin.cloud.dd.common.utils.TokenUtil;
 import com.aizhixin.cloud.dd.communication.dto.CallRecordsDTO;
@@ -22,6 +21,7 @@ import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/phone/v1")
 @Api(value = "手机学生端（包含电子围栏、辅导员签到、通讯录部分功能）API", description = "手机学生端（包含电子围栏、辅导员签到、通讯录部分功能）的相关API")
@@ -182,7 +183,7 @@ public class StudentPhoneController {
             callRecordsDTO.setDailingPhone(account.getPhoneNumber());
             callRecordsService.save(callRecordsDTO);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("success", Boolean.FALSE);
         }
         result.put("success", Boolean.TRUE);
@@ -248,7 +249,7 @@ public class StudentPhoneController {
 //        try {
 //            result = orgManagerRemoteService.saveBase(electricFenceBaseDTO);// 获取用户id:account.getId();
 //        } catch (Exception e) {
-//            e.printStackTrace();
+//            log.warn("Exception", e);
 //            result = new HashMap<>();
 //        }
         result.put("falseMSG", true);

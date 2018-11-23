@@ -22,6 +22,7 @@ import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.IODTO;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @Transactional
 public class RecordService {
@@ -262,7 +264,7 @@ public class RecordService {
                     os.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
     }

@@ -7,6 +7,7 @@ import com.aizhixin.cloud.dd.messege.service.PushMessageService;
 import com.aizhixin.cloud.dd.messege.service.PushService;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.StudentDTO;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.Set;
  * Created by LIMH on 2017/12/1.
  */
 @Component
+@Slf4j
 public class TempAdjustCourseMessageService {
 
 
@@ -80,7 +82,7 @@ public class TempAdjustCourseMessageService {
             //----新消息服务----end
             pushService.listPush(accessToken, message, "调(停)课通知(课表查看)", "调(停)课通知(课表查看)", ids);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
     }
 }

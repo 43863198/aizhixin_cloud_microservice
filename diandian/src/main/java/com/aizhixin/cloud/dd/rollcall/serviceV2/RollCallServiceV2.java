@@ -218,8 +218,8 @@ public class RollCallServiceV2 {
                 return resBody;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("签到异常" + e.getMessage(), e);
+            log.warn("Exception", e);
+            log.warn("签到异常" + e, e);
             resBody.put(ApiReturnConstants.MESSAGE, "签到异常!");
             resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             return resBody;
@@ -250,7 +250,7 @@ public class RollCallServiceV2 {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return isCan;
     }
@@ -383,7 +383,7 @@ public class RollCallServiceV2 {
             stringRedisTemplate.delete(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId.longValue()));
 
         } catch (Exception e) {
-            log.warn("清除reids数据异常。" + e.getMessage(), e);
+            log.warn("清除reids数据异常。" + e, e);
         }
     }
 

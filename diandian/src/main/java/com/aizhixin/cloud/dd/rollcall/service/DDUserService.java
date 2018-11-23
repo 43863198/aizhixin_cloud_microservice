@@ -32,7 +32,6 @@ import com.aizhixin.cloud.dd.rollcall.entity.OrganSet;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
 import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -195,11 +194,11 @@ public class DDUserService {
                 OrganSet organSet = organSetService.findByOrganId(account.getOrganId());
                 account.setAntiCheating(organSet == null ? Boolean.TRUE : organSet.getAnti_cheating());
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         } catch (Exception e) {
             account = null;
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("token认证异常,token:" + authorization, e);
         }
 
@@ -230,7 +229,7 @@ public class DDUserService {
             response = get.get(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfo"), "", authorization);
             System.out.println(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfo"));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         String s = response.getResponseBody();
         JSONObject obj = JSONObject.fromString(s);
@@ -244,7 +243,7 @@ public class DDUserService {
             response = get.get(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfoNew"), "", authorization);
             System.out.println(configCache.getConfigValueByParm("user.service.host") + configCache.getConfigValueByParm("user.service.getInfoNew"));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         String s = response.getResponseBody();
         JSONObject obj = JSONObject.fromString(s);
@@ -287,8 +286,8 @@ public class DDUserService {
                             + ") from User service!");
                     break;
             }
-        } catch (final IOException e) {
-            log.warn(e.getMessage());
+        } catch (Exception e) {
+            log.warn("Exception", e);
         } finally {
             put.releaseConnection();
         }
@@ -330,7 +329,6 @@ public class DDUserService {
                 JSONObject user_json = JSONObject.fromString(value);
                 result = user_json;
                 break;
-                // phone = user_json.getString("phoneNumber");
             }
         }
 
@@ -385,15 +383,8 @@ public class DDUserService {
                     if (null != data.get("userName")) {
                         adt.setName(data.get("userName").toString());
                     }
-                } catch (JsonParseException e) {
-
-                    e.printStackTrace();
-                } catch (JsonMappingException e) {
-
-                    e.printStackTrace();
-                } catch (IOException e) {
-
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    log.warn("Exception", e);
                 }
                 listMap.put(Long.valueOf(key), adt);
             }

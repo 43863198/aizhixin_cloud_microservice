@@ -385,7 +385,7 @@ public class SynchronizedDataService {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
             return cl;
@@ -928,7 +928,7 @@ public class SynchronizedDataService {
             }
             redisTokenStore.setUserInfoDomainList(ds);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
     }
 

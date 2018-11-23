@@ -17,6 +17,7 @@ import com.aizhixin.cloud.dd.counsellorollcall.v1.service.CounsellorRedisService
 import com.aizhixin.cloud.dd.orgStructure.entity.UserInfo;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 @Service
 @Transactional
 public class CounselorRollcallStudentService {
@@ -301,27 +303,32 @@ public class CounselorRollcallStudentService {
                 if (item.getRollcallType() == null || item.getRollcallType().intValue() < 1) {
                     item.setRollcallType(CounsellorRollCallType.Other.getType());
                 }
-                Date startDate = new Date();
-                startDate.setHours(0);
-                startDate.setMinutes(0);
-                startDate.setSeconds(0);
-                Date endDate = new Date();
-                endDate.setHours(23);
-                endDate.setMinutes(59);
-                endDate.setSeconds(59);
-                List<StuRollcallReportDomainV2> signlist = studentSignInRepository.findByStudentIdAndGroupIdAndDateAndDeleteFlag(userId, item.getGroupId(), startDate, endDate, DataValidity.VALID.getState());
-                if (signlist != null && signlist.size() > 0) {
-                    StuRollcallReportDomainV2 sign = signlist.get(signlist.size() - 1);
+
+                Calendar sCalendar = Calendar.getInstance();
+                sCalendar.setTime(new Date());
+                sCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                sCalendar.set(Calendar.MINUTE, 0);
+                sCalendar.set(Calendar.SECOND, 0);
+                Date startDate = sCalendar.getTime();
+                Calendar eCalendar = Calendar.getInstance();
+                eCalendar.setTime(new Date());
+                eCalendar.set(Calendar.HOUR_OF_DAY, 23);
+                eCalendar.set(Calendar.MINUTE, 59);
+                eCalendar.set(Calendar.SECOND, 59);
+                Date endDate = eCalendar.getTime();
+                List<StuRollcallReportDomainV2> signList = studentSignInRepository.findByStudentIdAndGroupIdAndDateAndDeleteFlag(userId, item.getGroupId(), startDate, endDate, DataValidity.VALID.getState());
+                if (signList != null && signList.size() > 0) {
+                    StuRollcallReportDomainV2 sign = signList.get(signList.size() - 1);
                     item.setHaveRead(sign.getHaveRead());
-                    item.setReportList(signlist);
+                    item.setReportList(signList);
                     item.setIsOpen(sign.getIsOpen());
-                    for (StuRollcallReportDomainV2 sitem : signlist) {
-                        sitem.setFirstTime(item.getFirstTime());
-                        sitem.setLateTime(item.getLateTime());
-                        sitem.setSecondTime(item.getSecondTime());
-                        sitem.setEndTime(item.getEndTime());
-                        if (isRead && !sitem.getHaveRead()) {
-                            studentSignInRepository.updateHaveRead(sitem.getId());
+                    for (StuRollcallReportDomainV2 sItem : signList) {
+                        sItem.setFirstTime(item.getFirstTime());
+                        sItem.setLateTime(item.getLateTime());
+                        sItem.setSecondTime(item.getSecondTime());
+                        sItem.setEndTime(item.getEndTime());
+                        if (isRead && !sItem.getHaveRead()) {
+                            studentSignInRepository.updateHaveRead(sItem.getId());
                         }
                     }
                 }
@@ -350,7 +357,7 @@ public class CounselorRollcallStudentService {
         try {
             return format.parse(timeStr);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return null;
         }
     }

@@ -5,6 +5,7 @@ import com.aizhixin.cloud.dd.counsellorollcall.domain.StuTempGroupDomainV2;
 import com.aizhixin.cloud.dd.messege.dto.AudienceDTO;
 import com.aizhixin.cloud.dd.messege.dto.MessageDTO;
 import com.aizhixin.cloud.dd.messege.service.MessageService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.xpath.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class UpdateRollcallMessageThread extends Thread {
                 concurrentLinkedQueue.add(messageDTO);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            log.warn("Exception", e);
         }
     }
 
@@ -97,7 +98,7 @@ public class UpdateRollcallMessageThread extends Thread {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            log.warn("Exception", e);
         }
     }
 
@@ -132,7 +133,7 @@ public class UpdateRollcallMessageThread extends Thread {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
         }

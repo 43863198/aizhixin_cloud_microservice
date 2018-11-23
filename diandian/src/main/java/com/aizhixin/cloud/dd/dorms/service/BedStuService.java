@@ -1,6 +1,5 @@
 package com.aizhixin.cloud.dd.dorms.service;
 
-import java.io.IOException;
 import java.util.*;
 
 import com.aizhixin.cloud.dd.orgStructure.entity.NewStudent;
@@ -10,6 +9,7 @@ import com.aizhixin.cloud.dd.orgStructure.repository.NewStudentRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.ProfRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,9 +38,8 @@ import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
 import com.aizhixin.cloud.dd.rollcall.service.SmsService;
 import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
+@Slf4j
 @Service
 public class BedStuService {
     @Autowired
@@ -80,7 +79,7 @@ public class BedStuService {
                     s = "男";
                 } else {
                     s = "女";
-                }//assgin.getProfId()
+                }
                 Prof prof = profRepository.findByProfId(assgin.getProfId());
                 List<NewStudent> newStudents = new ArrayList<>();
                 if (!StringUtils.isEmpty(name)) {
@@ -150,7 +149,6 @@ public class BedStuService {
             for (Bed bed : beds) {
                 bedMap.put(bed.getId(), bed);
             }
-
             for (BedStu bedStu : bedStus) {
                 StuInfoDomain sd = new StuInfoDomain();
                 Bed bed = bedMap.get(bedStu.getBedId());
@@ -182,13 +180,11 @@ public class BedStuService {
                         sd.setPhone(u.getPhone());
                         sd.setProfName(u.getProfName());
                         sd.setCollegeName(u.getCollegeName());
-
                         result.add(sd);
                     }
                 }
             }
         }
-
         return result;
     }
 
@@ -251,26 +247,6 @@ public class BedStuService {
                         }
                     }
                 }
-                // for (BedStu bedStu : bsl) {
-                // StuInfoDomain sd = new StuInfoDomain();
-                // AccountDTO a = m.get(bedStu.getStuId());
-                // Bed b = bedMap.get(bedStu.getBedId());
-                // sd.setNo(i);
-                // i++;
-                // if (null != a) {
-                // sd.setStuName(a.getName());
-                // sd.setClassesName(a.getClassesName());
-                // sd.setPhone(a.getPhoneNumber());
-                // sd.setProfName(a.getProfessionalName());
-                // sd.setCollegeName(a.getCollegeName());
-                // sd.setStuNo(a.getPersonId());
-                // }
-                // if (null != b) {
-                // sd.setBedName(b.getName());
-                // sd.setBedType(b.getBedType());
-                // }
-                // sdl.add(sd);
-                // }
             }
         }
         int i = 1;
@@ -352,7 +328,7 @@ public class BedStuService {
         bs = bedStuRepository.save(bs);
         if (null != b) {
             b.setLive(Boolean.TRUE);
-            b = bedRepository.save(b);
+            bedRepository.save(b);
         }
         if (null != r) {
             Long total = bedRepository.countByRoomIdAndLiveAndDeleteFlag(bd.getRoomId(), false,
@@ -361,15 +337,8 @@ public class BedStuService {
                 total = 0L;
             }
             r.setEmBeds(Integer.parseInt(total + ""));
-            r = roomRepository.save(r);
+            roomRepository.save(r);
         }
-        Integer sexType = 0;
-        if (a.getSex().equals("男")) {
-            sexType = 10;
-        } else if (a.getSex().equals("女")) {
-            sexType = 20;
-        }
-//		new Thread(new SendSmsRunnable(ddUserService, roomRepository, roomAssginRepository, bedRepository, bd.getRoomId(), sexType, smsService,roomAssginJdbc)).start();
         return bs;
     }
 
@@ -562,18 +531,10 @@ public class BedStuService {
                         sexType = 20;
                     }
                 }
-            } catch (JsonParseException e) {
-
-                e.printStackTrace();
-            } catch (JsonMappingException e) {
-
-                e.printStackTrace();
-            } catch (IOException e) {
-
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.warn("Exception", e);
             }
         }
-//		new Thread(new SendSmsRunnable(ddUserService, roomRepository, roomAssginRepository, bedRepository, b.getRoomId(), sexType, smsService,roomAssginJdbc)).start();
         return bs;
     }
 
@@ -671,15 +632,8 @@ public class BedStuService {
 
                 }
             }
-        } catch (JsonParseException e) {
-
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.warn("Exception", e);
         }
         return resultData;
     }

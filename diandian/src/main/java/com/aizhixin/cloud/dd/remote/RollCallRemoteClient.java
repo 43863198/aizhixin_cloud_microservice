@@ -23,7 +23,7 @@ import java.util.Set;
  * Created by LIMH on 2017/11/10.
  */
 //, url="http://gateway.aizhixintest.com:80/rollcall"
-@FeignClient(name = "rollcall")
+//@FeignClient(name = "rollcall")
 public interface RollCallRemoteClient {
 
     /**

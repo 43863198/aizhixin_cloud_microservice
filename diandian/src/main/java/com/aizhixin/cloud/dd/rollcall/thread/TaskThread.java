@@ -146,18 +146,18 @@ public class TaskThread extends Thread {
 								}
 							} catch (ParseException e) {
 
-								e.printStackTrace();
+								log.warn("Exception", e);
 							}
 
 					} catch (JsonParseException e) {
 
-						e.printStackTrace();
+						log.warn("Exception", e);
 					} catch (JsonMappingException e) {
 
-						e.printStackTrace();
+						log.warn("Exception", e);
 					} catch (IOException e) {
 
-						e.printStackTrace();
+						log.warn("Exception", e);
 					}
 				}
 			}

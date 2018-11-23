@@ -1,12 +1,12 @@
 package com.aizhixin.cloud.dd.alumnicircle.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,9 +38,8 @@ import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.repository.AssessRepository;
 import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
 import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
+@Slf4j
 @Service
 @Transactional
 public class AlumniCircleService {
@@ -74,15 +73,8 @@ public class AlumniCircleService {
 			if(null!=d&&null!=d.get("name")){
 				ac.setOrgName(d.get("name").toString());
 			}
-			} catch (JsonParseException e) {
-
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
-
-				e.printStackTrace();
-			} catch (IOException e) {
-
-				e.printStackTrace();
+			} catch (Exception e) {
+				log.warn("Exception", e);
 			}
 		}
 		ac.setId(null);

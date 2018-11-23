@@ -11,10 +11,12 @@ import com.aizhixin.cloud.dd.questionnaire.dto.QuestionnaireStudentCommentDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.IODTO;
 import com.aizhixin.cloud.dd.rollcall.dto.StudentInfoDTOV2;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
 
 import org.apache.poi.ss.util.CellRangeAddress;
 
+@Slf4j
 public class QuestionnaireDataExcelUtil {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 
@@ -323,15 +325,13 @@ public class QuestionnaireDataExcelUtil {
             workbook.write(ba);
             io = ioUtil.upload(qdd.getQuestionnaireName() + ".xls", ba.toByteArray());
         } catch (Exception e) {
-
-            e.printStackTrace();
+            log.warn("Exception", e);
         } finally {
             if (ba != null) {
                 try {
                     ba.close();
-                } catch (IOException e) {
-
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    log.warn("Exception", e);
                 }
             }
         }

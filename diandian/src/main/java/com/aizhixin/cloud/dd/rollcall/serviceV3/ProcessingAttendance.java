@@ -38,7 +38,7 @@ public class ProcessingAttendance {
                         Thread.sleep(2000);
                         log.info("休息2秒！");
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        log.warn("Exception", e);
                     }
                 } else {
                     log.info("开始处理签到队列.");
@@ -46,7 +46,7 @@ public class ProcessingAttendance {
                         Map<String, Object> info = (Map<String, Object>) RollCallServiceV3.concurrentLinkedDeque.poll();
                         pool.execute(new RunnableClass(info));
                     }catch (Exception e){
-                        e.printStackTrace();
+                        log.warn("Exception", e);
                         log.warn("签到队列中的数据处理异常！");
                     }
 

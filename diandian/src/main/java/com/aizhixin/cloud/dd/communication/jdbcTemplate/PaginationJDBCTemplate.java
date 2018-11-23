@@ -416,7 +416,7 @@ public class PaginationJDBCTemplate<T> {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         log.info("data size : {} ", data.size());
@@ -498,7 +498,7 @@ public class PaginationJDBCTemplate<T> {
 
                 } catch (ParseException e) {
 
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
         }
@@ -523,7 +523,7 @@ public class PaginationJDBCTemplate<T> {
 
                 } catch (ParseException e) {
 
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
 
@@ -810,7 +810,7 @@ public class PaginationJDBCTemplate<T> {
                 }
             } catch (ParseException e) {
 
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         return tt;

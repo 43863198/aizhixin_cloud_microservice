@@ -94,8 +94,7 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
                 }
             }
             questionnaireAssgins.add(questionnaireAssgin);
-            String json = tc.findTeachingClassListStudent(teachingClassesDTO.getTeachingClassesId(), 1,
-                    Integer.MAX_VALUE);
+            String json = tc.findTeachingClassListStudent(teachingClassesDTO.getTeachingClassesId(), 1, Integer.MAX_VALUE);
             if (!StringUtils.isEmpty(json)) {
                 try {
                     Map<String, Object> result = JsonUtil.Json2Object(json);
@@ -140,7 +139,7 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
                     }
                 } catch (Exception e) {
                     redisData.put(ApiReturnConstants.RESULT, "30");
-                    redisData.put(ApiReturnConstants.DATA, e.getMessage());
+                    redisData.put(ApiReturnConstants.DATA, e);
                 }
             }
         }

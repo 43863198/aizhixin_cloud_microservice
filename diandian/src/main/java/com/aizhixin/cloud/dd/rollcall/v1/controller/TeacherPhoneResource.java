@@ -304,7 +304,7 @@ public class TeacherPhoneResource {
             rollCallService.cancleRollCall(scheduleId, account);
             result.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
         }
 
@@ -327,7 +327,7 @@ public class TeacherPhoneResource {
             rollCallService.updateRollCallResult(rollcallDTO);
             result.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("success", Boolean.FALSE);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -361,7 +361,7 @@ public class TeacherPhoneResource {
             rollCallService.updateRollCall(rollCallIdSet, type, account.getId());
             result.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -390,7 +390,7 @@ public class TeacherPhoneResource {
 
             resBody.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             resBody.put(ApiReturnConstants.MESSAGE, "关闭异常");
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         resBody.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
         return new ResponseEntity<Object>(resBody, HttpStatus.OK);
@@ -460,7 +460,7 @@ public class TeacherPhoneResource {
         } catch (Exception e) {
             result.put(ApiReturnConstants.SUCCESS, false);
             result.put(ApiReturnConstants.MESSAGE, "修改点名设置异常," + e);
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
@@ -491,7 +491,7 @@ public class TeacherPhoneResource {
                 rollCallService.openClassrommRollcall(schedule.getId(), ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             result.put(ApiReturnConstants.MESSAGE, "开启随堂点失败!");
         }
@@ -526,7 +526,7 @@ public class TeacherPhoneResource {
                 rollCallService.openClassrommRollcall(schedule.getId(), ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC.equals(rollcallType) ? ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC : ScheduleConstants.TYPE_ROLL_CALL_DIGITAL);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             result.put(ApiReturnConstants.MESSAGE, "开启随堂点失败!");
         }
@@ -547,7 +547,7 @@ public class TeacherPhoneResource {
             ScheduleRollCall scheduleRollCall = scheduleRollCallService.findBySchedule(scheduleId);
             rollCallService.closeClassrommRollcall(scheduleId, scheduleRollCall);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             result.put(ApiReturnConstants.MESSAGE, "关闭随堂点失败!");
         }

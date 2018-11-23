@@ -228,7 +228,7 @@ public class LeaveServiceV2 {
             }
         } catch (Exception e) {
             log.warn("请假图片上传失败...。");
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         if (leavePictureUrls == null) {
             leavePictureUrls = "";

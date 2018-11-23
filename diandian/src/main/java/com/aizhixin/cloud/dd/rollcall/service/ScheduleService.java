@@ -14,7 +14,6 @@ import com.aizhixin.cloud.dd.monitor.utils.ScheduelStatusEnum;
 import com.aizhixin.cloud.dd.orgStructure.entity.TeachingClass;
 import com.aizhixin.cloud.dd.orgStructure.repository.TeachingClassRepository;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.entity.*;
 import com.aizhixin.cloud.dd.rollcall.repository.CourseRollCallRepository;
@@ -54,8 +53,6 @@ public class ScheduleService {
     private ScheduleQuery scheduleQuery;
     @Autowired
     private InitScheduleService initScheduleService;
-    //    @Autowired
-//    private StudentLeaveScheduleService studentLeaveScheduleService;
     @Autowired
     private StudentService studentService;
     @Autowired
@@ -72,8 +69,6 @@ public class ScheduleService {
     private ClaimService claimService;
     @Autowired
     public PushMonitor pushMonitor;
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
     @Autowired
     private TeachingClassRepository teachingClassRepository;
     @Autowired
@@ -536,7 +531,7 @@ public class ScheduleService {
             });
             endMap = null;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
     }
 
@@ -570,7 +565,7 @@ public class ScheduleService {
             log.info("上课了开始初始化学生的状态完毕...");
         } catch (Exception e) {
             log.warn("上课了开始初始化学生的状态失败，", e);
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         log.info("课前初始化数据耗时： " + (System.currentTimeMillis() - beginTime) + "ms");
     }
@@ -600,11 +595,6 @@ public class ScheduleService {
                 // 满足条件，进行初始化点名
                 initScheduleService.initScheduleRollCall(schedule, Boolean.TRUE, null, null, null, null);
                 status = ScheduelStatusEnum.ScheduleStatusOpen.getStatus();
-                try {
-                    rollCallRemoteClient.upadteRuler(schedule.getOrganId(), schedule.getTeacherId(), schedule.getCourseId(), courseRollCall.getRollCallType(), courseRollCall.getLateTime(), courseRollCall.getIsOpen(), "");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             } else {
                 status = ScheduelStatusEnum.ScheduleStatuClose.getStatus();
                 message = "打卡机为关闭状态";
@@ -646,7 +636,7 @@ public class ScheduleService {
             updateStudentStatusAfterClass(list);
         } catch (Exception e) {
             log.warn("下课!!!了修改学生状态计算异常，" + e);
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         log.info("课后写入数据库耗时： " + (System.currentTimeMillis() - beginTime) + "ms");
 
@@ -801,7 +791,7 @@ public class ScheduleService {
             rollCallStatsService.statsStuTeachingClassByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
             rollCallStatsService.statsStuAllByScheduleRollCallId(scheduleRollCall.getId());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("课后处理数据异常", e);
             message = e.getMessage();
             scheduleFlag = false;
@@ -825,7 +815,7 @@ public class ScheduleService {
             stringRedisTemplate.delete(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId.longValue()));
 
         } catch (Exception e) {
-            log.warn("清除reids数据异常。" + e.getMessage(), e);
+            log.warn("清除reids数据异常。" + e, e);
         }
     }
 
@@ -857,7 +847,7 @@ public class ScheduleService {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("计算学生是否迟到异常，默认学生为未迟到!", e);
         }
         return true;
@@ -873,7 +863,7 @@ public class ScheduleService {
                 redisTemplate.opsForValue().set(RedisUtil.getSchduleDominKey(scheduleId), schedule, 1, TimeUnit.DAYS);
             }
         } catch (Exception e) {
-            log.warn("获取排课信息异常，注意请检查数据。", e.getMessage());
+            log.warn("获取排课信息异常，注意请检查数据。", e);
         }
         return schedule;
     }
@@ -937,12 +927,6 @@ public class ScheduleService {
                     schedule.setTeacherNname(teacherName);
                 }
                 save(schedule);
-                // 签到重构优化
-                try {
-                    rollCallRemoteClient.declareCourse(orgId, schedule.getId(), srcTeacher, teacherId, teacherName);
-                } catch (Exception e) {
-                    log.warn("认领通知rollcall失败。");
-                }
             }
         }
 
