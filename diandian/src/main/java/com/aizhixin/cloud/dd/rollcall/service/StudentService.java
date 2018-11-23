@@ -171,8 +171,8 @@ public class StudentService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("获取学生信息异常!" + e.getMessage(), e.getMessage());
+            log.warn("Exception", e);
+            log.warn("获取学生信息异常!" + e, e);
             log.error("Exception", e);
         }
         return studentDTOList;
@@ -207,8 +207,8 @@ public class StudentService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("获取学生信息异常!" + e.getMessage(), e.getMessage());
+            log.warn("Exception", e);
+            log.warn("获取学生信息异常!" + e, e);
             log.error("Exception", e);
         }
         return studentDTOList;

@@ -3,7 +3,6 @@ package com.aizhixin.cloud.dd.rollcall.service;
 import com.aizhixin.cloud.dd.common.core.DataValidity;
 import com.aizhixin.cloud.dd.common.domain.CountDomain;
 import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
-import com.aizhixin.cloud.dd.common.schedule.MyScheduleService;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.constant.RollCallConstants;
 import com.aizhixin.cloud.dd.homepage.dto.HomePageDTO;
@@ -12,15 +11,12 @@ import com.aizhixin.cloud.dd.orgStructure.entity.UserInfo;
 import com.aizhixin.cloud.dd.orgStructure.repository.TeachingClassRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
-import com.aizhixin.cloud.dd.rollcall.domain.ScheduleInClassRedisDomain;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.entity.*;
 import com.aizhixin.cloud.dd.rollcall.repository.*;
 import com.aizhixin.cloud.dd.rollcall.utils.CourseUtils;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
 import com.aizhixin.cloud.dd.rollcall.utils.RollCallUtils;
-import com.aizhixin.cloud.dd.rollcallv2.domain.RollcallRedisDomain;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -70,8 +66,6 @@ public class ScheduleRollCallService {
     private ScheduleQuery scheduleQuery;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
     @Autowired
     private SemesterService semesterService;
     @Autowired
@@ -277,7 +271,7 @@ public class ScheduleRollCallService {
             ls.add(homePage);
             pageInfo.setData(ls);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
 
         return pageInfo;
@@ -385,50 +379,6 @@ public class ScheduleRollCallService {
                             dto.setCanReport(false);
                         }
                     }
-                }
-            }
-        } catch (Exception e) {
-            log.warn("获取签到列表失败", e);
-        }
-        return studentSignCourse;
-    }
-
-    public List<StudentScheduleDTO> getStudentSignCourseV2(Long orgId, Long studentId) {
-
-        // 数据转换
-        List<StudentScheduleDTO> studentSignCourse = new ArrayList<>();
-        try {
-
-            List<ScheduleInClassRedisDomain> signCourses = rollCallRemoteClient.getSignCourse(orgId, studentId);
-            if (signCourses != null && signCourses.size() > 0) {
-                for (ScheduleInClassRedisDomain signCours : signCourses) {
-                    Schedule schedule = scheduleService.findOne(signCours.getScheduleId());
-                    ScheduleRollCall scheduleRollCall = findBySchedule(signCours.getScheduleId());
-
-                    StudentScheduleDTO item = new StudentScheduleDTO();
-                    item.setId(schedule.getId());
-                    item.setScheduleId(schedule.getId());
-                    item.setScheduleRollCallId(scheduleRollCall.getId());
-                    item.setTeachingClassId(schedule.getTeachingclassId());
-                    item.setTeachingClassName(schedule.getTeachingclassName());
-                    item.setWeekName(schedule.getWeekName());
-                    item.setDayOfWeek(schedule.getDayOfWeek() + "");
-                    item.setCourseName(schedule.getCourseName());
-                    item.setTeacher(schedule.getTeacherNname());
-                    item.setClassRoom(schedule.getClassRoomName());
-                    item.setClassBeginTime(schedule.getScheduleStartTime());
-                    item.setClassEndTime(schedule.getScheduleEndTime());
-                    item.setRollcallType(scheduleRollCall.getRollCallType());
-                    item.setTeach_time(schedule.getTeachDate());
-                    item.setLocaltion(scheduleRollCall.getLocaltion());
-                    item.setLateTime(scheduleRollCall.getCourseLaterTime());
-                    item.setAbsenteeismTime(scheduleRollCall.getAbsenteeismTime());
-                    item.setRollCall(Boolean.TRUE);
-                    item.setInClass(Boolean.TRUE);
-                    item.setHaveReport(Boolean.FALSE);
-                    item.setDeviation(0);
-                    item.setType("1");
-                    studentSignCourse.add(item);
                 }
             }
         } catch (Exception e) {
@@ -765,7 +715,7 @@ public class ScheduleRollCallService {
                     log.info("根据该排课ID:" + scheduleId + ",未找到班级信息！");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
             Long tt = orgManagerRemoteService.countStudentsByTeachingClassId(schedule.getTeachingclassId());
             if (null != tt) {
@@ -801,7 +751,7 @@ public class ScheduleRollCallService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return ls;
     }
@@ -821,7 +771,7 @@ public class ScheduleRollCallService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return flag;
     }
@@ -871,8 +821,8 @@ public class ScheduleRollCallService {
             scheduleRollCall = scheduleRollCallRepository.findOne(id);
             redisTemplate.opsForValue().set(RedisUtil.getSchduleRollCallDominKey(scheduleRollCall.getSchedule().getId()), scheduleRollCall, 1, TimeUnit.DAYS);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("获取排课信息的排课规则失败，请检查排课数据", e.getMessage());
+            log.warn("Exception", e);
+            log.warn("获取排课信息的排课规则失败，请检查排课数据", e);
         }
         return scheduleRollCall;
     }

@@ -30,7 +30,7 @@ public class CourseUtils {
                 return false;
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("计算学生是否迟到异常，默认学生为未迟到!", e);
         }
         return true;
@@ -50,7 +50,7 @@ public class CourseUtils {
                 return false;
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("计算学生是否迟到异常，默认学生为未迟到!", e);
         }
         return true;
@@ -74,7 +74,7 @@ public class CourseUtils {
                 return false;
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return true;
     }
@@ -122,7 +122,7 @@ public class CourseUtils {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("计算学生是否迟到异常，默认学生为未迟到!", e);
         }
         return true;

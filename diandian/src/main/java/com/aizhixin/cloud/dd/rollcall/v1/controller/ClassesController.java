@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -39,6 +40,7 @@ import java.util.*;
 /**
  * Created by zhen.pan on 2017/5/8.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/web/v1/classes")
 @Api(description = "测试组织机构班级管理API")
@@ -64,7 +66,7 @@ public class ClassesController {
     @RequestMapping(value = "/queryStudentNotIncludeException", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "GET", value = "查询学生信息", response = Void.class, notes = "查询学生信息<br><br><b>@author zhen.pan</b>")
     public ResponseEntity<?> queryStudentNotIncludeException(@ApiParam(value = "班级名称") @RequestParam(value = "classesId", required = false) Long classesId,
-        @ApiParam(value = "名称") @RequestParam(value = "name", required = false) String name, @RequestHeader("Authorization") String accessToken) {
+                                                             @ApiParam(value = "名称") @RequestParam(value = "name", required = false) String name, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -83,7 +85,7 @@ public class ClassesController {
     @RequestMapping(value = "/queryStudentException", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "GET", value = "查询暂停考勤学生信息", response = Void.class, notes = "查询暂停考勤学生信息<br><br><b>@author zhen.pan</b>")
     public ResponseEntity<?> queryStudentException(@ApiParam(value = "班级名称") @RequestParam(value = "classesId", required = false) Long classesId,
-        @ApiParam(value = "名称") @RequestParam(value = "name", required = false) String name, @RequestHeader("Authorization") String accessToken) {
+                                                   @ApiParam(value = "名称") @RequestParam(value = "name", required = false) String name, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -132,10 +134,10 @@ public class ClassesController {
     @RequestMapping(value = "/ClassAttendance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "查询教学班考勤以及统计", httpMethod = "GET", response = Void.class, notes = "查询教学班考勤以及统计 <br>@author DuanWei")
     public ResponseEntity<?> ClassAttendance(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
-        @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName,
-        @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-        @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
+                                             @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
+                                             @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName,
+                                             @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                             @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
         // long start = System.currentTimeMillis();
         // LOG.info("Start ......" + start);
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
@@ -149,7 +151,7 @@ public class ClassesController {
         }
 
         PageData<AttendancesInfoDTO> attendancesInfoDTOPageData
-            = teachingClassesService.listTeachingClassesInfo(account.getOrganId(), semesterId, courseName, teacherName, pageNumber, pageSize);
+                = teachingClassesService.listTeachingClassesInfo(account.getOrganId(), semesterId, courseName, teacherName, pageNumber, pageSize);
         // long end = System.currentTimeMillis();
         // LOG.info("End ......speed time:" + end + " time:" + (end - start));
         return new ResponseEntity<Object>(attendancesInfoDTOPageData, HttpStatus.OK);
@@ -158,9 +160,9 @@ public class ClassesController {
     @RequestMapping(value = "/ClassAttendanceInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "教学班考勤详细信息", httpMethod = "GET", response = Void.class, notes = "教学班考勤详细信息 <br>@author DuanWei")
     public ResponseEntity<?> ClassAttendanceInfo(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "教学班ID") @RequestParam(value = "classId", required = true) Long classId,
-        @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-        @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
+                                                 @ApiParam(value = "教学班ID") @RequestParam(value = "classId", required = true) Long classId,
+                                                 @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                 @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -175,18 +177,7 @@ public class ClassesController {
             stuIds.add(attendancesDTO.getStudentId());
         }
         // 根据教学班ID 获取信息
-        // List <IdNameDomain> classIds = teachingClassesService.queryClassInfo(ids);
         List<TeachStudentDomain> stuIdInfos = teachingClassesService.queryStuInfoId(stuIds);
-        // if (classIds != null) {
-        // for (IdNameDomain idNameDomain : classIds) {
-        // Long id = idNameDomain.getId();
-        // for (AttendancesDTO attendancesDTO : attendancesDTOS) {
-        // if (attendancesDTO.getClassId().equals(id)) {
-        // attendancesDTO.setClassName(idNameDomain.getName());
-        // }
-        // }
-        // }
-        // }
         if (stuIdInfos != null && stuIdInfos.size() > 0) {
             for (TeachStudentDomain stuIdInfo : stuIdInfos) {
                 Long id = stuIdInfo.getId();
@@ -203,9 +194,9 @@ public class ClassesController {
     @RequestMapping(value = "/AttendanceWeekTendency", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "教学班学周趋势", httpMethod = "GET", response = Void.class, notes = "教学班学周趋势 <br>@author DuanWei")
     public ResponseEntity<?> AttendanceWeekTendency(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = true) Long classId,
-        @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
-        @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName, @RequestHeader("Authorization") String accessToken) {
+                                                    @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = true) Long classId,
+                                                    @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
+                                                    @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -254,9 +245,9 @@ public class ClassesController {
     @RequestMapping(value = "/exportAttendanceClass", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "导出教学班考勤", httpMethod = "GET", response = Void.class, notes = "导出教学班考勤 <br>@author DuanWei")
     public ResponseEntity<?> export(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
-        @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName, @RequestHeader("Authorization") String accessToken)
-        throws IOException {
+                                    @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
+                                    @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName, @RequestHeader("Authorization") String accessToken)
+            throws IOException {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -287,7 +278,7 @@ public class ClassesController {
                 result.put(ReturnConstants.RETURN_MESSAGE, downLoadFileUrl);
                 result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             } finally {
                 if (fis != null) {
                     fis.close();
@@ -310,7 +301,7 @@ public class ClassesController {
     @RequestMapping(value = "/exportAttendanceClassInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "导出教学班出勤详细", httpMethod = "GET", response = Void.class, notes = "导出教学班出勤详细 <br>@author DuanWei")
     public ResponseEntity<?> exportAttendanceClassInfo(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "教学班ID") @RequestParam(value = "classId", required = true) Long classId, @RequestHeader("Authorization") String accessToken) throws IOException {
+                                                       @ApiParam(value = "教学班ID") @RequestParam(value = "classId", required = true) Long classId, @RequestHeader("Authorization") String accessToken) throws IOException {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -367,7 +358,7 @@ public class ClassesController {
                 result.put(ReturnConstants.RETURN_MESSAGE, downLoadFileUrl);
                 result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             } finally {
                 if (fis != null) {
                     fis.close();
@@ -390,10 +381,10 @@ public class ClassesController {
     @RequestMapping(value = "/exportAttendanceWeekTendency", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "导出教学班学周趋势", httpMethod = "GET", response = Void.class, notes = "导出教学班学周趋势 <br>@author DuanWei")
     public ResponseEntity<?> exportAttendanceWeekTendency(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = true) Long classId,
-        @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
-        @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName, @RequestHeader("Authorization") String accessToken)
-        throws IOException {
+                                                          @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = true) Long classId,
+                                                          @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
+                                                          @ApiParam(value = "授课教师") @RequestParam(value = "teacherName", required = false) String teacherName, @RequestHeader("Authorization") String accessToken)
+            throws IOException {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -452,7 +443,7 @@ public class ClassesController {
                 result.put(ReturnConstants.RETURN_MESSAGE, downLoadFileUrl);
                 result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             } finally {
                 if (fis != null) {
                     fis.close();
@@ -474,11 +465,11 @@ public class ClassesController {
     @RequestMapping(value = "/ClassAdministrative", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "查询行政班考勤以及统计", httpMethod = "GET", response = Void.class, notes = "查询行政班考勤以及统计 <br>@author DuanWei")
     public ResponseEntity<?> ClassAdministrative(@ApiParam(value = "学期ID") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
-        @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
-        @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
-        @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-        @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
+                                                 @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
+                                                 @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
+                                                 @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
+                                                 @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                 @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -579,9 +570,9 @@ public class ClassesController {
     @RequestMapping(value = "/ClassAdministrativeInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "行政班考勤详细信息", httpMethod = "GET", response = Void.class, notes = "行政班考勤详细信息 <br>@author DuanWei")
     public ResponseEntity<?> ClassAdministrativeInfo(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "行政班ID") @RequestParam(value = "classId", required = true) Long classId,
-        @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-        @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
+                                                     @ApiParam(value = "行政班ID") @RequestParam(value = "classId", required = true) Long classId,
+                                                     @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                     @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -612,9 +603,9 @@ public class ClassesController {
     @RequestMapping(value = "/AdministrativeWeekTendency", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "行政班学周趋势", httpMethod = "GET", response = Void.class, notes = "学周趋势 <br>@author DuanWei")
     public ResponseEntity<?> AdministrativeWeekTendency(@ApiParam(value = "学期ID") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
-        @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
-        @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = false) Long classId, @RequestHeader("Authorization") String accessToken) {
+                                                        @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
+                                                        @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
+                                                        @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = false) Long classId, @RequestHeader("Authorization") String accessToken) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -746,12 +737,12 @@ public class ClassesController {
     @RequestMapping(value = "/exportAdministrativeClass", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "导出行政班考勤", httpMethod = "GET", response = Void.class, notes = "导出行政班考勤 <br>@author DuanWei")
     public ResponseEntity<?> exportAdministrativeClass(@ApiParam(value = "学期ID") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
-        @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
-        @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
-        @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-        @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken)
-        throws IOException {
+                                                       @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
+                                                       @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
+                                                       @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
+                                                       @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                       @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestHeader("Authorization") String accessToken)
+            throws IOException {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -861,7 +852,7 @@ public class ClassesController {
                 result.put(ReturnConstants.RETURN_MESSAGE, downLoadFileUrl);
                 result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             } finally {
                 if (fis != null) {
                     fis.close();
@@ -884,7 +875,7 @@ public class ClassesController {
     @RequestMapping(value = "/exportAdministrativeClassInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "导出行政班出勤详细", httpMethod = "GET", response = Void.class, notes = "导出行政班出勤详细 <br>@author DuanWei")
     public ResponseEntity<?> exportAdministrativeClass(@ApiParam(value = "学期名称") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = false) Long classId, @RequestHeader("Authorization") String accessToken) throws IOException {
+                                                       @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = false) Long classId, @RequestHeader("Authorization") String accessToken) throws IOException {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -927,7 +918,7 @@ public class ClassesController {
                 result.put(ReturnConstants.RETURN_MESSAGE, downLoadFileUrl);
                 result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             } finally {
                 if (fis != null) {
                     fis.close();
@@ -950,9 +941,9 @@ public class ClassesController {
     @RequestMapping(value = "/exportAdministrativeWeekTendency", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "导出行政班学周趋势", httpMethod = "GET", response = Void.class, notes = "导出行政班学周趋势 <br>@author DuanWei")
     public ResponseEntity<?> exportAdministrativeWeekTendency(@ApiParam(value = "学期ID") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
-        @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
-        @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = false) Long classId, @RequestHeader("Authorization") String accessToken) throws IOException {
+                                                              @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
+                                                              @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
+                                                              @ApiParam(value = "班级ID") @RequestParam(value = "classId", required = false) Long classId, @RequestHeader("Authorization") String accessToken) throws IOException {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -1079,7 +1070,7 @@ public class ClassesController {
                 result.put(ReturnConstants.RETURN_MESSAGE, downLoadFileUrl);
                 result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             } finally {
                 if (fis != null) {
                     fis.close();
@@ -1114,13 +1105,13 @@ public class ClassesController {
     @RequestMapping(value = "/attendancebyclass", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "查询行政班考勤以及统计", httpMethod = "GET", response = Void.class, notes = "查询行政班考勤以及统计 <br>@author DuanWei")
     public ResponseEntity<?> attendanceByClass(@ApiParam(value = "managerId 登录用户ID") @RequestParam(value = "managerId", required = true) Long managerId,
-        @ApiParam(value = "学期ID") @RequestParam(value = "semesterId", required = false) Long semesterId,
-        @ApiParam(value = "学校ID") @RequestParam(value = "orgId", required = false) Long orgId,
-        @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
-        @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
-        @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
-        @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-        @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+                                               @ApiParam(value = "学期ID") @RequestParam(value = "semesterId", required = false) Long semesterId,
+                                               @ApiParam(value = "学校ID") @RequestParam(value = "orgId", required = false) Long orgId,
+                                               @ApiParam(value = "学院ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
+                                               @ApiParam(value = "专业ID") @RequestParam(value = "professionId", required = false) Long professionId,
+                                               @ApiParam(value = "行政班ID") @RequestParam(value = "classAdministrativeId", required = false) Long classAdministrativeId,
+                                               @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                               @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         List<String> userRoles = orgManagerRemoteClient.getUserRoles(managerId);
         if (userRoles.size() > 0 && userRoles.contains("ROLE_COLLEGE_ADMIN")) {
             UserDomain userInfo = orgManagerRemoteClient.getUser(managerId);
@@ -1213,7 +1204,6 @@ public class ClassesController {
                 }
             }
         }
-
         return new ResponseEntity<Object>(Page, HttpStatus.OK);
     }
 

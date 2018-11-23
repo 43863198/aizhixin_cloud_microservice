@@ -4,6 +4,7 @@ import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.communication.dto.RollCallEverDTO;
 import com.aizhixin.cloud.dd.communication.dto.RollCallReportDTO;
 import com.aizhixin.cloud.dd.communication.dto.RollCallReportStudentDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-
+@Slf4j
 @Repository
 public class RollCallEverQuery {
 
@@ -48,7 +49,7 @@ public class RollCallEverQuery {
                 try {
                     item.setOpenTime(DateFormatUtil.format(rs.getTimestamp("open_time"), DateFormatUtil.FORMAT_LONG));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
                 return item;
             }

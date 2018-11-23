@@ -25,6 +25,7 @@ import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.entity.Leave;
 import com.aizhixin.cloud.dd.rollcall.service.ClassesService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 @Service
 @Transactional
 public class CounselorRollcallTeacherService {
@@ -496,8 +498,8 @@ public class CounselorRollcallTeacherService {
             // 保存定时点名信息
             saveOrUpdateAlarmClock(tempGroup, dto);
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("开启点名失败:" + e.toString(), e.getMessage());
+            log.warn("Exception", e);
+            LOG.warn("开启点名失败:" + e.toString(), e);
             return ApiReturn.message(Boolean.FALSE, "保存异常,联系管理员", null);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
@@ -743,8 +745,8 @@ public class CounselorRollcallTeacherService {
                 clockService.putAlarmMap(doTime.getTime(), tempGroup.getId());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("添加定时任务异常,组id:()", tempGroup.getId(), e.getMessage());
+            log.warn("Exception", e);
+            LOG.warn("添加定时任务异常,组id:()", tempGroup.getId(), e);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
     }
@@ -809,8 +811,8 @@ public class CounselorRollcallTeacherService {
             Date doTime = DateFormatUtil.parse(str, DateFormatUtil.FORMAT_MINUTE);
             clockService.putAlarmMap(doTime.getTime(), tempGroup.getId());
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("添加定时任务异常,组id:()", tempGroup.getId(), e.getMessage());
+            log.warn("Exception", e);
+            LOG.warn("添加定时任务异常,组id:()", tempGroup.getId(), e);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
     }
@@ -820,7 +822,7 @@ public class CounselorRollcallTeacherService {
         try {
             return format.parse(timeStr);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return null;
         }
     }

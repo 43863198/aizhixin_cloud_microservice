@@ -627,7 +627,7 @@ public class QuestionnaireService {
             }
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("message", "保存失败" + e);
             result.put("falseMSG", false);
         }
@@ -649,7 +649,7 @@ public class QuestionnaireService {
             questionnaireRepository.delete(id);
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("errorMSG", false);
             throw new Exception(e);
         }
@@ -707,7 +707,7 @@ public class QuestionnaireService {
             pageData.setData(qDtoList);
             PageData.setPageData(pageData, page.getTotalElements(), page.getTotalPages());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return pageData;
     }
@@ -786,7 +786,7 @@ public class QuestionnaireService {
         try {
             questionnaire.setEndDate(DateFormatUtil.parse(endDate + " 23:59:59", DateFormatUtil.FORMAT_LONG));
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
             result.put(ApiReturnConstants.MESSAGE, "结束日期格式错误");
             return result;
@@ -888,7 +888,7 @@ public class QuestionnaireService {
             }
             result.put("trueMSG", true);
         } catch (BeansException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("falseMSG", false);
         }
         return result;
@@ -1051,7 +1051,7 @@ public class QuestionnaireService {
             result.put("trueMSG", true);
         } catch (Exception e) {
             result.put("trueMSG", false);
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return result;
     }
@@ -1192,7 +1192,7 @@ public class QuestionnaireService {
             }
             questionnaireCensusDetailDTO.setPage(p);
         } catch (DlEduException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return questionnaireCensusDetailDTO;
     }

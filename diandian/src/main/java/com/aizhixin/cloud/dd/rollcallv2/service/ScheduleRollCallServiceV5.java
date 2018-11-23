@@ -8,7 +8,6 @@ import com.aizhixin.cloud.dd.constant.RollCallConstants;
 import com.aizhixin.cloud.dd.constant.ScheduleConstants;
 import com.aizhixin.cloud.dd.homepage.dto.HomePageDTO;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.domain.CurrentScheduleRulerDomain;
 import com.aizhixin.cloud.dd.rollcall.dto.*;
 import com.aizhixin.cloud.dd.rollcall.entity.OrganSet;
@@ -45,8 +44,8 @@ public class ScheduleRollCallServiceV5 {
 
     private final Logger log = LoggerFactory.getLogger(ScheduleRollCallServiceV5.class);
 
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
+//    @Autowired
+//    private RollCallRemoteClient rollCallRemoteClient;
 
     @Autowired
     private ScheduleRollCallService scheduleRollCallService;
@@ -87,7 +86,7 @@ public class ScheduleRollCallServiceV5 {
 
         if (DateFormatUtil.formatShort(new Date()).equals(teachDate)) {
             // 查询当天
-            list = rollCallRemoteClient.currentDayStudentCourseList(orgId, account.getId());
+//            list = rollCallRemoteClient.currentDayStudentCourseList(orgId, account.getId());
 
             StudentScheduleDTO studentScheduleDTO = null;
             List stuSchlist = new ArrayList();
@@ -96,7 +95,7 @@ public class ScheduleRollCallServiceV5 {
                     if (scheduleRedisDomain == null) {
                         continue;
                     }
-                    ScheduleRollCallRedisDomain scheduleRollCallRedisDomain = rollCallRemoteClient.getScheduleRollCall(orgId, scheduleRedisDomain.getScheduleId());
+                    ScheduleRollCallRedisDomain scheduleRollCallRedisDomain = null;//rollCallRemoteClient.getScheduleRollCall(orgId, scheduleRedisDomain.getScheduleId());
                     if (null == scheduleRollCallRedisDomain) {
                         scheduleRollCallRedisDomain = new ScheduleRollCallRedisDomain();
                         scheduleRollCallRedisDomain.setRollCallType(ScheduleConstants.TYPE_ROLL_CALL_AUTOMATIC);
@@ -108,7 +107,7 @@ public class ScheduleRollCallServiceV5 {
                     spc.put(studentScheduleDTO.getScheduleRollCallId().toString(), Lists.newArrayList(studentScheduleDTO));
                 }
 
-                Map<String, RollcallRedisDomain> map = rollCallRemoteClient.currentDayStudentSignType(account.getOrganId(), account.getId());
+                Map<String, RollcallRedisDomain> map = null;// rollCallRemoteClient.currentDayStudentSignType(account.getOrganId(), account.getId());
                 if (map != null) {
                     for (Map.Entry<String, RollcallRedisDomain> entry : map.entrySet()) {
                         List<StudentScheduleDTO> tlist = spc.get(String.valueOf(entry.getKey()));
@@ -221,7 +220,7 @@ public class ScheduleRollCallServiceV5 {
 
             // 查询某一天的排课，并按照课程节排序
             pageList = scheduleService.findByteachingclassIdInAndTeachDateAndDeleteFlag(teachingClassIdsStr, teachingClassIds, teachDate, DataValidity.VALID.getState(),
-                new Sort(new Sort.Order(Sort.Direction.ASC, "periodNo")));
+                    new Sort(new Sort.Order(Sort.Direction.ASC, "periodNo")));
 
             pageInfo.setTotalCount(1L);
             pageInfo.setPageCount(null == pageList ? 0 : pageList.size());
@@ -281,7 +280,7 @@ public class ScheduleRollCallServiceV5 {
 
                 // 是否在签到时间内 课前10分钟，截至上课时间
                 boolean flag = (DateFormatUtil.getNow(DateFormatUtil.FORMAT_SHORT).equals(schedule.getTeachDate()) && CourseUtils.classBeginTime(schedule.getScheduleStartTime())
-                    && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
+                        && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
 
                 studentScheduleDTO.setCanReport(false);
                 studentScheduleDTO.setInClass(flag);
@@ -302,7 +301,7 @@ public class ScheduleRollCallServiceV5 {
             }
 
             if (DateFormatUtil.formatShort(new Date()).equals(teachDate)) {
-                Map<String, RollcallRedisDomain> map = rollCallRemoteClient.currentDayStudentSignType(account.getOrganId(), account.getId());
+                Map<String, RollcallRedisDomain> map = null;//rollCallRemoteClient.currentDayStudentSignType(account.getOrganId(), account.getId());
                 if (map != null) {
                     for (Map.Entry<String, RollcallRedisDomain> entry : map.entrySet()) {
                         List<StudentScheduleDTO> tlist = spc.get(entry.getKey());
@@ -408,7 +407,7 @@ public class ScheduleRollCallServiceV5 {
         // 数据转换
         List<StudentScheduleDTO> studentSignCourse = new ArrayList<>();
         try {
-            List<CurrentScheduleRulerDomain> scheduleRulerDomainList = rollCallRemoteClient.getSignCourseRuler(orgId, studentId);
+            List<CurrentScheduleRulerDomain> scheduleRulerDomainList = null;//rollCallRemoteClient.getSignCourseRuler(orgId, studentId);
             if (null != scheduleRulerDomainList && !scheduleRulerDomainList.isEmpty()) {
                 for (CurrentScheduleRulerDomain curSchedule : scheduleRulerDomainList) {
                     StudentScheduleDTO item = new StudentScheduleDTO();
@@ -433,8 +432,8 @@ public class ScheduleRollCallServiceV5 {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("", e.getMessage());
+            log.warn("Exception", e);
+            log.warn("", e);
         }
 
         return studentSignCourse;
@@ -459,6 +458,6 @@ public class ScheduleRollCallServiceV5 {
                 }
             }
         }
-        return rollCallRemoteClient.signin(account.getOrganId(), account.getId(), signInDTO);
+        return null;//rollCallRemoteClient.signin(account.getOrganId(), account.getId(), signInDTO);
     }
 }

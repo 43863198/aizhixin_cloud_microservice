@@ -25,8 +25,8 @@
 //            source.output().send(MessageBuilder.withPayload(msg).build());
 //        } catch (Exception e) {
 //            log.info("消息发送失败，原因："+e);
-//            e.printStackTrace();
-//            e.printStackTrace();
+//            log.warn("Exception", e);
+//            log.warn("Exception", e);
 //        }
 //    }
 //

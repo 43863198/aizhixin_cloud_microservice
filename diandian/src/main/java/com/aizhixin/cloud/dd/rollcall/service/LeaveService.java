@@ -104,7 +104,7 @@ public class LeaveService {
             }
         } catch (Exception e) {
             log.warn("请假图片上传失败...。");
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         if (leavePictureUrls == null) {
             leavePictureUrls = "";
@@ -702,7 +702,7 @@ public class LeaveService {
                             try {
                                 tempTeacherId = send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(), DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
                             } catch (ParseException e) {
-                                e.printStackTrace();
+                                log.warn("Exception", e);
                             }
                             if (null != tempTeacherId) {
                                 ids.add(tempTeacherId);
@@ -765,7 +765,7 @@ public class LeaveService {
                             try {
                                 tempTeacherId = send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(), DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
                             } catch (ParseException e) {
-                                e.printStackTrace();
+                                log.warn("Exception", e);
                             }
                             if (null != tempTeacherId) {
                                 ids.add(tempTeacherId);
@@ -807,7 +807,7 @@ public class LeaveService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         Map<String, Object> res = new HashMap<>();
         res.put(ApiReturnConstants.MESSAGE, ApiReturnConstants.SUCCESS);

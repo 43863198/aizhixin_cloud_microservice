@@ -140,7 +140,7 @@ public class PhoneWebController {
             organSetService.save(oragnSet);
             resBody.put("msg", "修改成功!");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             resBody.put("msg", "修改异常" + e);
         }
         return new ResponseEntity <>(resBody, HttpStatus.OK);
@@ -280,7 +280,7 @@ public class PhoneWebController {
             OrganSet organSet = organSetService.findByOrganId(userId);
             result.put("antiCheating", organSet == null ? Boolean.TRUE : organSet.getAnti_cheating());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity <Object>(result, HttpStatus.OK);
     }

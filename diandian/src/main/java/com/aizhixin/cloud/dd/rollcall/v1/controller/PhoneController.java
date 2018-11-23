@@ -102,7 +102,7 @@ public class PhoneController {
         try {
             account = ddUserService.getUserInfoWithLoginBak(accessToken);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -132,7 +132,7 @@ public class PhoneController {
         try {
             account = ddUserService.getUserInfoWithLogin(accessToken);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
@@ -224,7 +224,7 @@ public class PhoneController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
@@ -264,7 +264,7 @@ public class PhoneController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
@@ -396,7 +396,7 @@ public class PhoneController {
             scheduleService.executePerTenMinutes(teachTime);
             result.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("success", Boolean.FALSE);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -420,7 +420,7 @@ public class PhoneController {
             ddUserService.updateAvatar(account.getId(), accessToken, file.getOriginalFilename(), file.getBytes());
         } catch (IOException e) {
 
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return null;
     }
@@ -524,7 +524,7 @@ public class PhoneController {
         try {
             ad = homePageService.getAd(StringUtils.isBlank(role) ? HomePageUtil.STUDENT : role, StringUtils.isBlank(version) ? "V2" : version, orgId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("getAdException", e);
         }
         return new ResponseEntity<>(ad, HttpStatus.OK);
@@ -544,7 +544,7 @@ public class PhoneController {
             homePageService.initAllRoleAd(StringUtils.isBlank(version) ? "V2" : version, orgId);
             result.put(ReturnConstants.RETURN_SUCCESS, Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("initAdException", e);
             result.put(ReturnConstants.RETURN_SUCCESS, Boolean.FALSE);
         }

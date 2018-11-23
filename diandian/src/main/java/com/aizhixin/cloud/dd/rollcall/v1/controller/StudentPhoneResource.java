@@ -104,7 +104,7 @@ public class StudentPhoneResource {
         try {
             page = scheduleRollCallService.getStudentCourseListDay(PageUtil.createNoErrorPageRequest(offset, limit), account, teachTime);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<PageInfo>(page, HttpStatus.OK);
     }
@@ -120,22 +120,6 @@ public class StudentPhoneResource {
         List<StudentScheduleDTO> studentSignCourse = scheduleRollCallService.getStudentSignCourse(account.getId());
         if (null == studentSignCourse) {
             studentSignCourse = new ArrayList<>();
-        }
-        return new ResponseEntity<>(studentSignCourse, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/students/signCourseV2", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(httpMethod = "GET", value = "签到课程 优化", response = Void.class, notes = "签到课程 优化<br>@author meihua.li")
-    public ResponseEntity<?> getStudentSignCourseV2(@RequestHeader("Authorization") String accessToken) {
-
-        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
-        if (account == null) {
-            return new ResponseEntity<Object>(TokenUtil.tokenValid(),
-                    HttpStatus.UNAUTHORIZED);
-        }
-        List<StudentScheduleDTO> studentSignCourse = scheduleRollCallService.getStudentSignCourseV2(account.getOrganId(), account.getId());
-        if (null == studentSignCourse) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(studentSignCourse, HttpStatus.OK);
     }

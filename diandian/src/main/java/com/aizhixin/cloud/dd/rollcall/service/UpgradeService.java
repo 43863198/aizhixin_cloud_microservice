@@ -92,7 +92,7 @@ public class UpgradeService {
             upgradeRepository.save(upgrade);
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("app升级包上传失败", e);
             result.put("trueMSG", false);
             result.put("message", e);
@@ -123,7 +123,7 @@ public class UpgradeService {
             }
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("trueMSG", false);
         }
         return result;

@@ -134,7 +134,7 @@ public class PushMessagePhoneController {
             pushMessageService.delete(id);
             result.put(ApiReturnConstants.SUCCESS, true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.SUCCESS, false);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);

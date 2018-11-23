@@ -21,6 +21,7 @@ import com.aizhixin.cloud.dd.orgStructure.repository.OrgInfoRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.ProfRepository;
 import com.aizhixin.cloud.dd.rollcall.dto.IODTO;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class CreditReportService {
 
@@ -147,7 +149,7 @@ public class CreditReportService {
             byte[] data = os.toByteArray();
             return data;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return null;
         } finally {
             try {
@@ -155,7 +157,7 @@ public class CreditReportService {
                     os.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
     }

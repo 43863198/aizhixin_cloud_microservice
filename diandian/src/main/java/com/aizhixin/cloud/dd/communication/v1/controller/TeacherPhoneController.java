@@ -410,7 +410,7 @@ public class TeacherPhoneController {
                 resBody.put("success", Boolean.FALSE);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("开启", e);
             resBody.put("success", Boolean.FALSE);
         }
@@ -454,7 +454,7 @@ public class TeacherPhoneController {
                 resBody.put("success", Boolean.FALSE);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             resBody.put("success", Boolean.FALSE);
         }
         return new ResponseEntity(resBody, HttpStatus.OK);
@@ -477,7 +477,7 @@ public class TeacherPhoneController {
             rollCallEverService.closeRollCallEver(rollCallEverId);
             resBody.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             resBody.put("success", Boolean.FALSE);
         }
         return new ResponseEntity(resBody, HttpStatus.OK);
@@ -528,7 +528,7 @@ public class TeacherPhoneController {
             resBody.put("data", list);
             resBody.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             resBody.put("success", Boolean.FALSE);
         }
         return new ResponseEntity(resBody, HttpStatus.OK);
@@ -617,7 +617,7 @@ public class TeacherPhoneController {
             resBody.put("data", list);
             resBody.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             resBody.put("success", Boolean.FALSE);
         }
         return new ResponseEntity(resBody, HttpStatus.OK);
@@ -711,7 +711,7 @@ public class TeacherPhoneController {
             resBody.put("data", list);
             resBody.put("success", Boolean.TRUE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             resBody.put("success", Boolean.FALSE);
         }
         return new ResponseEntity(resBody, HttpStatus.OK);

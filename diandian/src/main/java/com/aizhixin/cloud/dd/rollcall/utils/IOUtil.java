@@ -50,8 +50,7 @@ public class IOUtil {
                     + fileExtension, avatarData);
             FilePart filePart = new FilePart("file", byteSource);
             Part[] parts = {filePart};
-            MultipartRequestEntity mre = new MultipartRequestEntity(parts,
-                    post.getParams());
+            MultipartRequestEntity mre = new MultipartRequestEntity(parts, post.getParams());
             post.setRequestEntity(mre);
             client.executeMethod(post);
             final String response = post.getResponseBodyAsString();
@@ -67,12 +66,11 @@ public class IOUtil {
                     ioDTO.setFileMD5code(jsonObj.getString("fileMD5code"));
                     return ioDTO;
                 default:
-                    log.warn("Invalid response code (" + post.getStatusCode()
-                            + ") from common api service!");
+                    log.warn("Invalid response code (" + post.getStatusCode() + ") from common api service!");
                     break;
             }
-        } catch (IOException e) {
-            log.warn(e.getMessage());
+        } catch (Exception e) {
+            log.warn("Exception", e);
         } finally {
             post.releaseConnection();
         }

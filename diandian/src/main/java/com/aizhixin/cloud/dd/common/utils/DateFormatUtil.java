@@ -4,11 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+@Slf4j
 public class DateFormatUtil {
 
     private DateTime searchDate;
@@ -246,7 +248,7 @@ public class DateFormatUtil {
             try {
                 date = sdf.parse(dateStr);
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         return date;
@@ -259,7 +261,7 @@ public class DateFormatUtil {
             try {
                 date = sdf.parse(dateStr);
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         return date;

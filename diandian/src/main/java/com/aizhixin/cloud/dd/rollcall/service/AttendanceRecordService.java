@@ -14,6 +14,7 @@ import com.aizhixin.cloud.dd.rollcall.entity.RollCall;
 import com.aizhixin.cloud.dd.rollcall.repository.ModifyAttendanceLogRepository;
 import com.aizhixin.cloud.dd.rollcall.repository.RollCallRepository;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @E-mail: wujianwei@aizhixin.com
  * @Date: 2017-10-13
  */
+@Slf4j
 @Service
 @Transactional
 public class AttendanceRecordService {
@@ -172,7 +174,7 @@ public class AttendanceRecordService {
             p.getPage().setPageSize(pageable.getPageSize());
             p.getPage().setTotalPages(PageUtil.cacalatePagesize(count, p.getPage().getPageSize()));
         } catch (Exception e) {
-//            e.printStackTrace();
+//            log.warn("Exception", e);
             return p;
         }
         return p;
@@ -459,7 +461,7 @@ public class AttendanceRecordService {
             p.getPage().setPageSize(pageable.getPageSize());
             p.getPage().setTotalPages(PageUtil.cacalatePagesize(count, p.getPage().getPageSize()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return p;
         }
         return p;

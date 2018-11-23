@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.rollcall.dto.DianDianDaySchoolTimeTableDomain;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 @Component
 @Transactional
+@Slf4j
 public class PeriodService {
     @Autowired
     private OrgManagerRemoteClient orgManagerRemoteService;
@@ -24,16 +26,11 @@ public class PeriodService {
         if (null == orgId) {
             return null;
         }
-        Map<String, Object> periodResult = orgManagerRemoteService.listPeriod(
-                orgId, 1, Integer.MAX_VALUE);
-        // {id=16, orgId=null, startTime=null, endTime=null, no=1,
-        // createdDate=null, userId=null}
-        List<Map<String, Object>> mapPeriod = (List<Map<String, Object>>) periodResult
-                .get(ApiReturnConstants.DATA);
+        Map<String, Object> periodResult = orgManagerRemoteService.listPeriod(orgId, 1, Integer.MAX_VALUE);
+        List<Map<String, Object>> mapPeriod = (List<Map<String, Object>>) periodResult.get(ApiReturnConstants.DATA);
         List listPeriod = new ArrayList();
-        PeriodDTO dto = null;
         for (Map<String, Object> map : mapPeriod) {
-            dto = new PeriodDTO();
+            PeriodDTO dto = new PeriodDTO();
             dto.setId(Long.parseLong(String.valueOf(map.get("id"))));
             dto.setOrgId(orgId);
             dto.setStartTime((String) map.get("startTime"));
@@ -91,7 +88,7 @@ public class PeriodService {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.warn("Exception", e);
                     }
                     periodDTO.setTeacherName(d.getTeachers().split(",")[1]);
                 }
@@ -154,7 +151,7 @@ public class PeriodService {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.warn("Exception", e);
                     }
                     periodDTO.setTeacherName(d.getTeachers().split(",")[1]);
                 }

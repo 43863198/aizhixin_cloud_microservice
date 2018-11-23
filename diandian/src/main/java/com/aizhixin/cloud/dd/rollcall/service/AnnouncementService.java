@@ -125,7 +125,7 @@ public class AnnouncementService {
                 redisTemplate.opsForSet().add("taskAn", json);
             } catch (JsonProcessingException e) {
 
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         return a;
@@ -145,7 +145,7 @@ public class AnnouncementService {
                 redisTemplate.opsForSet().remove("taskAn", json);
             } catch (JsonProcessingException e) {
 
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         // announcementGroupRepository.deleteByGroupId(a.getGroupId());
@@ -195,7 +195,7 @@ public class AnnouncementService {
                 String json = mapper.writeValueAsString(gt);
                 redisTemplate.opsForSet().add("taskAn", json);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
         return a;
@@ -546,7 +546,7 @@ public class AnnouncementService {
                 redisTemplate.opsForSet().remove("taskAn", json);
             } catch (JsonProcessingException e) {
 
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
     }

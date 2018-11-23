@@ -1,5 +1,6 @@
 package com.aizhixin.cloud.dd.common.utils.http;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -9,6 +10,7 @@ import org.apache.http.impl.client.HttpClients;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 public class OauthPostJson implements ResponseUtil {
     /**
      * 使用String作为POST参数,
@@ -38,9 +40,9 @@ public class OauthPostJson implements ResponseUtil {
                 httpResponse = getHttpResponse(chr);
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         } finally {
             return httpResponse;
         }
@@ -64,9 +66,9 @@ public class OauthPostJson implements ResponseUtil {
                 httpResponse = getHttpResponse(chr);
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         } finally {
             return httpResponse;
         }
@@ -92,9 +94,9 @@ public class OauthPostJson implements ResponseUtil {
                 httpResponse = getHttpResponse(chr);
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         } finally {
             return httpResponse;
         }

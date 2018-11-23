@@ -106,7 +106,7 @@ public class InitScheduleService {
                 try {
                     executeTask(idNameDomain.getId(), idNameDomain.getName());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                     log.warn("初始化数据失败，组织机构id:({})", idNameDomain.getId());
                 }
             }
@@ -270,7 +270,6 @@ public class InitScheduleService {
             initScheduleRollCall(schedule, Boolean.FALSE, null, null, null, null);
         } catch (Exception e) {
             log.warn("排课异常.", e);
-            e.printStackTrace();
             message = e.getMessage();
         }
         pushMonitor.pushMonitor(schedule, (System.currentTimeMillis() - beginTime), StringUtils.isBlank(message), message);
@@ -292,7 +291,7 @@ public class InitScheduleService {
         try {
             return f.parse(str);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return null;
     }
@@ -439,8 +438,7 @@ public class InitScheduleService {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("初始化排课的点名信息失败," + schedule.getId(), e);
+            log.warn("初始化排课的点名信息失败:{}", schedule.getId(), e);
         }
         return false;
     }
@@ -666,7 +664,7 @@ public class InitScheduleService {
             stringRedisTemplate.delete(RedisUtil.getScheduleRollCallDateKey(scheduleRollCallId.longValue()));
 
         } catch (Exception e) {
-            log.warn("清除reids数据异常。" + e.getMessage(), e);
+            log.warn("清除reids数据异常。" + e, e);
         }
     }
 }

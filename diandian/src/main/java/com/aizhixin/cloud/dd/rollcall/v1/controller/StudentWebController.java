@@ -140,7 +140,7 @@ public class StudentWebController {
                     new StudentAttendanceDetailQueryPaginationSQL(courseIds, beginTime == null ? null : sdf
                             .format(beginTime), endTime == null ? null : edf.format(endTime), type, account.getId()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("导出考勤", e);
         }
 
@@ -214,7 +214,7 @@ public class StudentWebController {
                             beginTime == null ? null : sdf.format(beginTime), endTime == null ? null : edf.format(endTime),
                             account.getId(), courseId));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
 
         return new ResponseEntity(page, HttpStatus.OK);
@@ -242,7 +242,7 @@ public class StudentWebController {
                             beginTime == null ? null : sdf.format(beginTime), endTime == null ? null : edf.format(endTime),
                             account.getId(), courseId));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity(page, HttpStatus.OK);
     }

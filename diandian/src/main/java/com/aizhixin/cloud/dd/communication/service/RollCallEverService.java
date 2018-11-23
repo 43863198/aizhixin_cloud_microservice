@@ -328,7 +328,7 @@ public class RollCallEverService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return isCan;
     }

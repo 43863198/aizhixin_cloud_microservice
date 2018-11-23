@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.aizhixin.cloud.dd.common.domain.IdNameDomain;
 import com.aizhixin.cloud.dd.rollcall.dto.SemesterDTO;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 
 @Service
+@Slf4j
 public class SemesterService {
 
     @Autowired
@@ -106,7 +108,7 @@ public class SemesterService {
                         continue;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
 
                 sd.setEndDate(semJson.getString("endDate"));
@@ -122,7 +124,7 @@ public class SemesterService {
                             Date d2 = DateFormatUtil.parse(o2.getStartDate(), DateFormatUtil.FORMAT_SHORT);
                             return d1.getTime() > d2.getTime() ? -1 : 1;
                         } catch (ParseException e) {
-                            e.printStackTrace();
+                            log.warn("Exception", e);
                         }
                         return 0;
                     }

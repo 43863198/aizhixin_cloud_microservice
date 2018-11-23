@@ -202,7 +202,7 @@ public class QuestionnaireController {
         try {
             result = (Map<String, Object>) questionnaireService.deleteQuestionniare(id);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }
@@ -259,7 +259,7 @@ public class QuestionnaireController {
             result = (Map<String, Object>) questionnaireService.update(questionnaireDTO, account.getOrganId());
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("fmessage", e);
             result.put("falseMSG", false);
         }
@@ -280,7 +280,7 @@ public class QuestionnaireController {
         try {
             result = questionnaireService.updateEndTime(quesId, endDate);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put(ApiReturnConstants.ERROR, e);
             result.put(ApiReturnConstants.SUCCESS, false);
         }
@@ -326,7 +326,7 @@ public class QuestionnaireController {
             questionnaireService.cancleAssigned(id);
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("falseMSG", false);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -345,7 +345,7 @@ public class QuestionnaireController {
             questionnaireService.cancleAssignedList(ids);
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("falseMSG", false);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
@@ -364,7 +364,7 @@ public class QuestionnaireController {
             questionnaireService.cancleAssignedAll(questionnaireId);
             result.put("trueMSG", true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             result.put("falseMSG", false);
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);

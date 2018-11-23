@@ -31,7 +31,7 @@ import com.aizhixin.cloud.dd.rollcall.service.ClassesService;
 @Transactional
 public class TempGroupService {
 
-    private final Logger LOG = LoggerFactory.getLogger(TempGroupService.class);
+    private final Logger log = LoggerFactory.getLogger(TempGroupService.class);
 
     @Autowired
     private TempGroupRepository tempGroupRepository;
@@ -223,7 +223,7 @@ public class TempGroupService {
                 Thread thread = new Thread(myRunnable);
                 thread.start();
             } catch (Exception e) {
-                LOG.info("delCacheByDelTempGroup-1", e);
+                log.warn("delCacheByDelTempGroup-1", e);
             }
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
@@ -301,8 +301,7 @@ public class TempGroupService {
             studentSubGroupService.save(studentSubGroupList);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("开启点名失败2:" + e.getMessage(), e.getMessage());
+            log.warn("开启点名失败2:", e);
             return ApiReturn.message(Boolean.FALSE, "保存异常,联系管理员", null);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
@@ -419,12 +418,12 @@ public class TempGroupService {
      */
     public Map<String, Object> openTempGroup(String accessToken, Long tempGroupId) {
         if (tempGroupId == null) {
-            LOG.warn("开启点名失败-0-为空");
+            log.warn("开启点名失败-0-为空");
             throw new NullPointerException();
         }
         TempGroup tempGroup = tempGroupRepository.findOne(tempGroupId);
         if (null == tempGroup) {
-            LOG.warn("开启点名失败-1-为空:" + tempGroupId);
+            log.warn("开启点名失败-1-为空:" + tempGroupId);
             throw new NullPointerException();
         }
         if (tempGroup.getStatus()) {
@@ -457,7 +456,7 @@ public class TempGroupService {
                         return ApiReturn.message(Boolean.FALSE, "点名今日已经开启过!", null);
                     }
                 } catch (Exception e) {
-                    LOG.warn("Exception", e);
+                    log.warn("Exception", e);
                 }
                 CounsellorRollcallRule rule = ruleRepository.findOne(tempGroup.getRuleId());
                 counsellorRedisService.putRollcallRule(tempGroup.getId(), rule);
@@ -465,8 +464,7 @@ public class TempGroupService {
             //开启点名
             conunsellorRollcallService.openConunsellorRollcall(accessToken, tempGroup);
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("开启点名失败1:" + tempGroupId, e);
+            log.warn("开启点名失败1:" + tempGroupId, e);
             return ApiReturn.message(Boolean.FALSE, "开启点名失败!联系管理员", null);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
@@ -479,7 +477,7 @@ public class TempGroupService {
      * @return
      */
     public Map<String, Object> closeTempGroup(Long tempGroupId) {
-        LOG.warn("closeTempGroup:" + tempGroupId);
+        log.warn("closeTempGroup:" + tempGroupId);
         TempGroup tempGroup = tempGroupRepository.findOne(tempGroupId);
         if (null == tempGroup) {
             throw new NullPointerException();
@@ -492,9 +490,7 @@ public class TempGroupService {
             tempGroupRepository.save(tempGroup);
             conunsellorRollcallService.closeConunsellorRollcallAsyn(tempGroup, false, false);
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("关闭点名组失败:" + e.getMessage(), e.getMessage());
-            LOG.warn("Exception", e);
+            log.warn("关闭点名组失败:", e);
             return ApiReturn.message(Boolean.FALSE, "关闭点名组失败!联系管理员", null);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
@@ -508,14 +504,13 @@ public class TempGroupService {
                 return;
             }
             for (TempGroup tempGroup : tempGroups) {
-                LOG.info("开始关闭导员点名:" + tempGroup.getId());
+                log.info("开始关闭导员点名:" + tempGroup.getId());
                 conunsellorRollcallService.closeConunsellorRollcallV2(tempGroup, false, true, true);
-                LOG.info("完成关闭导员点名:" + tempGroup.getId());
+                log.info("完成关闭导员点名:" + tempGroup.getId());
             }
-            LOG.info("定时关闭点名完成");
+            log.info("定时关闭点名完成");
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("定时任务，关闭点名异常", e.getMessage());
+            log.warn("定时任务，关闭点名异常", e);
         }
     }
 
@@ -623,8 +618,7 @@ public class TempGroupService {
                 alarmClockService.putAlarmMap(doTime.getTime(), tempGroup.getId());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("添加定时任务异常,组id:()", tempGroup.getId(), e.getMessage());
+            log.warn("添加定时任务异常,组id:{}", tempGroup.getId(), e);
         }
         return ApiReturn.message(Boolean.TRUE, null, null);
     }
@@ -651,10 +645,4 @@ public class TempGroupService {
         return studentIds;
     }
 
-    /**
-     * 凌晨关闭导员点名
-     */
-    public void closeCounsellorRollcall() {
-
-    }
 }

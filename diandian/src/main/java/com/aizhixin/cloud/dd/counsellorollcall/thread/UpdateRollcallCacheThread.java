@@ -2,6 +2,7 @@ package com.aizhixin.cloud.dd.counsellorollcall.thread;
 
 import com.aizhixin.cloud.dd.common.provider.store.redis.RedisTokenStore;
 import com.aizhixin.cloud.dd.counsellorollcall.domain.UpdateRollcallReportDomain;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 public class UpdateRollcallCacheThread extends Thread {
     private static LinkedBlockingQueue<UpdateRollcallReportDomain> concurrentLinkedQueue = new LinkedBlockingQueue<>();
-
     private Logger log = LoggerFactory.getLogger(UpdateRollcallCacheThread.class);
     @Autowired
     private RedisTokenStore redisTokenStore;
@@ -24,7 +24,7 @@ public class UpdateRollcallCacheThread extends Thread {
         try {
             concurrentLinkedQueue.add(data);
         } catch (Exception e) {
-            e.printStackTrace();
+//            log.warn("Exception", e);
         }
     }
 
@@ -50,7 +50,7 @@ public class UpdateRollcallCacheThread extends Thread {
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
         }

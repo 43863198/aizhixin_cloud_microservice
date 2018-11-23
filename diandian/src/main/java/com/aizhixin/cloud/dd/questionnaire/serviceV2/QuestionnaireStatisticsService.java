@@ -10,7 +10,9 @@ import com.aizhixin.cloud.dd.questionnaire.thread.QuestionnaireStatisticsThread;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.IODTO;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class QuestionnaireStatisticsService {
     @Autowired
@@ -91,7 +94,7 @@ public class QuestionnaireStatisticsService {
             //初始化Excel
             XSSFWorkbook wb = new XSSFWorkbook();
             XSSFCellStyle cellStyle = wb.createCellStyle();
-            cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+            cellStyle.setAlignment(HorizontalAlignment.CENTER);
             //1.按课程统计
             generationSheet1(wb, questionnaire);
             //2.各课程汇总统计
@@ -128,7 +131,7 @@ public class QuestionnaireStatisticsService {
                         os.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
         } catch (Exception ex) {
@@ -915,8 +918,8 @@ public class QuestionnaireStatisticsService {
                         Map<String, Object> ct = null;
                         try {
                             ct = orgManagerRemoteService.getTeachingclassTeachers(item.getTeachingClassId());
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
+                        } catch (Exception e) {
+                            log.warn("Exception", e);
                         }
                         if (ct != null && ct.get("data") != null) {
                             List<Map> ts = (List<Map>) ct.get("data");
@@ -943,7 +946,7 @@ public class QuestionnaireStatisticsService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
     }
 

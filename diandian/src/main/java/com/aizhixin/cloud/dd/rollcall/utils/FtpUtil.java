@@ -54,7 +54,7 @@ public class FtpUtil {
 				ftp.logout();
 				ftp.disconnect();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.warn("Exception", e);
 			}
 		}
 	}
@@ -100,10 +100,8 @@ public class FtpUtil {
 	 *            远程目录
 	 * @throws Exception
 	 */
-	public static void startDown(Ftp f, String localBaseDir,
-			String remoteBaseDir) throws Exception {
+	public static void startDown(Ftp f, String localBaseDir, String remoteBaseDir) throws Exception {
 		if (FtpUtil.connectFtp(f)) {
-
 			try {
 				FTPFile[] files = null;
 				boolean changedir = ftp.changeWorkingDirectory(remoteBaseDir);
@@ -120,8 +118,7 @@ public class FtpUtil {
 					}
 				}
 			} catch (Exception e) {
-				logger.warn(e);
-				logger.warn("下载过程中出现异常");
+				logger.warn("下载过程中出现异常", e);
 			}
 		} else {
 			logger.warn("链接失败！");
@@ -137,14 +134,12 @@ public class FtpUtil {
 	 * @param relativeLocalPath
 	 * @param relativeRemotePath
 	 */
-	private static void downloadFile(FTPFile ftpFile, String relativeLocalPath,
-			String relativeRemotePath) {
+	private static void downloadFile(FTPFile ftpFile, String relativeLocalPath, String relativeRemotePath) {
 		if (ftpFile.isFile()) {
 			if (ftpFile.getName().indexOf("?") == -1) {
 				OutputStream outputStream = null;
 				try {
-					File locaFile = new File(relativeLocalPath
-							+ ftpFile.getName());
+					File locaFile = new File(relativeLocalPath + ftpFile.getName());
 					// 判断文件是否存在，存在则返回
 					if (locaFile.exists()) {
 						return;
@@ -168,15 +163,14 @@ public class FtpUtil {
 				}
 			}
 		} else {
-			String newlocalRelatePath = relativeLocalPath + ftpFile.getName();
-			String newRemote = new String(relativeRemotePath
-					+ ftpFile.getName().toString());
-			File fl = new File(newlocalRelatePath);
+			String newLocalRelatePath = relativeLocalPath + ftpFile.getName();
+			String newRemote = new String(relativeRemotePath + ftpFile.getName().toString());
+			File fl = new File(newLocalRelatePath);
 			if (!fl.exists()) {
 				fl.mkdirs();
 			}
 			try {
-				newlocalRelatePath = newlocalRelatePath + '/';
+				newLocalRelatePath = newLocalRelatePath + '/';
 				newRemote = newRemote + "/";
 				String currentWorkDir = ftpFile.getName().toString();
 				boolean changedir = ftp.changeWorkingDirectory(currentWorkDir);
@@ -184,29 +178,15 @@ public class FtpUtil {
 					FTPFile[] files = null;
 					files = ftp.listFiles();
 					for (int i = 0; i < files.length; i++) {
-						downloadFile(files[i], newlocalRelatePath, newRemote);
+						downloadFile(files[i], newLocalRelatePath, newRemote);
 					}
 				}
 				if (changedir) {
 					ftp.changeToParentDirectory();
 				}
 			} catch (Exception e) {
-				logger.warn(e);
+				logger.warn("Exception", e);
 			}
 		}
 	}
-
-	// public static void main(String[] args) throws Exception {
-	// Ftp f = new Ftp();
-	// f.setIpAddr("1111");
-	// f.setUserName("root");
-	// f.setPwd("111111");
-	// FtpUtil.connectFtp(f);
-	// File file = new File("F:/test/com/test/Testng.java");
-	// FtpUtil.upload(file);// 把文件上传在ftp上
-	// FtpUtil.startDown(f, "e:/", "/xxtest");// 下载ftp文件测试
-	// System.out.println("ok");
-	//
-	// }
-
 }

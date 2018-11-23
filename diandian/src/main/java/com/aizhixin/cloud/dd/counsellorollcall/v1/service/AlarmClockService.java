@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Transactional
 public class AlarmClockService {
 
-    private final Logger LOG = LoggerFactory.getLogger(AlarmClockService.class);
+    private final Logger log = LoggerFactory.getLogger(AlarmClockService.class);
 
     @Autowired
     private AlarmClockRepository alarmClockRepository;
@@ -64,20 +64,20 @@ public class AlarmClockService {
         if (null == alarmClockList || alarmClockList.isEmpty()) {
             return null;
         }
-        LOG.info("执行定时任务的数据集合为({})", alarmClockList.size());
+        log.info("执行定时任务的数据集合为({})", alarmClockList.size());
         for (AlarmClock alarmClock : alarmClockList) {
             try {
                 //开启点名任务
                 alarmClock(now, alarmClock, weekOfDate);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
             try {
                 if (alarmClock.getTempGroup().getRollcallNum() != null && alarmClock.getTempGroup().getRollcallNum().intValue() > 1 && alarmClock.getEndTime() != null) {
                     closeAlarmClock(now, alarmClock, weekOfDate);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Exception", e);
             }
         }
 
@@ -107,7 +107,7 @@ public class AlarmClockService {
         List<IdNameDomain> classList = orgManagerRemoteService.getClassesByTeacher(alarmClock.getTempGroup().getTeacherId());
         if (classList == null || classList.size() == 0) {
             alarmClockRepository.deleteAlarmClockByTempGroup(alarmClock.getTempGroup());
-            LOG.warn("教师[" + alarmClock.getTempGroup().getTeacherId() + "]不是辅导员，删除点名组[" + alarmClock.getTempGroup().getId() + "]定时任务");
+            log.warn("教师[" + alarmClock.getTempGroup().getTeacherId() + "]不是辅导员，删除点名组[" + alarmClock.getTempGroup().getId() + "]定时任务");
             return;
         }
 
@@ -117,7 +117,7 @@ public class AlarmClockService {
             time = DateFormatUtil.formatShort(date) + " " + alarmClock.getClockTime();
             alarmTime = DateFormatUtil.parse(time, DateFormatUtil.FORMAT_MINUTE);
         } catch (Exception e) {
-            LOG.warn("辅导员定时任务时间转换异常," + time, e.getMessage());
+            log.warn("辅导员定时任务时间转换异常," + time, e);
             return;
         }
 
@@ -135,12 +135,12 @@ public class AlarmClockService {
                 String timeStr = DateFormatUtil.formatShort(date) + " " + alarmClock.getEndTime();
                 endTime = DateFormatUtil.parse(timeStr, DateFormatUtil.FORMAT_MINUTE);
             } catch (Exception e) {
-                LOG.warn("Exception", e);
+                log.warn("Exception", e);
                 return;
             }
             if (endTime != null && endTime.getTime() > currentTimeMil && (currentTimeMil - alarmTimeMil) > 1 * 60 * 1000) {
                 //立即开启
-                LOG.warn("点名立即开启:"+alarmClock.getTempGroup().getId());
+                log.warn("点名立即开启:"+alarmClock.getTempGroup().getId());
                 openTempGroup(alarmClock.getTempGroup().getId());
             }
         }
@@ -169,7 +169,7 @@ public class AlarmClockService {
             time = DateFormatUtil.formatShort(date) + " " + alarmClock.getEndTime();
             endTime = DateFormatUtil.parse(time, DateFormatUtil.FORMAT_MINUTE);
         } catch (Exception e) {
-            LOG.warn("辅导员定时任务时间转换异常," + time, e.getMessage());
+            log.warn("辅导员定时任务时间转换异常," + time, e);
             return;
         }
 
@@ -182,7 +182,7 @@ public class AlarmClockService {
             addCloseAlarmMap(alarmClock.getTempGroup().getId(), endTimeMil);
         } else if ((currentTimeMil - endTimeMil) > 1 * 60 * 1000) {
             //判断当前时间已经大于截止时间1分钟，立即关闭
-            LOG.warn("判断当前时间已经大于截止时间1分钟:" + alarmClock.getTempGroup().getId());
+            log.warn("判断当前时间已经大于截止时间1分钟:" + alarmClock.getTempGroup().getId());
             closeTempGroup(alarmClock.getTempGroup().getId());
         }
     }
@@ -225,7 +225,7 @@ public class AlarmClockService {
                         AlarmClock alarmClock = alarmClockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
                         if (null != alarmClock && alarmClock.getStatus()) {
                             tempGroupService.openTempGroupSchedule(TokenUtil.accessToken, tempGroupId);
-                            LOG.info("定时任务开启导员点名组,组id:" + tempGroupId);
+                            log.info("定时任务开启导员点名组,组id:" + tempGroupId);
                             alarmMap.remove(entry.getKey());
                         }
                     }
@@ -240,7 +240,7 @@ public class AlarmClockService {
             AlarmClock alarmClock = alarmClockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
             if (null != alarmClock && alarmClock.getStatus()) {
                 tempGroupService.openTempGroupSchedule(TokenUtil.accessToken, tempGroupId);
-                LOG.info("立即开启导员点名组,组id:" + tempGroupId);
+                log.info("立即开启导员点名组,组id:" + tempGroupId);
             }
         }
     }
@@ -265,7 +265,7 @@ public class AlarmClockService {
                         AlarmClock alarmClock = alarmClockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
                         if (null != alarmClock && alarmClock.getStatus()) {
                             tempGroupService.closeTempGroup(tempGroupId);
-                            LOG.info("定时任务关闭导员点名组,组id:" + tempGroupId);
+                            log.info("定时任务关闭导员点名组,组id:" + tempGroupId);
                             closeAlarmMap.remove(entry.getKey());
                         }
                     }
@@ -275,18 +275,18 @@ public class AlarmClockService {
     }
 
     private void closeTempGroup(Long tempGroupId) {
-        LOG.info("closeTempGroup,组id:" + tempGroupId);
+        log.info("closeTempGroup,组id:" + tempGroupId);
         try {
             TempGroup tempGroup = tempGroupService.findOne(tempGroupId);
             if (tempGroup != null && DataValidity.VALID.getState().equals(tempGroup.getDeleteFlag())) {
                 AlarmClock alarmClock = alarmClockRepository.findByTempGroupAndDeleteFlag(tempGroup, DataValidity.VALID.getState());
                 if (null != alarmClock && alarmClock.getStatus()) {
                     tempGroupService.closeTempGroup(tempGroupId);
-                    LOG.info("立即关闭导员点名组,组id:" + tempGroupId);
+                    log.info("立即关闭导员点名组,组id:" + tempGroupId);
                 }
             }
         } catch (Exception e) {
-            LOG.info("Exception", e);
+            log.warn("Exception", e);
         }
     }
 

@@ -3,6 +3,7 @@ package com.aizhixin.cloud.dd.rollcall.repository;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.rollcall.dto.AssessDetailStudentDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.AssessGatherDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class TeacherAssessQuery {
 
@@ -75,7 +77,7 @@ public class TeacherAssessQuery {
                             / (item.getAssessNum() == 0 ? 1 : item.getAssessNum());
                     averageScore = String.valueOf(temp);
                 } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
                 item.setAverageScore(averageScore);
                 return item;
@@ -129,7 +131,7 @@ public class TeacherAssessQuery {
                     item.setAssessDate(DateFormatUtil.format(rs.getTimestamp("last_modified_date"),
                             DateFormatUtil.FORMAT_LONG));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
                 item.setContent(rs.getString("content"));
                 item.setClassRoomName(rs.getString("classRoomName"));

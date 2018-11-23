@@ -7,6 +7,7 @@ import java.util.List;
 import com.aizhixin.cloud.dd.constant.PushMessageConstants;
 import com.aizhixin.cloud.dd.messege.dto.AudienceDTO;
 import com.aizhixin.cloud.dd.messege.dto.MessageDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import com.aizhixin.cloud.dd.rollcall.repository.PushMessageRepository;
 /**
  * Service class for managing users.
  */
+@Slf4j
 @Service
 @Transactional
 public class PushMessageService {
@@ -50,7 +52,7 @@ public class PushMessageService {
             //TODO 消息 查询
             page = pushMessageRepository.findAllByModuleAndFunctionAndUserIdAndDeleteFlag(module, function, id, DataValidity.VALID.getState(), pageable);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         pageInfo.setTotalCount(page.getTotalElements());
         pageInfo.setPageCount(page.getTotalPages());

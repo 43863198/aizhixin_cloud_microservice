@@ -11,7 +11,6 @@ import com.aizhixin.cloud.dd.messege.service.MessageService;
 import com.aizhixin.cloud.dd.messege.service.PushMessageService;
 import com.aizhixin.cloud.dd.messege.service.PushService;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
-import com.aizhixin.cloud.dd.remote.RollCallRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.DianDianDaySchoolTimeTableDomain;
 import com.aizhixin.cloud.dd.rollcall.entity.Leave;
@@ -64,8 +63,8 @@ public class LeaveServiceV5 {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private RollCallRemoteClient rollCallRemoteClient;
+//    @Autowired
+//    private RollCallRemoteClient rollCallRemoteClient;
 
     @Autowired
     private LeaveService leaveService;
@@ -162,7 +161,7 @@ public class LeaveServiceV5 {
                                         && CourseUtils.classBeginTime(schedule.getScheduleStartTime()) && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
                                 if (inClass) {
                                     // 点点签到重构优化
-                                    rollCallRemoteClient.setStudentLeave(account.getOrganId(), schedule.getId(), leave.getStudentId());
+//                                    rollCallRemoteClient.setStudentLeave(account.getOrganId(), schedule.getId(), leave.getStudentId());
                                     RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
                                     if (null != rollCall) {
                                         rollCall.setLastType(rollCall.getType());
@@ -177,7 +176,7 @@ public class LeaveServiceV5 {
                                 tempTeacherId = leaveService.send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(),
                                         DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
                             } catch (ParseException e) {
-                                e.printStackTrace();
+                                log.warn("Exception", e);
                             }
                             if (null != tempTeacherId) {
                                 ids.add(tempTeacherId);
@@ -225,7 +224,7 @@ public class LeaveServiceV5 {
                                 boolean inClass = (DateFormatUtil.getNow(DateFormatUtil.FORMAT_SHORT).equals(schedule.getTeachDate())
                                         && CourseUtils.classBeginTime(schedule.getScheduleStartTime()) && CourseUtils.classEndTime(schedule.getScheduleEndTime()));
                                 if (inClass) {
-                                    rollCallRemoteClient.setStudentLeave(account.getOrganId(), schedule.getId(), leave.getStudentId());
+//                                    rollCallRemoteClient.setStudentLeave(account.getOrganId(), schedule.getId(), leave.getStudentId());
                                     RollCall rollCall = (RollCall) redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), leave.getStudentId());
                                     if (null != rollCall) {
                                         rollCall.setLastType(rollCall.getType());
@@ -239,7 +238,7 @@ public class LeaveServiceV5 {
                                 tempTeacherId = leaveService.send(leave.getStudentId(), schedule.getTeacherId(), schedule.getCourseId(),
                                         DateFormatUtil.parse(schedule.getTeachDate(), DateFormatUtil.FORMAT_SHORT), schedule.getPeriodId(), schedule, leave, account.getId());
                             } catch (ParseException e) {
-                                e.printStackTrace();
+                                log.warn("Exception", e);
                             }
                             if (null != tempTeacherId) {
                                 ids.add(tempTeacherId);
@@ -264,7 +263,7 @@ public class LeaveServiceV5 {
             messageService.push("请假审批结果通知", "请假审批结果通知", PushMessageConstants.FUNCTION_STUDENT_NOTICE, audiences);
             //----新消息服务----end
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         Map<String, Object> res = new HashMap<>();
         res.put(ApiReturnConstants.MESSAGE, ApiReturnConstants.SUCCESS);

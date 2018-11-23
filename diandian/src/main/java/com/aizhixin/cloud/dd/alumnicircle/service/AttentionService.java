@@ -29,8 +29,7 @@ public class AttentionService {
 		return attentionRepository.save(ad);
 	}
 	public Attention findByAttention(AttentionDomain ad) {
-		Attention a = attentionRepository.findByAttentionUserIdAndFollowedUserIdAndDeleteFlag(ad.getAttentionUserId(),
-				ad.getFollowedUserId(),DataValidity.VALID.getState());
+		Attention a = attentionRepository.findByAttentionUserIdAndFollowedUserIdAndDeleteFlag(ad.getAttentionUserId(), ad.getFollowedUserId(),DataValidity.VALID.getState());
 		return a;
 	}
 }

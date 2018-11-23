@@ -663,7 +663,7 @@ public class RollCallService {
                 return resBody;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         resBody.put(ApiReturnConstants.MESSAGE, "success!");
         resBody.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
@@ -699,7 +699,7 @@ public class RollCallService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return isCan;
     }
@@ -1039,7 +1039,7 @@ public class RollCallService {
             }
             redisTemplate.opsForHash().putAll(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCallMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             return false;
         }
         return true;
@@ -1179,7 +1179,7 @@ public class RollCallService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
         }
         return dtoList;
     }

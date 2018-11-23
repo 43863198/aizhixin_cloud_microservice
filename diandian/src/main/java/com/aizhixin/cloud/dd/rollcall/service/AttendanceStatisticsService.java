@@ -372,7 +372,7 @@ public class AttendanceStatisticsService {
                         os.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 }
             }
         }
@@ -421,7 +421,7 @@ public class AttendanceStatisticsService {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("Exception", e);
                 } finally {
                     // 清理资源
                 }

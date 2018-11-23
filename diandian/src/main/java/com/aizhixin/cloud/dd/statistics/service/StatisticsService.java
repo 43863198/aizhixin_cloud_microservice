@@ -137,7 +137,7 @@ public class StatisticsService {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Exception", e);
             log.warn("", e);
         }
 

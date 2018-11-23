@@ -66,8 +66,7 @@ public class ContrastToolService {
                 try {
                     getSchoolInfo(idNameDomain.getId(), idNameDomain.getName());
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    log.warn(e.getMessage());
+                    log.warn("Exception", e);
                 }
 
             }
