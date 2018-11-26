@@ -8,6 +8,7 @@ import com.aizhixin.cloud.dd.messege.dto.AudienceDTO;
 import com.aizhixin.cloud.dd.messege.service.MessageService;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
+import org.slf4j.Logger;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 
@@ -27,7 +28,7 @@ import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
 
 public class QuestionnairStudentTeachingClassInsertThread extends Thread {
     private QuestionnaireServiceV2 qs;
-    private OrgManagerRemoteClient tc;
+    private OrgManagerRemoteClient orgManagerRemoteClient;
     private List<TeachingClassesDTO> teachingClasses;
     private Questionnaire questionnaire;
     private IdNameDomain semester;
@@ -37,12 +38,14 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
     private MessageService messageService;
     private String accessToken;
     private RedisTemplate redisTemplate;
+    private Logger log;
 
     public QuestionnairStudentTeachingClassInsertThread(QuestionnaireServiceV2 qs, OrgManagerRemoteClient tc,
                                                         QuestionnaireAssignDTO questionnaireAssignDTO, Questionnaire questionnaire, IdNameDomain semester,
-                                                        Long userId, PushMessageRepository pushMessageRepository, PushService pushService, String accessToken, RedisTemplate redisTemplate, MessageService messageService) {
+                                                        Long userId, PushMessageRepository pushMessageRepository, PushService pushService, String accessToken,
+                                                        RedisTemplate redisTemplate, MessageService messageService, Logger log) {
         this.qs = qs;
-        this.tc = tc;
+        this.orgManagerRemoteClient = tc;
         this.teachingClasses = questionnaireAssignDTO.getTeachingClasses();
         this.questionnaire = questionnaire;
         this.semester = semester;
@@ -52,6 +55,7 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
         this.accessToken = accessToken;
         this.redisTemplate = redisTemplate;
         this.messageService = messageService;
+        this.log = log;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
                 }
             }
             questionnaireAssgins.add(questionnaireAssgin);
-            String json = tc.findTeachingClassListStudent(teachingClassesDTO.getTeachingClassesId(), 1, Integer.MAX_VALUE);
+            String json = orgManagerRemoteClient.findTeachingClassListStudent(teachingClassesDTO.getTeachingClassesId(), 1, Integer.MAX_VALUE);
             if (!StringUtils.isEmpty(json)) {
                 try {
                     Map<String, Object> result = JsonUtil.Json2Object(json);
@@ -138,9 +142,12 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
                         }
                     }
                 } catch (Exception e) {
+                    log.warn("Exception", e);
                     redisData.put(ApiReturnConstants.RESULT, "30");
                     redisData.put(ApiReturnConstants.DATA, e);
                 }
+            } else {
+                log.info("QuestionnairStudentTeachingClassInsertThread no student");
             }
         }
         if (!qasdl.isEmpty()) {
@@ -155,6 +162,8 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
             }
             messageService.push("问卷调查通知", "您有新的调查问卷。", PushMessageConstants.FUNCITON_QUESTIONNAIRE_NOTICE, audienceList);
             //----新消息服务----end
+        } else {
+            log.info("----qasdl is null----");
         }
         redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaire.getId()), redisData, 1, TimeUnit.DAYS);
     }
