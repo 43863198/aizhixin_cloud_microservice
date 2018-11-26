@@ -26,6 +26,7 @@ public class TeachingClassesAttendanceGroupbyScheduleDto {
     private Integer askForLeave;
     private Integer truancy;
     private Integer leave;
+    private Integer publicForLeave;
     private String attendance;
 
 }

@@ -15,6 +15,7 @@ import com.aizhixin.cloud.dd.questionnaire.dto.QuestionnaireCensusDTO;
 import com.aizhixin.cloud.dd.questionnaire.entity.QuestionnaireAssginStudents;
 import com.aizhixin.cloud.dd.remote.*;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,6 +50,7 @@ import com.aizhixin.cloud.dd.questionnaire.thread.QuestionnairStudentProfInsertT
 import com.aizhixin.cloud.dd.questionnaire.thread.QuestionnairStudentTeachingClassInsertThread;
 import com.aizhixin.cloud.dd.rollcall.utils.JsonUtil;
 
+@Slf4j
 @Service
 @Transactional
 public class QuestionnaireServiceV2 {
@@ -160,7 +162,7 @@ public class QuestionnaireServiceV2 {
         redisData.put(ApiReturnConstants.RESULT, "10");
         redisData.put(ApiReturnConstants.DATA, "进行中");
         redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), redisData, 1, TimeUnit.DAYS);
-        QuestionnairStudentTeachingClassInsertThread qt = new QuestionnairStudentTeachingClassInsertThread(this, orgManagerRemoteClient, questionnaireAssignDTO, q, semester, account.getId(), pushMessageRepository, pushService, accessToken, redisTemplate, messageService);
+        QuestionnairStudentTeachingClassInsertThread qt = new QuestionnairStudentTeachingClassInsertThread(this, orgManagerRemoteClient, questionnaireAssignDTO, q, semester, account.getId(), pushMessageRepository, pushService, accessToken, redisTemplate, messageService, log);
         qt.start();
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         result.put(ApiReturnConstants.DATA, q.getId());
@@ -224,8 +226,7 @@ public class QuestionnaireServiceV2 {
         redisData.put(ApiReturnConstants.RESULT, "10");
         redisData.put(ApiReturnConstants.DATA, "进行中");
         redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), redisData, 1, TimeUnit.DAYS);
-        QuestionnairStudentCollegeInsertThread qst
-                = new QuestionnairStudentCollegeInsertThread(questionnaireAssignDTO.getCollegeIds(), q, accessToken, account.getId(), this, semester);
+        QuestionnairStudentCollegeInsertThread qst = new QuestionnairStudentCollegeInsertThread(questionnaireAssignDTO.getCollegeIds(), q, accessToken, account.getId(), this, semester);
         qst.start();
         result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
         result.put(ApiReturnConstants.DATA, q.getId());
