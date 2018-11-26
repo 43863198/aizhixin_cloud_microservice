@@ -29,7 +29,9 @@ public class SynAllDataService {
 	private StudentChangeService studentChangeService;
 	@Autowired
 	private TeachingClassAndScheduleService teachingClassAndScheduleService;
-
+	@Autowired
+	@Qualifier("fdyInfoService")
+	private FdyInfoService fdyInfoService;
 	public void syn() {
 		studentChangeService.compactBaseLineData();
 		collegeService.compactBaseLineData();
@@ -39,5 +41,6 @@ public class SynAllDataService {
 		studentService.compactBaseLineData();
 		courseService.compactBaseLineData();
 		teachingClassAndScheduleService.compactBaseLineData();
+		fdyInfoService.compactBaseLineData();
 	}
 }

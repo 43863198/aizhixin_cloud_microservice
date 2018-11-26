@@ -19,6 +19,7 @@ public class ChongqingJdbcRepository {
 	private static String SQL_COURSE = "SELECT user_kcid, ZWMC FROM t_jh_setlessoninfo ";
 	private static String SQL_STUDENT_CHANGE = "SELECT DISTINCT T_XJ_StudBaseInfo.user_xh,T_XJ_StudChangeInfo.LB_ID,vxh.MC,T_XJ_StudChangeInfo.SM,T_XJ_StudChangeInfo.changetime  FROM T_XJ_StudBaseInfo,T_XJ_StudChangeInfo LEFT OUTER JOIN T_XJ_ClassInfo ON (T_XJ_ClassInfo.BJDM = (CASE WHEN ISNULL(oldbj, '') = '' THEN yddbj ELSE oldbj END)) AND (T_XJ_ClassInfo.YX_ID LIKE '%') LEFT OUTER JOIN T_XJ_ClassInfo ybj ON T_XJ_StudChangeInfo.oldbj = ybj.bjdm LEFT OUTER JOIN T_XJ_ClassInfo xbj ON T_XJ_StudChangeInfo.yddbj = xbj.bjdm LEFT OUTER JOIN t_zy_specialityinfo yzy ON ybj.zy_id = yzy.dm LEFT OUTER JOIN t_zy_specialityinfo xzy ON xbj.zy_id = xzy.dm LEFT OUTER JOIN t_zy_instituteinfo yyx ON ybj.yx_id = yyx.dm LEFT OUTER JOIN t_zy_instituteinfo xyx ON xbj.yx_id = xyx.dm LEFT OUTER JOIN VIEW_XJ_HLPYDJG vxh ON T_XJ_StudChangeInfo.LB_ID = vxh.DM,t_zy_specialityinfo,T_ZY_Schoolinfo,t_jh_terminfo WHERE (T_XJ_StudBaseInfo.XH = T_XJ_StudChangeInfo.XH) AND (T_XJ_StudChangeInfo.LB_ID LIKE '%') AND (T_XJ_StudChangeInfo.XN like '2018') AND (T_XJ_StudChangeInfo.xq like '0') AND t_jh_terminfo.dm = T_XJ_StudChangeInfo.xq AND ISNULL(T_XJ_StudBaseInfo.user_xh, '') LIKE '%' AND T_XJ_StudBaseInfo.xm LIKE '%' AND T_XJ_ClassInfo.nj LIKE '%' AND T_XJ_ClassInfo.zy_id = t_zy_specialityinfo.dm AND t_zy_specialityinfo.pycc LIKE '%' AND ISNULL(T_XJ_StudBaseInfo.xjlb_id, '') LIKE '%' ";
 
+	private static String SQL_FDYINFO = "select BJDM, fdyname , fdyphone from T_XJ_ClassInfo WHERE fdyname IS NOT NULL or fdyphone IS NOT NULL";
 	private static String SQL_TEACHING_CLASS_AND_SCHEDULE = "SELECT " + " T_KB_AUTO_TABLE.SKBJ,  "
 			+ " t_jh_setlessoninfo.user_kcid as KCID, " + " t_jh_setlessoninfo.ZWMC as KCMC, "
 			+ " T_KB_AUTO_TABLE.BJDM, " + " t_xj_classinfo.BJMC, " + " T_ZY_TeacherInfo.gh as JS, "
@@ -88,7 +89,9 @@ public class ChongqingJdbcRepository {
 	public List<Map<String, Object>> findClasses() {
 		return jdbcTemplate.queryForList(SQL_NEW_CLASSES);
 	}
-
+	public List<Map<String,Object>> findFdyInfo(){
+		return jdbcTemplate.queryForList(SQL_FDYINFO);
+	}
 	public List<Map<String, Object>> findTeacher() {
 		return jdbcTemplate.queryForList(SQL_TEACHER);
 	}

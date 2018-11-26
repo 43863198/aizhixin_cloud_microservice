@@ -48,7 +48,9 @@ public class ExcelExportService {
 	private StudentChangeManager studentChangeManager;
 	@Autowired
 	private TeachingClassAndScheduleManager teachingClassAndScheduleManager;
-
+	@Autowired
+	@Qualifier("fdyInfoManager")
+	private FdyInfoManager fdyInfoManager;
 	/**
 	 * 全量最新数据的输出
 	 */
@@ -60,10 +62,12 @@ public class ExcelExportService {
 		List<StudentDTO> studentDTOList = studentManager.getCurrentAllNewData();
 		List<CourseDTO> courseDTOList = courseManager.getCurrentAllNewData();
 		List<StudentChangeDTO> studentChangeDTOList = studentChangeManager.getCurrentAllNewData();
+		// added for fudaoyuan information
+		List<FdyDTO> fdyDTOList = fdyInfoManager.getCurrentAllNewData();
 
 		OutputStream out = fileOperator.getOutputStream("base_data.xlsx");
 		excelUtilManager.outWorkboot(excelUtilManager.writeBasedataToExcel(collegeDTOList, professionalDTOList,
-				classesDTOList, studentDTOList, teacherDTOList, courseDTOList, studentChangeDTOList), out);
+				classesDTOList, studentDTOList, teacherDTOList, courseDTOList, studentChangeDTOList,fdyDTOList), out);
 		fileOperator.closeOutputStream(out);
 
 		// 课表相关
@@ -91,10 +95,12 @@ public class ExcelExportService {
 		List<StudentDTO> studentDTOList = studentManager.getCurrentUpdateData();
 		List<CourseDTO> courseDTOList = courseManager.getCurrentUpdateData();
 		List<StudentChangeDTO> studentChangeDTOList = studentChangeManager.getCurrentUpdateData();
+		//added for fudaoyuan current info
+		List<FdyDTO> fdyDTOList = fdyInfoManager.getCurrentUpdateData();
 
 		OutputStream out = fileOperator.getOutputStream("base_data_update.xlsx");
 		excelUtilManager.outWorkboot(excelUtilManager.writeBasedataToExcel(collegeDTOList, professionalDTOList,
-				classesDTOList, studentDTOList, teacherDTOList, courseDTOList, studentChangeDTOList), out);
+				classesDTOList, studentDTOList, teacherDTOList, courseDTOList, studentChangeDTOList,fdyDTOList), out);
 		fileOperator.closeOutputStream(out);
 
 		// 课表相关
