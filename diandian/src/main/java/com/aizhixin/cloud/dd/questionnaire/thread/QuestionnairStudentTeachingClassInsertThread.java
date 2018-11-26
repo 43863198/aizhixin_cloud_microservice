@@ -60,111 +60,120 @@ public class QuestionnairStudentTeachingClassInsertThread extends Thread {
 
     @Override
     public void run() {
-        Map<String, Object> redisData = new HashMap<>();
-        redisData.put(ApiReturnConstants.RESULT, "20");
-        redisData.put(ApiReturnConstants.DATA, "完成");
+        try {
+            Map<String, Object> redisData = new HashMap<>();
+            redisData.put(ApiReturnConstants.RESULT, "20");
+            redisData.put(ApiReturnConstants.DATA, "完成");
 
-        List<PushMessage> messages = new ArrayList<>();
-        List<QuestionnaireAssginStudentsDomain> qasdl = new ArrayList<>();
-        List<Long> userIds = new ArrayList<Long>();
-        List<QuestionnaireAssgin> questionnaireAssgins = new ArrayList<>();
-        for (TeachingClassesDTO teachingClassesDTO : teachingClasses) {
-            List<Long> userIdAll = new ArrayList<Long>();
-            QuestionnaireAssgin questionnaireAssgin = qs.findByQuestionnaireAssgin(10, teachingClassesDTO.getTeachingClassesId(), questionnaire.getId());
-            Long questionnaireAssginId = 0l;
-            if (null == questionnaireAssgin) {
-                questionnaireAssgin = new QuestionnaireAssgin();
-                questionnaireAssgin.setQuestionnaire(questionnaire);
-                questionnaireAssgin.setCollegeId(teachingClassesDTO.getCollegeId());
-                questionnaireAssgin.setCollegeName(teachingClassesDTO.getCollegeName());
-                questionnaireAssgin.setTeacherId(teachingClassesDTO.getTeacherId());
-                questionnaireAssgin.setTeacherName(teachingClassesDTO.getTeacherName());
-                questionnaireAssgin.setCourseName(teachingClassesDTO.getCourseName());
-                questionnaireAssgin.setCourseId(teachingClassesDTO.getCourseId());
-                questionnaireAssgin.setTeachingClassId(teachingClassesDTO.getTeachingClassesId());
-                questionnaireAssgin.setTeachingClassCode(teachingClassesDTO.getTeachingClassCode());
-                questionnaireAssgin.setTeachingClassName(teachingClassesDTO.getTeachingClassName());
-                questionnaireAssgin.setSemesterId(semester.getId());
-                questionnaireAssgin.setCreatedBy(userId);
-                questionnaireAssgin.setLastModifiedBy(userId);
-                questionnaireAssgin.setStatus("10");// 分配
-                questionnaireAssgin.setClassType(ClassType.TeachingClass.getClassTypeI());
-                questionnaireAssginId = qs.saveQuestionnaireAssgin(questionnaireAssgin);
-            } else {
-                questionnaireAssginId = questionnaireAssgin.getId();
-                List<Long> userIdss = qs.findQuestionnaireAssginStudent(questionnaireAssginId);
-                if (null != userIdss && 0 < userIdss.size()) {
-                    userIdAll.addAll(userIdss);
-                }
-            }
-            questionnaireAssgins.add(questionnaireAssgin);
-            String json = orgManagerRemoteClient.findTeachingClassListStudent(teachingClassesDTO.getTeachingClassesId(), 1, Integer.MAX_VALUE);
-            if (!StringUtils.isEmpty(json)) {
+            List<PushMessage> messages = new ArrayList<>();
+            List<QuestionnaireAssginStudentsDomain> qasdl = new ArrayList<>();
+            List<Long> userIds = new ArrayList<Long>();
+            List<QuestionnaireAssgin> questionnaireAssgins = new ArrayList<>();
+            for (TeachingClassesDTO teachingClassesDTO : teachingClasses) {
                 try {
-                    Map<String, Object> result = JsonUtil.Json2Object(json);
-                    if (null != result.get("data")) {
-                        List<Map<String, Object>> rl = (List<Map<String, Object>>) result.get("data");
-                        if (null != rl && 0 < rl.size()) {
-                            for (Map<String, Object> map : rl) {
-                                QuestionnaireAssginStudentsDomain qd = new QuestionnaireAssginStudentsDomain();
-                                if (null != map.get("classesId")) {
-                                    qd.setClassesId(Long.valueOf(map.get("classesId").toString()));
-                                }
-                                if (null != map.get("classesName")) {
-                                    qd.setClassesName(map.get("classesName").toString());
-                                }
-                                if (null != map.get("id")) {
-                                    if (userIdAll.contains(Long.valueOf(map.get("id").toString()))) {
-                                        continue;
-                                    }
-                                    userIdAll.add(Long.valueOf(map.get("id").toString()));
-                                    qd.setStuId(Long.valueOf(map.get("id").toString()));
-                                    userIds.add(Long.valueOf(map.get("id").toString()));
-                                    PushMessage message = new PushMessage();
-                                    message.setContent(questionnaire.getName());
-                                    message.setFunction(PushMessageConstants.FUNCITON_QUESTIONNAIRE_NOTICE);
-                                    message.setModule(PushMessageConstants.MODULE_QUESTIONNAIRE);
-                                    message.setHaveRead(Boolean.FALSE);
-                                    message.setPushTime(new Date());
-                                    message.setTitle("问卷调查通知");
-                                    message.setUserId(Long.valueOf(map.get("id").toString()));
-                                    String businessContent = "";
-                                    message.setBusinessContent(businessContent);
-                                    messages.add(message);
-                                }
-                                if (null != map.get("name")) {
-                                    qd.setStuName(map.get("name").toString());
-                                }
-                                qd.setQuestionnaireAssginId(questionnaireAssginId);
-                                qd.setStatus(10);
-                                qasdl.add(qd);
-                            }
+                    List<Long> userIdAll = new ArrayList<Long>();
+                    QuestionnaireAssgin questionnaireAssgin = qs.findByQuestionnaireAssgin(10, teachingClassesDTO.getTeachingClassesId(), questionnaire.getId());
+                    Long questionnaireAssginId = 0l;
+                    if (null == questionnaireAssgin) {
+                        questionnaireAssgin = new QuestionnaireAssgin();
+                        questionnaireAssgin.setQuestionnaire(questionnaire);
+                        questionnaireAssgin.setCollegeId(teachingClassesDTO.getCollegeId());
+                        questionnaireAssgin.setCollegeName(teachingClassesDTO.getCollegeName());
+                        questionnaireAssgin.setTeacherId(teachingClassesDTO.getTeacherId());
+                        questionnaireAssgin.setTeacherName(teachingClassesDTO.getTeacherName());
+                        questionnaireAssgin.setCourseName(teachingClassesDTO.getCourseName());
+                        questionnaireAssgin.setCourseId(teachingClassesDTO.getCourseId());
+                        questionnaireAssgin.setTeachingClassId(teachingClassesDTO.getTeachingClassesId());
+                        questionnaireAssgin.setTeachingClassCode(teachingClassesDTO.getTeachingClassCode());
+                        questionnaireAssgin.setTeachingClassName(teachingClassesDTO.getTeachingClassName());
+                        questionnaireAssgin.setSemesterId(semester.getId());
+                        questionnaireAssgin.setCreatedBy(userId);
+                        questionnaireAssgin.setLastModifiedBy(userId);
+                        questionnaireAssgin.setStatus("10");// 分配
+                        questionnaireAssgin.setClassType(ClassType.TeachingClass.getClassTypeI());
+                        questionnaireAssginId = qs.saveQuestionnaireAssgin(questionnaireAssgin);
+                    } else {
+                        questionnaireAssginId = questionnaireAssgin.getId();
+                        List<Long> userIdss = qs.findQuestionnaireAssginStudent(questionnaireAssginId);
+                        if (null != userIdss && 0 < userIdss.size()) {
+                            userIdAll.addAll(userIdss);
                         }
                     }
-                } catch (Exception e) {
+                    questionnaireAssgins.add(questionnaireAssgin);
+                    String json = orgManagerRemoteClient.findTeachingClassListStudent(teachingClassesDTO.getTeachingClassesId(), 1, Integer.MAX_VALUE);
+                    if (!StringUtils.isEmpty(json)) {
+                        try {
+                            Map<String, Object> result = JsonUtil.Json2Object(json);
+                            if (null != result.get("data")) {
+                                List<Map<String, Object>> rl = (List<Map<String, Object>>) result.get("data");
+                                if (null != rl && 0 < rl.size()) {
+                                    for (Map<String, Object> map : rl) {
+                                        QuestionnaireAssginStudentsDomain qd = new QuestionnaireAssginStudentsDomain();
+                                        if (null != map.get("classesId")) {
+                                            qd.setClassesId(Long.valueOf(map.get("classesId").toString()));
+                                        }
+                                        if (null != map.get("classesName")) {
+                                            qd.setClassesName(map.get("classesName").toString());
+                                        }
+                                        if (null != map.get("id")) {
+                                            if (userIdAll.contains(Long.valueOf(map.get("id").toString()))) {
+                                                continue;
+                                            }
+                                            userIdAll.add(Long.valueOf(map.get("id").toString()));
+                                            qd.setStuId(Long.valueOf(map.get("id").toString()));
+                                            userIds.add(Long.valueOf(map.get("id").toString()));
+                                            PushMessage message = new PushMessage();
+                                            message.setContent(questionnaire.getName());
+                                            message.setFunction(PushMessageConstants.FUNCITON_QUESTIONNAIRE_NOTICE);
+                                            message.setModule(PushMessageConstants.MODULE_QUESTIONNAIRE);
+                                            message.setHaveRead(Boolean.FALSE);
+                                            message.setPushTime(new Date());
+                                            message.setTitle("问卷调查通知");
+                                            message.setUserId(Long.valueOf(map.get("id").toString()));
+                                            String businessContent = "";
+                                            message.setBusinessContent(businessContent);
+                                            messages.add(message);
+                                        }
+                                        if (null != map.get("name")) {
+                                            qd.setStuName(map.get("name").toString());
+                                        }
+                                        qd.setQuestionnaireAssginId(questionnaireAssginId);
+                                        qd.setStatus(10);
+                                        qasdl.add(qd);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.warn("Exception", e);
+                            redisData.put(ApiReturnConstants.RESULT, "30");
+                            redisData.put(ApiReturnConstants.DATA, e);
+                        }
+                    } else {
+                        log.info("QuestionnairStudentTeachingClassInsertThread no student");
+                    }
+                    Thread.sleep(300);
+                }catch (Exception e){
                     log.warn("Exception", e);
-                    redisData.put(ApiReturnConstants.RESULT, "30");
-                    redisData.put(ApiReturnConstants.DATA, e);
                 }
-            } else {
-                log.info("QuestionnairStudentTeachingClassInsertThread no student");
             }
-        }
-        if (!qasdl.isEmpty()) {
-            qs.save(qasdl);
-            pushMessageRepository.save(messages);
-            pushService.listPush(accessToken, questionnaire.getName(), "问卷调查通知", "问卷调查通知", userIds);
+            if (!qasdl.isEmpty()) {
+                qs.save(qasdl);
+                pushMessageRepository.save(messages);
+                pushService.listPush(accessToken, questionnaire.getName(), "问卷调查通知", "问卷调查通知", userIds);
 
-            //----新消息服务----start
-            List<AudienceDTO> audienceList = new ArrayList<>();
-            for (QuestionnaireAssginStudentsDomain item : qasdl) {
-                audienceList.add(new AudienceDTO(item.getStuId(), item));
+                //----新消息服务----start
+                List<AudienceDTO> audienceList = new ArrayList<>();
+                for (QuestionnaireAssginStudentsDomain item : qasdl) {
+                    audienceList.add(new AudienceDTO(item.getStuId(), item));
+                }
+                messageService.push("问卷调查通知", "您有新的调查问卷。", PushMessageConstants.FUNCITON_QUESTIONNAIRE_NOTICE, audienceList);
+                //----新消息服务----end
+            } else {
+                log.info("----qasdl is null----");
             }
-            messageService.push("问卷调查通知", "您有新的调查问卷。", PushMessageConstants.FUNCITON_QUESTIONNAIRE_NOTICE, audienceList);
-            //----新消息服务----end
-        } else {
-            log.info("----qasdl is null----");
+            redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaire.getId()), redisData, 1, TimeUnit.DAYS);
+        } catch (Exception e) {
+            log.warn("Exception", e);
         }
-        redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaire.getId()), redisData, 1, TimeUnit.DAYS);
     }
 }

@@ -149,23 +149,28 @@ public class QuestionnaireServiceV2 {
     }
 
     public Map<String, Object> saveTeachingClassQuestionnaireAssgin(String accessToken, AccountDTO account, QuestionnaireAssignDTO questionnaireAssignDTO, Map<String, Object> result) {
-        IdNameDomain semester = semesterService.getCurrentSemester(account.getOrganId());
-        if (null == semester) {
-            result.put(ApiReturnConstants.MESSAGE, "该时间不在学期内，不能分配问卷。");
-            redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), null);
-            return result;
+        try {
+            IdNameDomain semester = semesterService.getCurrentSemester(account.getOrganId());
+            if (null == semester) {
+                result.put(ApiReturnConstants.MESSAGE, "该时间不在学期内，不能分配问卷。");
+                redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), null);
+                return result;
+            }
+            Questionnaire q = qr.findOne(questionnaireAssignDTO.getQuestionnaireId());
+            q.setStatus(QuestionnaireStatus.QUESTION_STATUS_ASSIGN);
+            q = questionnaireRepository.save(q);
+            Map<String, Object> redisData = new HashMap<>();
+            redisData.put(ApiReturnConstants.RESULT, "10");
+            redisData.put(ApiReturnConstants.DATA, "进行中");
+            redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), redisData, 1, TimeUnit.DAYS);
+            QuestionnairStudentTeachingClassInsertThread qt = new QuestionnairStudentTeachingClassInsertThread(this, orgManagerRemoteClient, questionnaireAssignDTO, q, semester, account.getId(), pushMessageRepository, pushService, accessToken, redisTemplate, messageService, log);
+            qt.start();
+            result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
+            result.put(ApiReturnConstants.DATA, q.getId());
+        } catch (Exception e) {
+            result.put(ApiReturnConstants.RESULT, Boolean.FALSE);
+            log.warn("Exception", e);
         }
-        Questionnaire q = qr.findOne(questionnaireAssignDTO.getQuestionnaireId());
-        q.setStatus(QuestionnaireStatus.QUESTION_STATUS_ASSIGN);
-        q = questionnaireRepository.save(q);
-        Map<String, Object> redisData = new HashMap<>();
-        redisData.put(ApiReturnConstants.RESULT, "10");
-        redisData.put(ApiReturnConstants.DATA, "进行中");
-        redisTemplate.opsForValue().set(RedisUtil.getQuesAssignResultKey(questionnaireAssignDTO.getQuestionnaireId()), redisData, 1, TimeUnit.DAYS);
-        QuestionnairStudentTeachingClassInsertThread qt = new QuestionnairStudentTeachingClassInsertThread(this, orgManagerRemoteClient, questionnaireAssignDTO, q, semester, account.getId(), pushMessageRepository, pushService, accessToken, redisTemplate, messageService, log);
-        qt.start();
-        result.put(ApiReturnConstants.RESULT, Boolean.TRUE);
-        result.put(ApiReturnConstants.DATA, q.getId());
         return result;
     }
 
