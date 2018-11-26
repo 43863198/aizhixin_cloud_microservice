@@ -197,7 +197,7 @@ public class StudentPhoneController {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-
+        log.info("导员点名签到:{} {}", account.getId(), reportDTO);
         Map<String, Object> resBody = rollCallEverService.reprotEver(account, reportDTO);
         if (resBody == null) {
             // 新版签到
@@ -221,7 +221,7 @@ public class StudentPhoneController {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-
+        log.info("导员点名签到:{} {}", account.getId(), reportDTO);
         /** ------------------------------------潘震2017-12-29修改----------------------- */
 //        Long a=System.currentTimeMillis();
         Map<String, Object> res = studentSignInService.signIn(account, reportDTO);

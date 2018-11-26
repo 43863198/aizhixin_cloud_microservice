@@ -13,6 +13,7 @@ import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @RequestMapping("/api/phone/v1/counsellor")
 @RestController
 @Api(value = "辅导员点名相关API", description = "辅导员点名相关API")
@@ -277,7 +279,7 @@ public class CounsellorRollcallController {
         if (account == null) {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
-
+        log.info("导员点名签到:{} {}", account.getId(), reportDTO);
         /** ------------------------------------潘震2017-12-29修改----------------------- */
 //        Long a=System.currentTimeMillis();
         Map<String, Object> res = studentSignInService.signIn(account, reportDTO);

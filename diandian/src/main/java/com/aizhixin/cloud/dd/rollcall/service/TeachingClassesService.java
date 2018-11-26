@@ -27,7 +27,7 @@ public class TeachingClassesService {
     TeachingClassAttendaceInfoQuery teachingClassAttendaceInfoQuery;
 
 
-    public PageData <TeachingClassesDTO> listTeachingClasses(Set <Long> teachingClassesIds, Long orgId, Long semesterId, Long collegeId, String courseName, String teacherName, Integer pageNumber, Integer pageSize) {
+    public PageData <TeachingClassesDTO> listTeachingClasses(Set<Long> teachingClassesIds, Long orgId, Long semesterId, Long collegeId, String courseName, String teacherName, Integer pageNumber, Integer pageSize) {
         TeachingClassQueryDomain teachingClassQueryDomain = new TeachingClassQueryDomain(teachingClassesIds, orgId, semesterId, collegeId, courseName, teacherName, pageNumber, pageSize);
         String str = orgManagerRemoteClient.listTeachingClasses(teachingClassQueryDomain);
         if (null == str) {
