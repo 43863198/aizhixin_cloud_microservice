@@ -1,13 +1,13 @@
-package com.aizhixin.cloud.cqaq.syn.manager;
+package com.aizhixin.cloud.sqzd.syn.manager;
 
-import com.aizhixin.cloud.cqaq.common.manager.FileOperator;
-import com.aizhixin.cloud.cqaq.common.manager.JsonUtil;
-import com.aizhixin.cloud.cqaq.syn.dto.BaseDTO;
-import com.aizhixin.cloud.cqaq.syn.dto.TeachingClassAndScheduleDTO;
-import com.aizhixin.cloud.cqaq.syn.dto.excel.CourseScheduleDTO;
-import com.aizhixin.cloud.cqaq.syn.dto.excel.TeachingclassClassesDTO;
-import com.aizhixin.cloud.cqaq.syn.dto.excel.TeachingclassDTO;
-import com.aizhixin.cloud.cqaq.syn.repository.ChongqingJdbcRepository;
+import com.aizhixin.cloud.sqzd.common.manager.FileOperator;
+import com.aizhixin.cloud.sqzd.common.manager.JsonUtil;
+import com.aizhixin.cloud.sqzd.syn.dto.BaseDTO;
+import com.aizhixin.cloud.sqzd.syn.dto.TeachingClassAndScheduleDTO;
+import com.aizhixin.cloud.sqzd.syn.dto.excel.CourseScheduleDTO;
+import com.aizhixin.cloud.sqzd.syn.dto.excel.TeachingclassClassesDTO;
+import com.aizhixin.cloud.sqzd.syn.dto.excel.TeachingclassDTO;
+import com.aizhixin.cloud.sqzd.syn.repository.ChongqingJdbcRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -258,7 +258,7 @@ public class TeachingClassAndScheduleManager {
 	 *            课程表
 	 */
 	public void sourceToExcel(List<TeachingClassAndScheduleDTO> inList, List<TeachingclassDTO> teachingclassDTOList,
-			List<TeachingclassClassesDTO> teachingclassClassesDTOList, List<CourseScheduleDTO> courseScheduleDTOList) {
+							  List<TeachingclassClassesDTO> teachingclassClassesDTOList, List<CourseScheduleDTO> courseScheduleDTOList) {
 		Map<String, TeachingclassDTO> teachingclassDTOMap = new HashMap<>();
 		Map<String, TeachingclassClassesDTO> teachingclassClassesDTOMap = new HashMap<>();
 		Map<String, Set<String>> teachingclassScheduleMap = new HashMap<>();
