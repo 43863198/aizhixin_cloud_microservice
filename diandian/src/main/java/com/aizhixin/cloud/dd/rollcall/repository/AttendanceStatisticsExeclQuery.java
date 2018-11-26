@@ -120,7 +120,7 @@ public class AttendanceStatisticsExeclQuery {
             + "  drr.total,drr.normal,drr.later,drr.askForLeave,drr.leaveEarly,drr.truant,drr.teaching_year,drr.class_name  "
             + "  FROM dd_schedule ds LEFT JOIN dd_schedule_rollcall dsr ON dsr.`SCHEDULE_ID` = ds.`ID` LEFT JOIN   "
             + " (SELECT dr.`SCHEDULE_ROLLCALL_ID`,dr.`teaching_year`,GROUP_CONCAT(DISTINCT dr.class_name) AS class_name, SUM(IF(TYPE<9, 1, 0)) AS total, "
-            + " SUM(IF(dr.`TYPE` = 1, 1, 0)) AS normal,SUM(IF(dr.`TYPE` = 3, 1, 0)) AS later, SUM(IF(is_public_leave=1, 1, 0)) publicforleave"
+            + " SUM(IF(dr.`TYPE` = 1, 1, 0)) AS normal,SUM(IF(dr.`TYPE` = 3, 1, 0)) AS later, SUM(IF(is_public_leave=1, 1, 0)) publicforleave,"
             + "  SUM(IF(dr.`TYPE` = 4, 1, 0)) AS askForLeave,SUM(IF(dr.`TYPE` = 5, 1, 0)) AS leaveEarly,SUM(IF(dr.`TYPE` = 2, 1, 0)) AS truant "
             + " FROM dd_rollcall dr  WHERE DATE_FORMAT(dr.`CREATED_DATE`, '%Y-%m-%d') >= '" + beginDate + "'   AND DATE_FORMAT(dr.`CREATED_DATE`, '%Y-%m-%d') <=  '" + endDate
             + "'    AND dr.org_id =  " + orgId + "    " + "  GROUP BY dr.`SCHEDULE_ROLLCALL_ID`) drr  "
