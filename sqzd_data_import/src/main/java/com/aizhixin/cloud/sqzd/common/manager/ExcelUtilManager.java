@@ -123,6 +123,13 @@ public class ExcelUtilManager {
 		titleRow.createCell(2).setCellValue("异动描述");
 	}
 
+	public void createFdyInfoHeader(Sheet sheet) {
+		Row titleRow = sheet.createRow(0);
+		titleRow.createCell(0).setCellValue("班级编号");
+		titleRow.createCell(1).setCellValue("辅导员姓名");
+		titleRow.createCell(2).setCellValue("辅导员联系电话");
+	}
+
 	public void createTeacherHeader(Sheet sheet) {
 		Row titleRow = sheet.createRow(0);
 		titleRow.createCell(0).setCellValue("老师姓名(必填)");
@@ -274,9 +281,23 @@ public class ExcelUtilManager {
 		}
 	}
 
+	private void writeFdyInfo(Workbook workbook, List<FdyDTO> fdyDTO) {
+		/************************************************* 学籍异动 *********************************/
+		Sheet sheet = createWorkBook(workbook, "辅导员表");
+		createFdyInfoHeader(sheet);
+		int rowIndex = 1;
+		for (FdyDTO d : fdyDTO) {
+			Row row = sheet.createRow(rowIndex);
+			row.createCell(0).setCellValue(d.getKey());
+			row.createCell(1).setCellValue(d.getFdyname());
+			row.createCell(2).setCellValue(d.getFdyphone());
+			rowIndex++;
+		}
+	}
+
 	public Workbook writeBasedataToExcel(List<CollegeDTO> collegeDTOList, List<ProfessionalDTO> professionalDTOList,
 			List<ClassesDTO> classesDTOList, List<StudentDTO> studentDTOList, List<TeacherDTO> teacherDTOList,
-			List<CourseDTO> courseDTOList, List<StudentChangeDTO> studentChangeDTOList) {
+			List<CourseDTO> courseDTOList, List<StudentChangeDTO> studentChangeDTOList , List<FdyDTO> fdyDTOList) {
 		Workbook workbook = createWorkbook();
 		writeCollege(workbook, collegeDTOList);
 		writeProfessional(workbook, professionalDTOList);
@@ -285,6 +306,7 @@ public class ExcelUtilManager {
 		writeTeacher(workbook, teacherDTOList);
 		writeCourse(workbook, courseDTOList);
 		writeStudentChange(workbook, studentChangeDTOList);
+		writeFdyInfo(workbook, fdyDTOList);
 		return workbook;
 	}
 
