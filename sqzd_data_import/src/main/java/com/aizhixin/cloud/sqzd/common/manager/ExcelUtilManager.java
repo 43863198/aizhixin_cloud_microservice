@@ -1,9 +1,10 @@
-package com.aizhixin.cloud.cqaq.common.manager;
+package com.aizhixin.cloud.sqzd.common.manager;
 
-import com.aizhixin.cloud.cqaq.syn.dto.*;
-import com.aizhixin.cloud.cqaq.syn.dto.excel.CourseScheduleDTO;
-import com.aizhixin.cloud.cqaq.syn.dto.excel.TeachingclassClassesDTO;
-import com.aizhixin.cloud.cqaq.syn.dto.excel.TeachingclassDTO;
+
+import com.aizhixin.cloud.sqzd.syn.dto.*;
+import com.aizhixin.cloud.sqzd.syn.dto.excel.CourseScheduleDTO;
+import com.aizhixin.cloud.sqzd.syn.dto.excel.TeachingclassClassesDTO;
+import com.aizhixin.cloud.sqzd.syn.dto.excel.TeachingclassDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
