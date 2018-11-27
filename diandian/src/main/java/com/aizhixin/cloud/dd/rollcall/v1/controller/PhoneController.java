@@ -52,6 +52,7 @@ public class PhoneController {
     @Autowired
     private OrgManagerRemoteClient orgManagerRemoteService;
 
+    @Lazy
     @Autowired
     private InitScheduleService initScheduleService;
 
