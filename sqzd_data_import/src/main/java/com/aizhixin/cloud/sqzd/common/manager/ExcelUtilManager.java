@@ -318,7 +318,11 @@ public class ExcelUtilManager {
 		for (TeachingclassDTO d : teachingclassDTOList) {
 			Row row = sheet1.createRow(rowIndex);
 			row.createCell(0).setCellValue(d.getSkbj());
-			row.createCell(1).setCellValue(d.getKcmc() + "-" + d.getBjmc());
+			if((d.getKcmc() + "-" + d.getBjmc()).length() > 50){
+				row.createCell(1).setCellValue(d.getKcmc() + "-1");
+			}else{
+				row.createCell(1).setCellValue(d.getKcmc() + "-" + d.getBjmc());
+			}
 			row.createCell(2).setCellValue(d.getKcdm());
 			row.createCell(3).setCellValue(d.getKcmc());
 			row.createCell(4).setCellValue(d.getXn());
