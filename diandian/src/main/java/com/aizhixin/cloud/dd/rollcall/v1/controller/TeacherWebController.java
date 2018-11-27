@@ -479,9 +479,8 @@ public class TeacherWebController {
             FileOutputStream fos = null;
             FileInputStream fis = null;
             try {
-                URL resource = this.getClass().getResource("/templates/教师评教明细导出模版.xls");
-                fis = new FileInputStream(URLDecoder.decode(resource.getPath(), "utf-8"));
-                HSSFWorkbook wb = new HSSFWorkbook(new POIFSFileSystem(fis));
+                InputStream resourceAsStream = this.getClass().getResourceAsStream("/templates/教师评教明细导出模版.xls");
+                HSSFWorkbook wb = new HSSFWorkbook(resourceAsStream);
                 exprotExcelByTeacherAssessDetail(wb, list);
                 // 输出转输入
                 os = new ByteArrayOutputStream();
@@ -583,9 +582,8 @@ public class TeacherWebController {
             FileOutputStream fos = null;
             FileInputStream fis = null;
             try {
-                URL resource = this.getClass().getResource("/templates/教师评教汇总导出模版.xls");
-                fis = new FileInputStream(URLDecoder.decode(resource.getPath(), "utf-8"));
-                HSSFWorkbook wb = new HSSFWorkbook(new POIFSFileSystem(fis));
+                InputStream resourceAsStream = this.getClass().getResourceAsStream("/templates/教师评教汇总导出模版.xls");
+                HSSFWorkbook wb = new HSSFWorkbook(resourceAsStream);
                 exprotExcelByTeacherAssessGather(wb, map);
                 // 输出转输入
                 os = new ByteArrayOutputStream();
