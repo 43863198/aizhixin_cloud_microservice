@@ -4,7 +4,6 @@ package com.aizhixin.cloud.sqzd.syn.manager;
 import com.aizhixin.cloud.sqzd.common.manager.FileOperator;
 import com.aizhixin.cloud.sqzd.common.manager.JsonUtil;
 import com.aizhixin.cloud.sqzd.syn.dto.BaseDTO;
-import com.aizhixin.cloud.sqzd.syn.dto.ClassesDTO;
 import com.aizhixin.cloud.sqzd.syn.dto.FdyDTO;
 import com.aizhixin.cloud.sqzd.syn.repository.ChongqingJdbcRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -63,11 +62,11 @@ public class FdyInfoManager implements BaseDataManager {
         File f = fileOperator.getYesterdayDBFile(FILE_NAME);
         List<BaseDTO> rs = new ArrayList<>();
         if (f.exists() && f.isFile()) {
-            List<ClassesDTO> list = JsonUtil.decode(f, new TypeReference<List<ClassesDTO>>() {
+            List<FdyDTO> list = JsonUtil.decode(f, new TypeReference<List<FdyDTO>>() {
             });
             rs.addAll(list);
         } else {
-            log.warn("Read classes yesterday file ({}) not exists.", f.toString());
+            log.warn("Read fdy info yesterday file ({}) not exists.", f.toString());
         }
         return rs;
     }
