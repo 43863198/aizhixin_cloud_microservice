@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -51,6 +52,7 @@ public class ScheduleService {
     private ScheduleRollCallService scheduleRollCallService;
     @Autowired
     private ScheduleQuery scheduleQuery;
+    @Lazy
     @Autowired
     private InitScheduleService initScheduleService;
     @Autowired

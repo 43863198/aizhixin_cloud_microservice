@@ -63,6 +63,7 @@ public class TeacherPhoneResource {
     private LeaveService leaveService;
     @Autowired
     private AssessService assessService;
+    @Lazy
     @Autowired
     private InitScheduleService initScheduleService;
     @Autowired

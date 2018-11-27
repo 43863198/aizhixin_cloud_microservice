@@ -29,6 +29,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -67,6 +68,7 @@ public class LeaveService {
     private RollCallRepository rollCallRepository;
     @Autowired
     private LeaveRequestQuery leaveRequestQuery;
+    @Lazy
     @Autowired
     private InitScheduleService initScheduleService;
     @Autowired
