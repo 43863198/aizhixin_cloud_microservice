@@ -218,6 +218,7 @@ public class CounsellorService {
                     calendar.set(Calendar.MONTH, currCalendar.get(Calendar.MONTH));
                     calendar.set(Calendar.DAY_OF_MONTH, currCalendar.get(Calendar.DAY_OF_MONTH));
                     calendar.set(Calendar.MINUTE, currCalendar.get(Calendar.MINUTE) + 5);
+                    date = calendar.getTime();
                 } catch (ParseException e) {
                     log.warn("Exception", e);
                     date = null;
