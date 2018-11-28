@@ -614,6 +614,7 @@ public class CreditService {
                     Integer cCount = creditClass.getCommitCount();
                     cCount++;
                     creditClass.setCommitCount(cCount);
+                    creditClass.setLastSubmittedTime(new Date());
                     classRepository.save(creditClass);
                 }
             }

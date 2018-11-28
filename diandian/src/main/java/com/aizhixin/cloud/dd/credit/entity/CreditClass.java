@@ -1,11 +1,14 @@
 package com.aizhixin.cloud.dd.credit.entity;
 
 import com.aizhixin.cloud.dd.common.entity.AbstractOnlyIdAndCreatedDateEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author hsh
@@ -34,4 +37,12 @@ public class CreditClass extends AbstractOnlyIdAndCreatedDateEntity {
     @Getter
     @Setter
     private Integer commitCount;
+
+    @Column(name = "last_submitted_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Getter
+    @Setter
+    private Date lastSubmittedTime;
 }
