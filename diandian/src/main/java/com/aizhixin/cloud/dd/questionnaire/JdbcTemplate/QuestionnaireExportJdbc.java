@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aizhixin.cloud.dd.questionnaire.entity.Questions;
+import com.aizhixin.cloud.dd.questionnaire.entity.QuestionsChoice;
 import com.aizhixin.cloud.dd.rollcall.dto.StudentInfoDTOV2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -49,7 +52,7 @@ public class QuestionnaireExportJdbc {
 
     //获取问卷提交人数
     public Integer countCommitTotalStu(Long questionnaireId) {
-        String sql = "SELECT COUNT(dqas.`STUDENT_ID`) FROM `dd_questionnaire_assgin` AS dqa LEFT JOIN  `dd_questionnaire_assgin_students` AS dqas ON dqa.`ID`=dqas.QUESTIONNAIRE_ASSGIN_ID  WHERE dqas.`DELETE_FLAG`=0 AND dqa.`DELETE_FLAG`=0 AND dqa.`STATUS`='10' AND dqas. `STATUS`=20 AND dqa.`QUESTIONNAIRE_ID`=" + questionnaireId;
+        String sql = "SELECT COUNT(dqas.`STUDENT_ID`) FROM `dd_questionnaire_assgin` AS dqa LEFT JOIN  `dd_questionnaire_assgin_students` AS dqas ON dqa.`ID`=dqas.QUESTIONNAIRE_ASSGIN_ID  WHERE dqas.`DELETE_FLAG`=0 AND dqa.`DELETE_FLAG`=0 AND dqa.`STATUS`='10' AND dqas.`STATUS`=20 AND dqa.`QUESTIONNAIRE_ID`=" + questionnaireId;
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
@@ -135,6 +138,32 @@ public class QuestionnaireExportJdbc {
             return 0.00;
         }
         return b / a;
+    }
+
+    public Map<String, Object> getQuestionChoiceZbStu(Questions questions) {
+        String choiceStr = "";
+        for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
+            if (StringUtils.isNotEmpty(choiceStr)) {
+                choiceStr += ",";
+            }
+            choiceStr += " SUM(if(dqar.`answer` LIKE '%" + questionsChoice.getChoice() + "%', 1, 0)) " + questionsChoice.getChoice();
+        }
+        String sql = "SELECT COUNT(*) total, " + choiceStr + "  FROM `dd_question_answer_record` AS dqar WHERE dqar.`QUESTIONS_ID`=" + questions.getId() + " AND dqar.`QUESTIONNAIRE_ASSGIN_STUDENTS_ID` IN (SELECT  dqas.`id` FROM  `dd_questionnaire_assgin` AS dqa  LEFT JOIN `dd_questionnaire_assgin_students` AS dqas ON dqa.`ID`=dqas.`QUESTIONNAIRE_ASSGIN_ID`  WHERE dqa.`QUESTIONNAIRE_ID`=" + questions.getQuestionnaire().getId() + " AND dqa.`STATUS`='10' AND dqas.`STATUS`=20 AND dqas.`STUDENT_ID` IS NOT NULL GROUP BY dqas.`STUDENT_ID`)";
+        Map<String, Object> a = jdbcTemplate.queryForMap(sql);
+        return a;
+    }
+
+    public Map<String, Object> getQuestionChoiceZbUser(Questions questions) {
+        String choiceStr = "";
+        for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
+            if (StringUtils.isNotEmpty(choiceStr)) {
+                choiceStr += ",";
+            }
+            choiceStr += " SUM(if(dqar.`answer` LIKE '%" + questionsChoice.getChoice() + "%', 1, 0)) " + questionsChoice.getChoice();
+        }
+        String sql = "SELECT COUNT(*) total, " + choiceStr + " FROM `dd_question_answer_record` AS dqar WHERE dqar.`QUESTIONS_ID`=" + questions.getId() + " AND dqar.`QUESTIONNAIRE_ASSGIN_STUDENTS_ID` IN (SELECT dqa.id FROM `dd_questionnaire_assgin` AS dqa WHERE dqa.`QUESTIONNAIRE_ID`=" + questions.getQuestionnaire().getId() + " AND dqa.`STATUS`='10' AND dqa.`commit_status`=20 AND dqa.DELETE_FLAG=0)";
+        Map<String, Object> a = jdbcTemplate.queryForMap(sql);
+        return a;
     }
 
     public Double getChoiceZbUser(Long questionId, String choice, Long questionnaireId) {

@@ -163,6 +163,12 @@ public class QuestionnaireExport {
                         // 多选
                         qqdd.setQuestionType(20);
                     }
+                    Map<String, Object> zbStuMap = new HashMap<>();
+                    if (q.getQuesType().intValue() == QuestionnaireType.STUDENT.getType()) {
+                        zbStuMap = questionnaireExportJdbc.getQuestionChoiceZbStu(questions);
+                    } else {
+                        zbStuMap = questionnaireExportJdbc.getQuestionChoiceZbUser(questions);
+                    }
                     List<QuestionnaireQuestionChoiceDTO> qqcdl = new ArrayList<>();
                     for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
                         QuestionnaireQuestionChoiceDTO qqcd = new QuestionnaireQuestionChoiceDTO();
@@ -172,16 +178,17 @@ public class QuestionnaireExport {
                         } else {
                             qqcd.setScore("-");
                         }
-                        if (q.getQuesType().intValue() == QuestionnaireType.STUDENT.getType()) {
-                            Double choiceZb = questionnaireExportJdbc.getChoiceZbStu(questions.getId(),
-                                    questionsChoice.getChoice(), q.getId());
-                            qqcd.setChoiceZb(MathUtil.doubleToBFBString(choiceZb));
-                        } else {
-                            Double choiceZb = questionnaireExportJdbc.getChoiceZbUser(questions.getId(),
-                                    questionsChoice.getChoice(), q.getId());
-                            qqcd.setChoiceZb(MathUtil.doubleToBFBString(choiceZb));
+                        Double choiceZb = 0.00;
+                        if (zbStuMap.get("total") != null && zbStuMap.get(questionsChoice.getChoice()) != null) {
+                            Double a = Double.parseDouble(zbStuMap.get("total").toString());
+                            Double b = Double.parseDouble(zbStuMap.get(questionsChoice.getChoice()).toString());
+                            if (a == 0) {
+                                choiceZb = 0.00;
+                            } else {
+                                choiceZb = b / a;
+                            }
                         }
-
+                        qqcd.setChoiceZb(MathUtil.doubleToBFBString(choiceZb));
                         qqcdl.add(qqcd);
                     }
                     // 试题选项占比
