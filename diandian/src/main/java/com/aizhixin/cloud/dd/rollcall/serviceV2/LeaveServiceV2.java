@@ -21,7 +21,9 @@ import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.DianDianDaySchoolTimeTableDomain;
 import com.aizhixin.cloud.dd.rollcall.dto.PeriodDTO;
 import com.aizhixin.cloud.dd.rollcall.entity.Leave;
+import com.aizhixin.cloud.dd.rollcall.entity.StudentLeaveSchedule;
 import com.aizhixin.cloud.dd.rollcall.repository.LeaveRepository;
+import com.aizhixin.cloud.dd.rollcall.repository.StudentLeaveScheduleRepository;
 import com.aizhixin.cloud.dd.rollcall.service.InitScheduleService;
 import com.aizhixin.cloud.dd.rollcall.service.PeriodService;
 import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
@@ -56,6 +58,28 @@ public class LeaveServiceV2 {
     private PeriodService periodService;
     @Autowired
     private UserInfoRepository userInfoRepository;
+    @Autowired
+    private StudentLeaveScheduleRepository studentLeaveScheduleRepository;
+
+    public Map<String, Object> deleteLeave(Long leaveId) {
+        Map<String, Object> result = new HashMap<>();
+        Leave leave = leaveRepository.findOne(leaveId);
+        if (leave != null) {
+            leave.setDeleteFlag(DataValidity.INVALID.getState());
+            leaveRepository.save(leave);
+            List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findByLeaveIdAndDeleteFlag(leaveId, DataValidity.VALID.getState());
+            if (list != null && list.size() > 0) {
+                for (StudentLeaveSchedule item : list) {
+                    item.setDeleteFlag(DataValidity.INVALID.getState());
+                }
+                studentLeaveScheduleRepository.save(list);
+            }
+            result.put(ApiReturnConstants.SUCCESS, Boolean.TRUE);
+        } else {
+            result.put(ApiReturnConstants.SUCCESS, Boolean.FALSE);
+        }
+        return result;
+    }
 
     @Async
     public void initLeaveData() {

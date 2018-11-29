@@ -98,6 +98,21 @@ public class LeaveController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
+    /**
+     * 删除请假
+     */
+    @RequestMapping(value = "/teacher/deleteLeave", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "Delete", value = "删除请假", response = Void.class, notes = "删除请假<br>@author hsh")
+    public ResponseEntity<?> deleteLeave(@RequestHeader("Authorization") String accessToken,
+                                         @ApiParam(value = "leaveId") @RequestParam(value = "leaveId", required = false) Long leaveId) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        Map<String, Object> result = leaveService.deleteLeave(leaveId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/init/leavedata", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(httpMethod = "GET", value = "补全旧请假数据", response = Void.class, notes = "补全旧请假数据<br>@author hsh")
     public ResponseEntity<?> initLeaveData(@RequestHeader("Authorization") String accessToken) {
