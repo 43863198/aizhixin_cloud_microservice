@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.aizhixin.cloud.dd.common.core.DataValidity;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
 import com.aizhixin.cloud.dd.constant.LeaveConstants;
 import com.aizhixin.cloud.dd.rollcall.entity.Leave;
@@ -39,7 +40,7 @@ public class StudentLeaveScheduleService {
 
     public List<Long> findStudentIdByScheduleId(Schedule schedule) {
         List<Long> stList = null;
-        List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findAllByScheduleId(schedule.getId());
+        List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findAllByScheduleIdAndDeleteFlag(schedule.getId(), DataValidity.VALID.getState());
         if (null != list && list.size() > 0) {
             stList = new ArrayList();
             for (StudentLeaveSchedule sl : list) {
@@ -52,7 +53,7 @@ public class StudentLeaveScheduleService {
     public List<Long> findStudentIdByScheduleId(Schedule schedule, Date startDate, Date endDate) {
         List<Long> stList = null;
         String day = DateFormatUtil.formatShort(startDate);
-        List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findAllByScheduleId(schedule.getId());
+        List<StudentLeaveSchedule> list = studentLeaveScheduleRepository.findAllByScheduleIdAndDeleteFlag(schedule.getId(), DataValidity.VALID.getState());
         if (null != list && list.size() > 0) {
             stList = new ArrayList();
             for (StudentLeaveSchedule sl : list) {

@@ -12,7 +12,9 @@ import java.util.List;
 
 public interface StudentLeaveScheduleRepository extends JpaRepository<StudentLeaveSchedule, Long> {
 
-    List<StudentLeaveSchedule> findAllByScheduleId(Long scheduleId);
+    List<StudentLeaveSchedule> findAllByScheduleIdAndDeleteFlag(Long scheduleId, Integer deleteFlag);
+
+    List<StudentLeaveSchedule> findByLeaveIdAndDeleteFlag(Long leaveId, Integer deleteFlag);
 
     List<StudentLeaveSchedule> findByTeacherIdAndCourseIdAndRequesDateAndRequestPeriodIdAndDeleteFlag(Long teacherId, Long courseId, java.util.Date requestDate, Long requestperiodId, Integer deleteFlag);
 
