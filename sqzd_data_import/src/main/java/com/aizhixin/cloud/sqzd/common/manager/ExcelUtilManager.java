@@ -126,8 +126,8 @@ public class ExcelUtilManager {
 	public void createFdyInfoHeader(Sheet sheet) {
 		Row titleRow = sheet.createRow(0);
 		titleRow.createCell(0).setCellValue("班级编号");
-		titleRow.createCell(1).setCellValue("辅导员姓名");
-		titleRow.createCell(2).setCellValue("辅导员联系电话");
+		titleRow.createCell(1).setCellValue("辅导员工号");
+		titleRow.createCell(2).setCellValue("辅导员姓名");
 	}
 
 	public void createTeacherHeader(Sheet sheet) {
@@ -282,15 +282,15 @@ public class ExcelUtilManager {
 	}
 
 	private void writeFdyInfo(Workbook workbook, List<FdyDTO> fdyDTO) {
-		/************************************************* 学籍异动 *********************************/
+		/*************************************************辅导员表 *********************************/
 		Sheet sheet = createWorkBook(workbook, "辅导员表");
 		createFdyInfoHeader(sheet);
 		int rowIndex = 1;
 		for (FdyDTO d : fdyDTO) {
 			Row row = sheet.createRow(rowIndex);
 			row.createCell(0).setCellValue(d.getKey());
-			row.createCell(1).setCellValue(d.getFdyname());
-			row.createCell(2).setCellValue(d.getFdyphone());
+			row.createCell(1).setCellValue(d.getFdynum());
+			row.createCell(2).setCellValue(d.getFdyname());
 			rowIndex++;
 		}
 	}

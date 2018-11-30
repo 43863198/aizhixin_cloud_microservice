@@ -9,7 +9,7 @@ public class FdyDTO implements BaseDTO{
     @Getter@Setter
     private String fdyname;
     @Getter@Setter
-    private String fdyphone;
+    private String fdynum;
     @Override
     public String keyValue() {
         return key;
@@ -17,7 +17,7 @@ public class FdyDTO implements BaseDTO{
 
     @Override
     public String stringValue() {
-        return key + fdyname + fdyphone;
+        return key + fdyname + fdynum;
     }
 
     @Override

@@ -21,8 +21,8 @@ import java.util.Map;
 @Component("fdyInfoManager")
 public class FdyInfoManager implements BaseDataManager {
     private final static String KEY = "BJDM";// 数据库字段名称，班级编码
-    private final static String fdyname = "fdyname"; //数据库字段，辅导员名字
-    private final static String fdyphone = "fdyphone";//数据库字段，辅导员电话
+    private final static String fdyname = "xm"; //数据库字段，辅导员名字
+    private final static String fdynum = "gh";//数据库字段，辅导员电话
     private final static String FILE_NAME = "fdyinfo.json";//生成的json文件
 
     @Autowired
@@ -35,20 +35,28 @@ public class FdyInfoManager implements BaseDataManager {
     public List<BaseDTO> findAll() {
         List<Map<String, Object>> fdyInfo = repository.findFdyInfo();
         List<BaseDTO> list = new ArrayList<>();
+
         for(Map<String, Object> m : fdyInfo){
             FdyDTO fdyDTO = new FdyDTO();
-            if (StringUtils.isEmpty(m.get(KEY))) {
-                log.warn("BJBM code is null");
-                continue;
-            }
-            if(!StringUtils.isEmpty(m.get(fdyname)) && !StringUtils.isEmpty(m.get(fdyphone))){
+            if (!StringUtils.isEmpty(m.get(KEY))) {
                 fdyDTO.setKey(m.get(KEY).toString());
+            }else{
+                log.warn("fdy key is null");
+            }
+
+            if(!StringUtils.isEmpty(m.get(fdyname))) {
                 fdyDTO.setFdyname(m.get(fdyname).toString());
-                fdyDTO.setFdyphone(m.get(fdyphone).toString());
+            }else{
+                log.warn("fdy name is null");
+            }
+
+            if(!StringUtils.isEmpty(m.get(fdynum))) {
+                fdyDTO.setFdynum(m.get(fdynum).toString());
+            }else{
+                log.warn("fdy num is null");
             }
             list.add(fdyDTO);
-
-        }
+            }
         return list;
     }
 
