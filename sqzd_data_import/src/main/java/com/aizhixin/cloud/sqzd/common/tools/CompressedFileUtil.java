@@ -84,7 +84,7 @@ public class CompressedFileUtil {
 		try {
 			Date date = new Date();
 			String dateNow = DateFormatUtil.format(date, "yyyy-MM-dd");
-			CompressedFileUtil.compressedFile("E:\\zhixinshu\\data\\out\\" + dateNow, "E:\\zhixinshu\\data\\out");
+			CompressedFileUtil.compressedFile("E:\\aizhixin\\data\\out\\" + dateNow, "E:\\aizhixin\\data\\out");
 			log.info("The compressed file generated success");
 		} catch (Exception e) {
 			log.info("The compressed file generation failed");
