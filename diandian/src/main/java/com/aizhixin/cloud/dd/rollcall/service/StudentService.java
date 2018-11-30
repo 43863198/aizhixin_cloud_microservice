@@ -123,6 +123,71 @@ public class StudentService {
         return null;
     }
 
+    /**
+     * 包含已删除的请假
+     * @param teachingClassesId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public List<StudentDTO> listStudents3(Long teachingClassesId, Date startDate, Date endDate) {
+        String str = orgManagerRemoteService.listNotIncludeException(teachingClassesId, 1, Integer.MAX_VALUE);
+        log.info("listStudents2: {}", str);
+        if (null == str) {
+            return null;
+        }
+        JSONObject jsonObject = JSONObject.fromObject(str);
+        if (null == jsonObject) {
+            return null;
+        }
+        JSONArray data = jsonObject.getJSONArray("data");
+        List<StudentDTO> list = new ArrayList();
+        if (null != data && data.length() > 0) {
+            Set<Long> ids = new HashSet<>();
+            for (int i = 0; i < data.length(); i++) {
+                StudentDTO studentDTO = new StudentDTO();
+                JSONObject obj = data.getJSONObject(i);
+                studentDTO.setStudentId(obj.getLong("id"));
+                studentDTO.setSutdentNum(obj.getString("jobNumber"));
+                studentDTO.setStudentName(obj.getString("name"));
+                studentDTO.setClassesId(obj.getLong("classesId"));
+                studentDTO.setClassesName(obj.getString("classesName"));
+                studentDTO.setProfessionalId(obj.getLong("professionalId"));
+                studentDTO.setProfessionalName(obj.getString("professionalName"));
+                studentDTO.setCollegeId(obj.getLong("collegeId"));
+                studentDTO.setCollegeName(obj.getString("collegeName"));
+                studentDTO.setTeachingYear(obj.getString("teachingYear"));
+                list.add(studentDTO);
+                ids.add(studentDTO.getStudentId());
+            }
+            try {
+                List<Leave> leaves = leaveRepository.findByStatusAndStudentIdIn2(LeaveConstants.STATUS_PASS, startDate, endDate, ids);
+                if (leaves != null && leaves.size() > 0) {
+                    Map<Long, Leave> leaveMap = new HashMap<>();
+                    for (Leave l : leaves) {
+                        leaveMap.put(l.getStudentId(), l);
+                    }
+                    for (StudentDTO s : list) {
+                        if (leaveMap.get(s.getStudentId()) != null) {
+                            Leave leave = leaveMap.get(s.getStudentId());
+                            if (leave.getLeavePublic() == LeaveConstants.TYPE_PU) {
+                                s.setIsPublicLeave(true);
+                                s.setIsPrivateLeave(false);
+                            } else {
+                                s.setIsPublicLeave(false);
+                                s.setIsPrivateLeave(true);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("listStudents2Exception", e);
+            }
+            return list;
+        }
+        return null;
+    }
+
     public IdNameCode getClassByStudentId(Long studentId) {
         IdNameCode domain = new IdNameCode();
         String studentJson = "";
