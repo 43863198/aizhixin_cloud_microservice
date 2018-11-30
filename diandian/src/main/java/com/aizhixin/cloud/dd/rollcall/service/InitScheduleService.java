@@ -417,8 +417,9 @@ public class InitScheduleService {
                 scheduleRollCall.setIsOpenRollcall(Boolean.FALSE);
                 scheduleRollCall.setIsInClassroom(Boolean.FALSE);
             }
-            scheduleRollCallRepository.save(scheduleRollCall);
-
+            scheduleRollCall = scheduleRollCallRepository.save(scheduleRollCall);
+            log.info("save scheduleRollCall: {}", scheduleRollCall);
+            redisTemplate.opsForValue().set(RedisUtil.getSchduleRollCallDominKey(schedule.getId()), scheduleRollCall, 1, TimeUnit.DAYS);
             // ==========================reidsRollCall==============================
             redisTemplate.opsForValue().set("l-" + scheduleRollCall.getId(), "", 1, TimeUnit.DAYS);
             // 将上课的id放入reids,定时任务后续将计算中值 排课点名id

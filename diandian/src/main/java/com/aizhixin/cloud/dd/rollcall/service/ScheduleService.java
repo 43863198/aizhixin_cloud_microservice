@@ -594,7 +594,7 @@ public class ScheduleService {
                 return ApiReturn.message(Boolean.FALSE, message, null);
             }
             if (CourseRollCallConstants.OPEN_ROLLCALL.equals(courseRollCall.getIsOpen())) {
-                // 满足条件，进行初始化点名
+                log.info("满足条件，进行初始化点名。" + schedule.getId());
                 initScheduleService.initScheduleRollCall(schedule, Boolean.TRUE, null, null, null, null);
                 status = ScheduelStatusEnum.ScheduleStatusOpen.getStatus();
             } else {
@@ -671,6 +671,7 @@ public class ScheduleService {
                 return ApiReturn.message(Boolean.TRUE, message, null);
             }
             if (scheduleRollCall != null) {
+                log.warn("scheduleRollCall:{}", scheduleRollCall);
                 if (scheduleRollCall.getIsOpenRollcall() != null && scheduleRollCall.getIsOpenRollcall()) {
                     log.warn("打卡机开启, 排课id为:" + schedule.getId());
                 } else {
