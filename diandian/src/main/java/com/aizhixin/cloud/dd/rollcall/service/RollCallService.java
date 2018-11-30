@@ -1213,7 +1213,7 @@ public class RollCallService {
             Long teachingclassId = schedule.getTeachingclassId();
             Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
             Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
-            List<StudentDTO> studentList = studentService.listStudents2(teachingclassId, startDate, endDate);
+            List<StudentDTO> studentList = studentService.listStudents3(teachingclassId, startDate, endDate);
             if (null == studentList) {
                 log.info("根据教学班id获取学生列表信息为空!");
                 return;
