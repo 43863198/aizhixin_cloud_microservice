@@ -61,4 +61,7 @@ public interface TeachingClassClassesRepository extends JpaRepository<TeachingCl
 
     @Query("select distinct new com.aizhixin.cloud.orgmanager.classschedule.domain.TeachingclassAndClasses(t.teachingClass.id, t.teachingClass.name, t.classes.id, t.classes.name) from  #{#entityName} t where t.classes.id in (:classesIds) and t.semester = :semester")
     List<TeachingclassAndClasses> findTeachingClassIdNameByClassesAndSemester(@Param(value = "classesIds") Set<Long> classesIds, @Param(value = "semester") Semester semester);
+
+    @Query("select t.teachingClass.id from  #{#entityName} t where t.classes = :classes")
+    List<Long> findIdsByClasses(@Param(value = "classes") Classes classes);
 }
