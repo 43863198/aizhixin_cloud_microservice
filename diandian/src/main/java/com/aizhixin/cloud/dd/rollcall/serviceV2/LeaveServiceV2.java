@@ -155,7 +155,7 @@ public class LeaveServiceV2 {
         return user;
     }
 
-    public PageData<LeaveDomain> getLeaveList(Pageable pageable, Long orgId, String stuName, String teacherName, Integer status, String className, Integer leavePublic, Integer leaveType) {
+    public PageData<LeaveDomain> getLeaveList(Pageable pageable, Long orgId, String stuName, String teacherName, Integer status, String className, Integer leavePublic, Integer leaveType, Date startDate, Date endDate) {
         String statusStr = "reject";
         if (status == 1) {
             statusStr = "pass";
@@ -169,13 +169,47 @@ public class LeaveServiceV2 {
         if (StringUtils.isEmpty(className)) {
             className = "";
         }
+        if (startDate != null) {
+            startDate = DateFormatUtil.parse2(DateFormatUtil.formatShort(startDate)+" 00:00:00", DateFormatUtil.getDatePattern());
+        }
+        if (endDate != null) {
+            endDate = DateFormatUtil.parse2(DateFormatUtil.formatShort(endDate)+" 23:59:59", DateFormatUtil.getDatePattern());
+        }
         Page<LeaveDomain> page = null;
-        if (leavePublic != null && leaveType != null) {
-            page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className);
-        } else if (leavePublic != null) {
-            page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className);
+        if (startDate != null || endDate != null) {
+            if (startDate != null && endDate != null) {
+                if (leavePublic != null && leaveType != null) {
+                    page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndStartDateAndEndDateAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className, startDate, endDate);
+                } else if (leavePublic != null) {
+                    page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndStartDateAndEndDateAndNameLike(pageable, orgId, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className, startDate, endDate);
+                } else {
+                    page = leaveRepository.findByStatusAndDeleteFlagAndStartDateAndEndDateAndNameLike(pageable, orgId, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className, startDate, endDate);
+                }
+            } else if (startDate != null) {
+                if (leavePublic != null && leaveType != null) {
+                    page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndStartDateAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className, startDate);
+                } else if (leavePublic != null) {
+                    page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndStartDateAndNameLike(pageable, orgId, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className, startDate);
+                } else {
+                    page = leaveRepository.findByStatusAndDeleteFlagAndStartDateAndNameLike(pageable, orgId, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className, startDate);
+                }
+            } else if (endDate != null) {
+                if (leavePublic != null && leaveType != null) {
+                    page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndEndDateAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className, endDate);
+                } else if (leavePublic != null) {
+                    page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndEndDateAndNameLike(pageable, orgId, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className, endDate);
+                } else {
+                    page = leaveRepository.findByStatusAndDeleteFlagAndEndDateAndNameLike(pageable, orgId, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className, endDate);
+                }
+            }
         } else {
-            page = leaveRepository.findByStatusAndDeleteFlagAndNameLike(pageable, orgId, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className);
+            if (leavePublic != null && leaveType != null) {
+                page = leaveRepository.findByStatusAndLeavePublicAndLeaveTypeAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, leaveType, DataValidity.VALID.getState(), stuName, teacherName, className);
+            } else if (leavePublic != null) {
+                page = leaveRepository.findByStatusAndLeavePublicAndDeleteFlagAndNameLike(pageable, orgId, statusStr, leavePublic, DataValidity.VALID.getState(), stuName, teacherName, className);
+            } else {
+                page = leaveRepository.findByStatusAndDeleteFlagAndNameLike(pageable, orgId, statusStr, DataValidity.VALID.getState(), stuName, teacherName, className);
+            }
         }
         PageDomain pageDomain = new PageDomain();
         pageDomain.setPageSize(page.getSize());

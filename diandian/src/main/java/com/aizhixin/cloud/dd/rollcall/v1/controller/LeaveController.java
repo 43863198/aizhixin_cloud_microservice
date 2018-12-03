@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -87,6 +88,8 @@ public class LeaveController {
                                           @ApiParam(value = "className") @RequestParam(value = "className", required = false) String className,
                                           @ApiParam(value = "leavePublic 1:公假 0:私假") @RequestParam(value = "leavePublic", required = false) Integer leavePublic,
                                           @ApiParam(value = "leaveType") @RequestParam(value = "leaveType", required = false) Integer leaveType,
+                                          @ApiParam(value = "startDate") @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+                                          @ApiParam(value = "endDate") @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
                                           @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
                                           @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
@@ -94,7 +97,7 @@ public class LeaveController {
             return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
         }
         Pageable pageable = PageUtil.createNoErrorPageRequestAndSortType(pageNumber, pageSize, "desc", "id");
-        PageData<LeaveDomain> result = leaveService.getLeaveList(pageable, account.getOrganId(), stuName, teacherName, status, className, leavePublic, leaveType);
+        PageData<LeaveDomain> result = leaveService.getLeaveList(pageable, account.getOrganId(), stuName, teacherName, status, className, leavePublic, leaveType, startDate, endDate);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
