@@ -12,6 +12,7 @@ import com.aizhixin.cloud.orgmanager.importdata.domain.ImportBaseData;
 import com.aizhixin.cloud.orgmanager.importdata.domain.ImportCourseData;
 import com.aizhixin.cloud.orgmanager.importdata.service.BaseDataService;
 import com.aizhixin.cloud.orgmanager.importdata.service.CourseDataService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AsyncTaskBase {
     @Async
     public void importStudents(UserService userService, Long orgId, Long userId, List<StudentExcelDomain> excelDatas, RedisTokenStore redisTokenStore) {
@@ -28,7 +30,7 @@ public class AsyncTaskBase {
             userService.processStudentData(orgId, userId, excelDatas);
             studentRedisData.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 studentRedisData.setMessage("NullPointerException");
             } else {
@@ -48,6 +50,7 @@ public class AsyncTaskBase {
             userService.processTeacherData(orgId, userId, excelDatas);
             teacherRedisData.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 teacherRedisData.setMessage("NullPointerException");
             } else {
@@ -65,7 +68,7 @@ public class AsyncTaskBase {
             teachingClassService.processMustCourseScheduleData(orgId, userId, mustCourseScheduleExcelDomain);
             mustCourseScheduleExcelDomain.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 mustCourseScheduleExcelDomain.setMessage("NullPointerException");
             } else {
@@ -82,6 +85,7 @@ public class AsyncTaskBase {
             teachingClassService.processOptionCourseScheduleData(orgId, userId, optionCourseScheduleExcelDomain);
             optionCourseScheduleExcelDomain.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 optionCourseScheduleExcelDomain.setMessage("NullPointerException");
             } else {
@@ -99,6 +103,7 @@ public class AsyncTaskBase {
             courseService.processCourseData(orgId, userId, excelDatas);
             courseRedisData.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 courseRedisData.setMessage("NullPointerException");
             } else {
@@ -117,7 +122,7 @@ public class AsyncTaskBase {
             userService.processNewStudentData(orgId, userId, excelDatas);
             newStudentRedisData.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 newStudentRedisData.setMessage("NullPointerException");
             } else {
@@ -142,7 +147,7 @@ public class AsyncTaskBase {
                 redisData.setClassTeacherDomainList(excelDatas.getClassTeacherDomainList());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 redisData.setMessage("NullPointerException");
             } else {
@@ -164,7 +169,7 @@ public class AsyncTaskBase {
             service.processData(orgId, userId, excelDatas);
             redisData.setState(ExcelImportStatus.SUCCESS.getState());//成功
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("{}", e);
             if (e instanceof NullPointerException) {
                 redisData.setMessage("NullPointerException");
             } else {
