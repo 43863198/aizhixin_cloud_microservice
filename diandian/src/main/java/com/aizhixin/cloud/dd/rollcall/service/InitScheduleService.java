@@ -418,7 +418,7 @@ public class InitScheduleService {
                 scheduleRollCall.setIsInClassroom(Boolean.FALSE);
             }
             scheduleRollCall = scheduleRollCallRepository.save(scheduleRollCall);
-            log.info("save scheduleRollCall: {}", scheduleRollCall);
+            log.info("save scheduleRollCall: {}", scheduleRollCall.toString());
             redisTemplate.opsForValue().set(RedisUtil.getSchduleRollCallDominKey(schedule.getId()), scheduleRollCall, 1, TimeUnit.DAYS);
             // ==========================reidsRollCall==============================
             redisTemplate.opsForValue().set("l-" + scheduleRollCall.getId(), "", 1, TimeUnit.DAYS);
@@ -463,6 +463,7 @@ public class InitScheduleService {
             log.info("scheduleRollCall null");
             throw new NullPointerException();
         }
+        log.info("initRollCall scheduleRollCallId: {}", scheduleRollCall.getId());
         List<RollCall> rollCallList = listRollCallBySRCIdInRedis(scheduleRollCall.getId());
         // 判断是否已经在 进行点名签到中
         if (null != rollCallList && rollCallList.size() > 0) {
@@ -477,7 +478,7 @@ public class InitScheduleService {
             log.info("根据教学班id获取学生列表信息为空! scheduleId:{} teachingClassId:{}", schedule.getId(), teachingClassId);
             return false;
         } else {
-            log.info("学生列表 {}", studentList);
+            log.info("学生列表 {} {}", studentList.size(), studentList);
         }
 //        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
         RollCall rollCall = null;
