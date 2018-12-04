@@ -69,20 +69,20 @@ public class RollCallExportInfoQuery {
                 + "     ON dsr.ID = dr.SCHEDULE_ROLLCALL_ID "
                 + "   LEFT JOIN dd_schedule ds      "
                 + "     ON ds.id = dsr.SCHEDULE_ID  "
-                + "  WHERE  #teacherId#  #courseId# #beginTime# #endTime#  "
+                + "  WHERE dr.delete_flag=0 #teacherId#  #courseId# #beginTime# #endTime#  "
                 + " GROUP BY dr.course_id,          "
                 + "   dr.class_id,                  "
                 + "   dr.student_id                 ";
 
         if (!isHeadTeacher) {
             if (teacherId != null) {
-                sql = sql.replace("#teacherId#", " dr.`teacher_id` =" + teacherId.toString());
+                sql = sql.replace("#teacherId#", " AND dr.`teacher_id` =" + teacherId.toString());
             } else {
                 sql = sql.replace("#teacherId#", " ");
             }
         } else {
             if (teacherId != null) {
-                sql = sql.replace("#teacherId#", " dr.student_id in (" + studentIds + ")");
+                sql = sql.replace("#teacherId#", " AND dr.student_id in (" + studentIds + ")");
             } else {
                 sql = sql.replace("#teacherId#", " ");
             }
@@ -93,12 +93,12 @@ public class RollCallExportInfoQuery {
             sql = sql.replace("#beginTime#", " ");
         }
         if (StringUtils.isNotBlank(endTime)) {
-            sql = sql.replace("#endTime#", " and dsr.CREATED_DATE <= '" + endTime + "'");
+            sql = sql.replace("#endTime#", " AND dsr.CREATED_DATE <= '" + endTime + "'");
         } else {
             sql = sql.replace("#endTime#", " ");
         }
         if (courseId != null) {
-            sql = sql.replace("#courseId#", " and dr.`course_id` =" + courseId);
+            sql = sql.replace("#courseId#", " AND dr.`course_id` =" + courseId);
         } else {
             sql = sql.replace("#courseId#", " ");
         }
