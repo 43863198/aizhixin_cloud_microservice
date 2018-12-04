@@ -58,10 +58,10 @@ public class AttendanceRecordService {
         Long count = 0L;
         try {
             Map<String, Object> condition = new HashMap<>();
-            StringBuilder cql = new StringBuilder("SELECT r.rcount FROM (SELECT count(1) AS rcount, rc.ID as id FROM dd_rollcall rc INNER JOIN dd_schedule_rollcall sr ON rc.SCHEDULE_ROLLCALL_ID = sr.ID INNER JOIN dd_schedule s ON sr.SCHEDULE_ID = s.ID WHERE 1=1");
+            StringBuilder cql = new StringBuilder("SELECT r.rcount FROM (SELECT count(1) AS rcount, rc.ID as id FROM dd_rollcall rc LEFT JOIN dd_schedule_rollcall sr ON rc.SCHEDULE_ROLLCALL_ID = sr.ID LEFT JOIN dd_schedule s ON sr.SCHEDULE_ID = s.ID WHERE 1=1");
             StringBuilder sql = new StringBuilder("SELECT r.*, m.mcount from (");
             sql.append("SELECT rc.STUDENT_NUM, rc.STUDENT_NAME, s.COURSE_NAME, s.TEACHER_NAME, s.TEACH_DATE, s.START_TIME, s.END_TIME, s.CLASSROOM_NAME, rc.TYPE, rc.SIGN_TIME, rc.DISTANCE, rc.ID AS id, rc.CREATED_DATE FROM " +
-                    "dd_rollcall rc INNER JOIN dd_schedule_rollcall sr ON rc.SCHEDULE_ROLLCALL_ID = sr.ID INNER JOIN dd_schedule s ON sr.SCHEDULE_ID = s.ID WHERE 1=1");
+                    "dd_rollcall rc LEFT JOIN dd_schedule_rollcall sr ON rc.SCHEDULE_ROLLCALL_ID = sr.ID LEFT JOIN dd_schedule s ON sr.SCHEDULE_ID = s.ID WHERE 1=1");
             if (null != orgId) {
                 cql.append(" AND rc.org_id = :orgId");
                 sql.append(" AND rc.org_id = :orgId");
