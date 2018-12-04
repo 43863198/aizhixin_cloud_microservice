@@ -65,9 +65,9 @@ public class RollCallExportInfoQuery {
                 + "   dr.`type`                             "
                 + " FROM                                    "
                 + "   dd_rollcall dr                        "
-                + "   LEFT JOIN dd_schedule_rollcall dsr    "
+                + "   INNER JOIN dd_schedule_rollcall dsr    "
                 + "     ON dsr.ID = dr.SCHEDULE_ROLLCALL_ID "
-                + "   LEFT JOIN dd_schedule ds      "
+                + "   INNER JOIN dd_schedule ds      "
                 + "     ON ds.id = dsr.SCHEDULE_ID  "
                 + "  WHERE  #teacherId#  #courseId# #beginTime# #endTime#  "
                 + " GROUP BY dr.course_id,          "
@@ -88,12 +88,12 @@ public class RollCallExportInfoQuery {
             }
         }
         if (StringUtils.isNotBlank(beginTime)) {
-            sql = sql.replace("#beginTime#", " AND dr.`last_modified_date` >= '" + beginTime + "'");
+            sql = sql.replace("#beginTime#", " AND dsr.CREATED_DATE >= '" + beginTime + "'");
         } else {
             sql = sql.replace("#beginTime#", " ");
         }
         if (StringUtils.isNotBlank(endTime)) {
-            sql = sql.replace("#endTime#", " and dr.`last_modified_date` <= '" + endTime + "'");
+            sql = sql.replace("#endTime#", " and dsr.CREATED_DATE <= '" + endTime + "'");
         } else {
             sql = sql.replace("#endTime#", " ");
         }
