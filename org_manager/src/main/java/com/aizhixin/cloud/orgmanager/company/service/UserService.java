@@ -3251,4 +3251,24 @@ public class UserService {
         }
         return result;
     }
+
+    public PageData<TeacherSimpleDomainV2> findByOrgIdTeacherInfo(Pageable page,Long orgId,String name){
+        Page<TeacherSimpleDomainV2> teacherSimpleDomainV2Page;
+        if (StringUtils.isEmpty(name)){
+            teacherSimpleDomainV2Page = userRepository.findByTeacherOrgId(page, orgId, 60);
+        } else {
+            teacherSimpleDomainV2Page = userRepository.findByTeacherOrgIdAndNameLikeOrJobNumber(page,orgId,60,"%"+name+"%","%"+name+"%");
+        }
+        PageData<TeacherSimpleDomainV2> pageData = new PageData<>();
+        PageDomain pageDomain = new PageDomain();
+        if (teacherSimpleDomainV2Page!=null){
+            pageData.setData(teacherSimpleDomainV2Page.getContent());
+            pageDomain.setTotalElements(teacherSimpleDomainV2Page.getTotalElements());
+            pageDomain.setTotalPages(teacherSimpleDomainV2Page.getTotalPages());
+        }
+        pageDomain.setPageNumber(page.getPageNumber());
+        pageDomain.setPageSize(page.getPageSize());
+        pageData.setPage(pageDomain);
+        return pageData;
+    }
 }

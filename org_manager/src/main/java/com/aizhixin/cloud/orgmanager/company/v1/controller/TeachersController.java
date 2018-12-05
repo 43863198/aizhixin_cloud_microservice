@@ -11,6 +11,7 @@ import com.aizhixin.cloud.orgmanager.common.exception.CommonException;
 import com.aizhixin.cloud.orgmanager.common.exception.NoAuthenticationException;
 import com.aizhixin.cloud.orgmanager.company.domain.TeacherDomain;
 import com.aizhixin.cloud.orgmanager.company.domain.TeacherSimpleDomain;
+import com.aizhixin.cloud.orgmanager.company.domain.TeacherSimpleDomainV2;
 import com.aizhixin.cloud.orgmanager.company.domain.excel.TeacherRedisData;
 import com.aizhixin.cloud.orgmanager.company.entity.User;
 import com.aizhixin.cloud.orgmanager.company.service.UserService;
@@ -211,6 +212,16 @@ public class TeachersController {
             @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         return userService.querySimpleTeacherList(PageUtil.createNoErrorPageRequest(pageNumber, pageSize), orgId, collegeId, name, null);
+    }
+
+    @RequestMapping(value = "/simpleteachers/order", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "简化的老师信息查询列表，用于批量老师的操作的筛选按工号排序", response = Void.class, notes = "简化的老师信息查询列表，用于批量老师的操作的筛选按工号排序<br><br><b>@author xg</b>")
+    public PageData<TeacherSimpleDomainV2> simpleteachersOrder(
+            @ApiParam(value = "orgId 学校ID", required = true) @RequestParam(value = "orgId") Long orgId,
+            @ApiParam(value = "name 老师姓名或工号") @RequestParam(value = "name", required = false) String name,
+            @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+            @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        return userService.findByOrgIdTeacherInfo(PageUtil.createNoErrorPageRequest(pageNumber, pageSize), orgId, name);
     }
 
     @RequestMapping(value = "/querybycollege", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

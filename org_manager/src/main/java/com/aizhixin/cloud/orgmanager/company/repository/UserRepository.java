@@ -3,10 +3,7 @@ package com.aizhixin.cloud.orgmanager.company.repository;
 import com.aizhixin.cloud.orgmanager.classschedule.domain.TeachStudentDomain;
 import com.aizhixin.cloud.orgmanager.common.domain.CountDomain;
 import com.aizhixin.cloud.orgmanager.common.domain.IdNameDomain;
-import com.aizhixin.cloud.orgmanager.company.domain.IdCodeNameBase;
-import com.aizhixin.cloud.orgmanager.company.domain.StudentDomain;
-import com.aizhixin.cloud.orgmanager.company.domain.StudentSimpleDomain;
-import com.aizhixin.cloud.orgmanager.company.domain.TeacherDomain;
+import com.aizhixin.cloud.orgmanager.company.domain.*;
 import com.aizhixin.cloud.orgmanager.company.entity.Classes;
 import com.aizhixin.cloud.orgmanager.company.entity.College;
 import com.aizhixin.cloud.orgmanager.company.entity.Professional;
@@ -226,4 +223,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("select new com.aizhixin.cloud.orgmanager.classschedule.domain.TeachStudentDomain (c.id, c.name, c.jobNumber,c.college.id,c.college.name,c.sex) from #{#entityName} c where c.id in (:ids)")
     List<TeachStudentDomain> findTeacherByIds(@Param(value = "ids") Set<Long> ids);
+
+    @Query("select new com.aizhixin.cloud.orgmanager.company.domain.TeacherSimpleDomainV2(t.id,t.name,t.jobNumber) from #{#entityName} t where t.orgId = :orgId and t.userType = :userType order by t.jobNumber asc")
+    Page<TeacherSimpleDomainV2> findByTeacherOrgId(Pageable page, @Param("orgId") Long orgId, @Param("userType") Integer userType);
+
+    @Query("select new com.aizhixin.cloud.orgmanager.company.domain.TeacherSimpleDomainV2(t.id,t.name,t.jobNumber) from #{#entityName} t where t.orgId = :orgId and t.userType = :userType and (t.name like :name or t.jobNumber like :jobNumber) order by t.jobNumber asc")
+    Page<TeacherSimpleDomainV2> findByTeacherOrgIdAndNameLikeOrJobNumber(Pageable page,@Param("orgId")Long orgId, @Param("userType") Integer userType,@Param("name")String name, @Param("jobNumber")String jobNumber);
 }
