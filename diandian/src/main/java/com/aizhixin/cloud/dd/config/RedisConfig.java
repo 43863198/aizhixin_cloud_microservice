@@ -27,7 +27,7 @@ public class RedisConfig {
         jedisConnectionFactory.setPort(Integer.parseInt(env.getProperty(
                 "spring.redis.port", "6379")));
         jedisConnectionFactory.setDatabase(Integer.parseInt(env.getProperty("spring.redis.database", "9")));
-        jedisConnectionFactory.setPassword(env.getProperty("spring.redis.password", "123456"));
+//        jedisConnectionFactory.setPassword(env.getProperty("spring.redis.password", "123456"));
         jedisConnectionFactory.setUsePool(Boolean.TRUE);
         jedisConnectionFactory.afterPropertiesSet();
         return jedisConnectionFactory;
