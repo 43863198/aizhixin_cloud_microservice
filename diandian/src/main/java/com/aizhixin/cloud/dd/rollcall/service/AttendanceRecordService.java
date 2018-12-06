@@ -21,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -66,7 +69,7 @@ public class AttendanceRecordService {
         String redisData = (String) redisTemplate.opsForValue().get(key);
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isNotEmpty(redisData)) {
-            if(!redisData.equals("error")){
+            if (!redisData.equals("error")) {
                 result.put(ApiReturnConstants.RESULT, 20);
                 result.put(ApiReturnConstants.DATA, redisData);
             } else {
@@ -97,24 +100,64 @@ public class AttendanceRecordService {
     @Async
     private void exportSearchAttendanceToExcel(PageData<AttendanceRecordDTO> recordDTOPageData, String key) {
         XSSFWorkbook wb = new XSSFWorkbook();
-
+        XSSFSheet sheet = wb.createSheet("考勤记录");
+        XSSFRow titleRow = sheet.createRow(0);
+        XSSFCell c0 = titleRow.createCell(0);
+        c0.setCellValue("序号");
+        XSSFCell c1 = titleRow.createCell(1);
+        c1.setCellValue("学号");
+        XSSFCell c2 = titleRow.createCell(2);
+        c2.setCellValue("姓名");
+        XSSFCell c3 = titleRow.createCell(3);
+        c3.setCellValue("课程");
+        XSSFCell c4 = titleRow.createCell(4);
+        c4.setCellValue("任课教师");
+        XSSFCell c5 = titleRow.createCell(5);
+        c5.setCellValue("课程时间");
+        XSSFCell c6 = titleRow.createCell(6);
+        c6.setCellValue("教室");
+        XSSFCell c7 = titleRow.createCell(7);
+        c7.setCellValue("考勤状态");
+        XSSFCell c8 = titleRow.createCell(8);
+        c8.setCellValue("签到时间");
+        XSSFCell c9 = titleRow.createCell(9);
+        c9.setCellValue("备注");
+        int i = 0;
+        for (AttendanceRecordDTO item : recordDTOPageData.getData()) {
+            i++;
+            XSSFRow row = sheet.createRow(i);
+            XSSFCell cc0 = row.createCell(0);
+            cc0.setCellValue(i);
+            XSSFCell cc1 = row.createCell(1);
+            cc1.setCellValue(item.getStudentNum());
+            XSSFCell cc2 = row.createCell(2);
+            cc2.setCellValue(item.getName());
+            XSSFCell cc3 = row.createCell(3);
+            cc3.setCellValue(item.getCourseName());
+            XSSFCell cc4 = row.createCell(4);
+            cc4.setCellValue(item.getTeacherName());
+            XSSFCell cc5 = row.createCell(5);
+            cc5.setCellValue(item.getTime());
+            XSSFCell cc6 = row.createCell(6);
+            cc6.setCellValue(item.getClassRoomName());
+            XSSFCell cc7 = row.createCell(7);
+            cc7.setCellValue(item.getType());
+            XSSFCell cc8 = row.createCell(8);
+            cc8.setCellValue(item.getSignTime());
+            XSSFCell cc9 = row.createCell(9);
+            cc9.setCellValue(item.getDistance());
+        }
 
         ByteArrayOutputStream os = null;
         try {
             os = new ByteArrayOutputStream();
             wb.write(os);
             byte[] data = os.toByteArray();
-            String url = uploadIo(data, "学生评教统计.xlsx");
-            Map<String, String> redisData = new HashMap<>();
-            redisData.put(ApiReturnConstants.RESULT, "20");
-            redisData.put(ApiReturnConstants.DATA, url);
-            redisTemplate.opsForValue().set(key, redisData, 1, TimeUnit.DAYS);
+            String url = uploadIo(data, "考勤记录.xlsx");
+            redisTemplate.opsForValue().set(key, url, 1, TimeUnit.DAYS);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            Map<String, String> redisData = new HashMap<>();
-            redisData.put(ApiReturnConstants.RESULT, "30");
-            redisData.put(ApiReturnConstants.DATA, "导出错误");
-            redisTemplate.opsForValue().set(key, redisData, 1, TimeUnit.DAYS);
+            log.warn("exportSearchAttendanceToExcel", ex);
+            redisTemplate.opsForValue().set(key, "error", 1, TimeUnit.DAYS);
         } finally {
             try {
                 if (os != null) {
@@ -124,9 +167,6 @@ public class AttendanceRecordService {
                 log.warn("Exception", e);
             }
         }
-
-        String url = "";
-        redisTemplate.opsForValue().set(key, url);
     }
 
     private String uploadIo(byte[] data, String fileName) {
