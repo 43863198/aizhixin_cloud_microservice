@@ -418,7 +418,7 @@ public class InitScheduleService {
                 scheduleRollCall.setIsInClassroom(Boolean.FALSE);
             }
             scheduleRollCall = scheduleRollCallRepository.save(scheduleRollCall);
-            log.info("save scheduleRollCall: {}", scheduleRollCall.toString());
+            log.info("save scheduleRollCall: {}", scheduleRollCall);
             redisTemplate.opsForValue().set(RedisUtil.getSchduleRollCallDominKey(schedule.getId()), scheduleRollCall, 1, TimeUnit.DAYS);
             // ==========================reidsRollCall==============================
             redisTemplate.opsForValue().set("l-" + scheduleRollCall.getId(), "", 1, TimeUnit.DAYS);

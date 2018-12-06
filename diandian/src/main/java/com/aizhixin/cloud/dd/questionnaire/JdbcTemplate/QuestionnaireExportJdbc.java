@@ -142,26 +142,36 @@ public class QuestionnaireExportJdbc {
 
     public Map<String, Object> getQuestionChoiceZbStu(Questions questions) {
         String choiceStr = "";
-        for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
-            if (StringUtils.isNotEmpty(choiceStr)) {
-                choiceStr += ",";
+        if (questions.getQuestionsChoice() != null && questions.getQuestionsChoice().size() > 0) {
+            for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
+                if (StringUtils.isNotEmpty(choiceStr)) {
+                    choiceStr += ",";
+                }
+                choiceStr += " SUM(if(dqar.`answer` LIKE '%" + questionsChoice.getChoice() + "%', 1, 0)) " + questionsChoice.getChoice();
             }
-            choiceStr += " SUM(if(dqar.`answer` LIKE '%" + questionsChoice.getChoice() + "%', 1, 0)) " + questionsChoice.getChoice();
+            if (StringUtils.isNotEmpty(choiceStr)) {
+                choiceStr = "," + choiceStr;
+            }
         }
-        String sql = "SELECT COUNT(*) total, " + choiceStr + "  FROM `dd_question_answer_record` AS dqar WHERE dqar.`QUESTIONS_ID`=" + questions.getId() + " AND dqar.`QUESTIONNAIRE_ASSGIN_STUDENTS_ID` IN (SELECT  dqas.`id` FROM  `dd_questionnaire_assgin` AS dqa  LEFT JOIN `dd_questionnaire_assgin_students` AS dqas ON dqa.`ID`=dqas.`QUESTIONNAIRE_ASSGIN_ID`  WHERE dqa.`QUESTIONNAIRE_ID`=" + questions.getQuestionnaire().getId() + " AND dqa.`STATUS`='10' AND dqas.`STATUS`=20 AND dqas.`STUDENT_ID` IS NOT NULL GROUP BY dqas.`STUDENT_ID`)";
+        String sql = "SELECT COUNT(*) total " + choiceStr + "  FROM `dd_question_answer_record` AS dqar WHERE dqar.`QUESTIONS_ID`=" + questions.getId() + " AND dqar.`QUESTIONNAIRE_ASSGIN_STUDENTS_ID` IN (SELECT  dqas.`id` FROM  `dd_questionnaire_assgin` AS dqa  LEFT JOIN `dd_questionnaire_assgin_students` AS dqas ON dqa.`ID`=dqas.`QUESTIONNAIRE_ASSGIN_ID`  WHERE dqa.`QUESTIONNAIRE_ID`=" + questions.getQuestionnaire().getId() + " AND dqa.`STATUS`='10' AND dqas.`STATUS`=20 AND dqas.`STUDENT_ID` IS NOT NULL GROUP BY dqas.`STUDENT_ID`)";
         Map<String, Object> a = jdbcTemplate.queryForMap(sql);
         return a;
     }
 
     public Map<String, Object> getQuestionChoiceZbUser(Questions questions) {
         String choiceStr = "";
-        for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
-            if (StringUtils.isNotEmpty(choiceStr)) {
-                choiceStr += ",";
+        if (questions.getQuestionsChoice() != null && questions.getQuestionsChoice().size() > 0) {
+            for (QuestionsChoice questionsChoice : questions.getQuestionsChoice()) {
+                if (StringUtils.isNotEmpty(choiceStr)) {
+                    choiceStr += ",";
+                }
+                choiceStr += " SUM(if(dqar.`answer` LIKE '%" + questionsChoice.getChoice() + "%', 1, 0)) " + questionsChoice.getChoice();
             }
-            choiceStr += " SUM(if(dqar.`answer` LIKE '%" + questionsChoice.getChoice() + "%', 1, 0)) " + questionsChoice.getChoice();
+            if (StringUtils.isNotEmpty(choiceStr)) {
+                choiceStr = "," + choiceStr;
+            }
         }
-        String sql = "SELECT COUNT(*) total, " + choiceStr + " FROM `dd_question_answer_record` AS dqar WHERE dqar.`QUESTIONS_ID`=" + questions.getId() + " AND dqar.`QUESTIONNAIRE_ASSGIN_STUDENTS_ID` IN (SELECT dqa.id FROM `dd_questionnaire_assgin` AS dqa WHERE dqa.`QUESTIONNAIRE_ID`=" + questions.getQuestionnaire().getId() + " AND dqa.`STATUS`='10' AND dqa.`commit_status`=20 AND dqa.DELETE_FLAG=0)";
+        String sql = "SELECT COUNT(*) total " + choiceStr + " FROM `dd_question_answer_record` AS dqar WHERE dqar.`QUESTIONS_ID`=" + questions.getId() + " AND dqar.`QUESTIONNAIRE_ASSGIN_STUDENTS_ID` IN (SELECT dqa.id FROM `dd_questionnaire_assgin` AS dqa WHERE dqa.`QUESTIONNAIRE_ID`=" + questions.getQuestionnaire().getId() + " AND dqa.`STATUS`='10' AND dqa.`commit_status`=20 AND dqa.DELETE_FLAG=0)";
         Map<String, Object> a = jdbcTemplate.queryForMap(sql);
         return a;
     }
