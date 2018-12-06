@@ -105,7 +105,7 @@ public class LeaveController {
      * 删除请假
      */
     @RequestMapping(value = "/teacher/deleteLeave", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(httpMethod = "Delete", value = "删除请假", response = Void.class, notes = "删除请假<br>@author hsh")
+    @ApiOperation(httpMethod = "DELETE", value = "删除请假", response = Void.class, notes = "删除请假<br>@author hsh")
     public ResponseEntity<?> deleteLeave(@RequestHeader("Authorization") String accessToken,
                                          @ApiParam(value = "leaveId") @RequestParam(value = "leaveId", required = false) Long leaveId) {
         AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
