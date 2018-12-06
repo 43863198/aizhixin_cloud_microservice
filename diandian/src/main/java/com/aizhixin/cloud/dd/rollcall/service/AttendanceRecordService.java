@@ -1,5 +1,6 @@
 package com.aizhixin.cloud.dd.rollcall.service;
 
+import com.aizhixin.cloud.dd.common.core.ApiReturnConstants;
 import com.aizhixin.cloud.dd.common.core.PageUtil;
 import com.aizhixin.cloud.dd.common.domain.PageData;
 import com.aizhixin.cloud.dd.common.utils.DateFormatUtil;
@@ -7,25 +8,31 @@ import com.aizhixin.cloud.dd.communication.entity.RollCallReport;
 import com.aizhixin.cloud.dd.communication.service.RollCallEverService;
 import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.AttendanceRecordDTO;
+import com.aizhixin.cloud.dd.rollcall.dto.IODTO;
 import com.aizhixin.cloud.dd.rollcall.dto.Statistics.ClassNamingDetailsDTO;
 import com.aizhixin.cloud.dd.rollcall.dto.Statistics.RollcallStatisticsDTO;
 import com.aizhixin.cloud.dd.rollcall.entity.ModifyAttendanceLog;
 import com.aizhixin.cloud.dd.rollcall.entity.RollCall;
 import com.aizhixin.cloud.dd.rollcall.repository.ModifyAttendanceLogRepository;
 import com.aizhixin.cloud.dd.rollcall.repository.RollCallRepository;
+import com.aizhixin.cloud.dd.rollcall.utils.IOUtil;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +58,87 @@ public class AttendanceRecordService {
     private ModifyAttendanceLogRepository modifyAttendanceLogRepository;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private IOUtil ioUtil;
 
+    public Map<String, Object> getExportSearchAttendanceResult(Long orgId, Long collegeId, String criteria, String startTime, String endTime, String teachingClassName, String teacherName, String courseName, Integer type) {
+        String key = "exportSA_" + orgId + "_" + collegeId + "_" + criteria + "_" + startTime + "_" + endTime + "_" + teachingClassName + "_" + teacherName + "_" + courseName + "_" + type;
+        String redisData = (String) redisTemplate.opsForValue().get(key);
+        Map<String, Object> result = new HashMap<>();
+        if (StringUtils.isNotEmpty(redisData)) {
+            if(!redisData.equals("error")){
+                result.put(ApiReturnConstants.RESULT, 20);
+                result.put(ApiReturnConstants.DATA, redisData);
+            } else {
+                result.put(ApiReturnConstants.RESULT, 30);
+            }
+            redisTemplate.delete(key);
+        } else {
+            result.put(ApiReturnConstants.RESULT, 10);
+        }
+        return result;
+    }
+
+    public Map<String, Object> exportSearchAttendance(Long orgId, Long collegeId, String criteria, String startTime, String endTime, String teachingClassName, String teacherName, String courseName, Integer type) {
+        Map<String, Object> result = new HashMap<>();
+        Pageable pageable = PageUtil.createNoErrorPageRequest(1, Integer.MAX_VALUE);
+        PageData<AttendanceRecordDTO> recordDTOPageData = searchAttendance(orgId, collegeId, criteria, startTime, endTime, teachingClassName, teacherName, courseName, type, pageable);
+        if (recordDTOPageData != null && recordDTOPageData.getData() != null && recordDTOPageData.getData().size() > 0) {
+            //excel
+            String key = "exportSA_" + orgId + "_" + collegeId + "_" + criteria + "_" + startTime + "_" + endTime + "_" + teachingClassName + "_" + teacherName + "_" + courseName + "_" + type;
+            exportSearchAttendanceToExcel(recordDTOPageData, key);
+            result.put(ApiReturnConstants.SUCCESS, true);
+        } else {
+            result.put(ApiReturnConstants.SUCCESS, false);
+        }
+        return result;
+    }
+
+    @Async
+    private void exportSearchAttendanceToExcel(PageData<AttendanceRecordDTO> recordDTOPageData, String key) {
+        XSSFWorkbook wb = new XSSFWorkbook();
+
+
+        ByteArrayOutputStream os = null;
+        try {
+            os = new ByteArrayOutputStream();
+            wb.write(os);
+            byte[] data = os.toByteArray();
+            String url = uploadIo(data, "学生评教统计.xlsx");
+            Map<String, String> redisData = new HashMap<>();
+            redisData.put(ApiReturnConstants.RESULT, "20");
+            redisData.put(ApiReturnConstants.DATA, url);
+            redisTemplate.opsForValue().set(key, redisData, 1, TimeUnit.DAYS);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Map<String, String> redisData = new HashMap<>();
+            redisData.put(ApiReturnConstants.RESULT, "30");
+            redisData.put(ApiReturnConstants.DATA, "导出错误");
+            redisTemplate.opsForValue().set(key, redisData, 1, TimeUnit.DAYS);
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException e) {
+                log.warn("Exception", e);
+            }
+        }
+
+        String url = "";
+        redisTemplate.opsForValue().set(key, url);
+    }
+
+    private String uploadIo(byte[] data, String fileName) {
+        try {
+            IODTO ioDTO = ioUtil.upload(fileName, data);
+            String url = ioDTO.getFileUrl();
+            return url;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
     public PageData<AttendanceRecordDTO> searchAttendance(Long orgId, Long collegeId, String criteria, String startTime, String endTime, String teachingClassName, String teacherName, String courseName, Integer type, Pageable pageable) {
         PageData<AttendanceRecordDTO> p = new PageData<>();

@@ -114,7 +114,7 @@ public class WebAttendanceController {
      * @throws DlEduException
      */
     @RequestMapping(value = "/attendance/attendanceByPeriod", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(httpMethod = "GET", value = "教学班考勤 按课程节", response = Void.class, notes = "教学班考勤 按课程节<br>@author meihua.li")
+    @ApiOperation(httpMethod = "GET", value = "教学班考勤 按课程节 (上课时间考勤报表)", response = Void.class, notes = "教学班考勤 按课程节<br>@author meihua.li")
     public ResponseEntity<?> attendanceByPeriod(@ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
                                                 @ApiParam(value = "老师名称") @RequestParam(value = "teacherName", required = false) String teacherName,
                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") @ApiParam(value = "起始时间") @RequestParam(value = "beginDate", required = true) String beginDate,
@@ -325,6 +325,44 @@ public class WebAttendanceController {
             }
         }
         return attendanceRecordService.searchAttendance(orgId, collegeId, criteria, startTime, endTime, teachingClassName, teacherName, courseName, type, PageUtil.createNoErrorPageRequest(pageNumber, pageSize));
+    }
+
+    /**
+     * 导出按条件搜索学生考勤
+     *
+     * @param orgId
+     * @param criteria
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @GetMapping(value = "/attendancerecor/exportsearchbywhere", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "导出按条件搜索学生考勤。", httpMethod = "GET", response = Void.class, notes = "导出按条件搜索学生考勤。<br><br>@author jianwei.wu</b>")
+    public Map<String, Object> exportsearchbywhere(
+            @ApiParam(value = "managerId 登录用户ID", required = true) @RequestParam(value = "managerId", required = true) Long managerId,
+            @ApiParam(value = "orgId 学校id", required = true) @RequestParam(value = "orgId") Long orgId,
+            @ApiParam(value = "collegeId 班级ID") @RequestParam(value = "collegeId", required = false) Long collegeId,
+            @ApiParam(value = "criteria 姓名/学号") @RequestParam(value = "criteria", required = false) String criteria,
+            @ApiParam(value = "startTime 开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(value = "endTime 结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+
+            @ApiParam(value = "教学班名称") @RequestParam(value = "teachingClassName", required = false) String teachingClassName,
+            @ApiParam(value = "教师姓名") @RequestParam(value = "teacherName", required = false) String teacherName,
+            @ApiParam(value = "课程名称") @RequestParam(value = "courseName", required = false) String courseName,
+            @ApiParam(value = "type") @RequestParam(value = "type", required = false) Integer type) {
+        List<String> userRoles = orgManagerRemoteService.getUserRoles(managerId);
+        if (isCollegeManager(userRoles)) {
+            String userInfo = orgManagerRemoteService.getUserInfo(managerId);
+            if (null != userInfo) {
+                JSONObject user = JSONObject.fromObject(userInfo);
+                if (null != user) {
+                    collegeId = user.getLong("collegeId");
+                } else {
+                    return null;
+                }
+            }
+        }
+        return attendanceRecordService.exportSearchAttendance(orgId, collegeId, criteria, startTime, endTime, teachingClassName, teacherName, courseName, type);
     }
 
     /**
