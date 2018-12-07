@@ -154,7 +154,11 @@ public class AttendanceRecordService {
             wb.write(os);
             byte[] data = os.toByteArray();
             String url = uploadIo(data, "考勤记录.xlsx");
-            redisTemplate.opsForValue().set(key, url, 1, TimeUnit.DAYS);
+            if (StringUtils.isNotEmpty(url)) {
+                redisTemplate.opsForValue().set(key, url, 1, TimeUnit.DAYS);
+            } else {
+                redisTemplate.opsForValue().set(key, "error", 1, TimeUnit.DAYS);
+            }
         } catch (Exception ex) {
             log.warn("exportSearchAttendanceToExcel", ex);
             redisTemplate.opsForValue().set(key, "error", 1, TimeUnit.DAYS);
@@ -174,8 +178,8 @@ public class AttendanceRecordService {
             IODTO ioDTO = ioUtil.upload(fileName, data);
             String url = ioDTO.getFileUrl();
             return url;
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            log.warn("Exception", e);
             return null;
         }
     }
@@ -301,7 +305,7 @@ public class AttendanceRecordService {
             p.getPage().setPageSize(pageable.getPageSize());
             p.getPage().setTotalPages(PageUtil.cacalatePagesize(count, p.getPage().getPageSize()));
         } catch (Exception e) {
-//            log.warn("Exception", e);
+            log.warn("Exception", e);
             return p;
         }
         return p;
@@ -313,6 +317,7 @@ public class AttendanceRecordService {
         try {
             modifyAttendanceLogArrayList = modifyAttendanceLogRepository.findAllByRollcallIdOrderByOperatingDate(rollcallId);
         } catch (Exception e) {
+            log.warn("Exception", e);
             result.put("success", false);
             result.put("message", "获取修改签到日志失败！");
             return result;
@@ -341,6 +346,7 @@ public class AttendanceRecordService {
             }
             updateRollcallType(rollcallId, type);
         } catch (Exception e) {
+            log.warn("Exception", e);
             result.put("success", false);
             result.put("message", "操作员修改考勤失败！");
             return result;
@@ -366,6 +372,7 @@ public class AttendanceRecordService {
                 }
             }
         } catch (Exception e) {
+            log.warn("Exception", e);
             return false;
         }
         return true;
@@ -398,6 +405,7 @@ public class AttendanceRecordService {
             rollCallRepository.save(rollCalls);
             updateRollcallsTypeCache(rollCalls, type);
         } catch (Exception e) {
+            log.warn("Exception", e);
             result.put("success", false);
             result.put("message", "操作员修改考勤失败！");
             return result;
@@ -659,6 +667,7 @@ public class AttendanceRecordService {
                 }
             }
         } catch (Exception e) {
+            log.warn("Exception", e);
             result.put("success", false);
             result.put("message", "获取辅导员点名的行政班级学生签到信息失败！");
             return result;
