@@ -89,6 +89,8 @@ public class InitScheduleService {
     @Lazy
     @Autowired
     private PushMonitor pushMonitor;
+    @Autowired
+    private RollCallLogService rollCallLogService;
 
     public Boolean checkDayDataTask() {
         Boolean status = redisTokenStore.getInitScheduleStatus(DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT));
@@ -481,10 +483,10 @@ public class InitScheduleService {
             log.info("学生列表 {} {}", studentList.size(), studentList);
         }
 //        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
-        RollCall rollCall = null;
+       List<RollCall> rollCalls = new ArrayList<>();
         Map<Long, RollCall> rollCallMap = new HashMap();
         for (StudentDTO dto : studentList) {
-            rollCall = new RollCall();
+            RollCall rollCall = new RollCall();
             rollCall.setId(RedisUtil.getRollCallId());
             rollCall.setScheduleRollcallId(scheduleRollCall.getId());
             rollCall.setTeacherId(schedule.getTeacherId());
@@ -517,6 +519,7 @@ public class InitScheduleService {
                 rollCall.setType(RollCallConstants.TYPE_UNCOMMITTED);
             }
             rollCallMap.put(studentId, rollCall);
+            rollCalls.add(rollCall);
         }
         redisTemplate.opsForHash().putAll(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollCallMap);
         redisTemplate.expire(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), 24, TimeUnit.HOURS);
@@ -524,6 +527,7 @@ public class InitScheduleService {
         schedule.setIsInitRollcall(Boolean.TRUE);
         scheduleRepository.save(schedule);
         log.info("初始化学生签到信息完毕。" + schedule.getId());
+        rollCallLogService.saveInitLog(rollCalls);
         return true;
     }
 

@@ -142,8 +142,10 @@ public class AttendanceRecordService {
             cc6.setCellValue(item.getClassRoomName());
             XSSFCell cc7 = row.createCell(7);
             cc7.setCellValue(item.getType());
-            XSSFCell cc8 = row.createCell(8);
-            cc8.setCellValue(item.getSignTime());
+            if (item.getSignTime() != null) {
+                XSSFCell cc8 = row.createCell(8);
+                cc8.setCellValue(DateFormatUtil.format(item.getSignTime()));
+            }
             XSSFCell cc9 = row.createCell(9);
             cc9.setCellValue(item.getDistance());
         }
