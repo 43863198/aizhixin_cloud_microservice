@@ -75,6 +75,8 @@ public class ScheduleService {
     private TeachingClassRepository teachingClassRepository;
     @Autowired
     private RollCallStatsService rollCallStatsService;
+    @Autowired
+    private RollCallLogService rollCallLogService;
 
     /**
      * 目前直接从平台查询学生课表
@@ -776,7 +778,9 @@ public class ScheduleService {
                             redisTemplate.opsForValue().set(RedisUtil.DIANDIAN_ROLLCALL + rollCall.getStudentId(), rollCallRe, 15, TimeUnit.HOURS);
                         }
                     }
-                    rollCallRepository.save(rollCallList);
+                    log.info("处理的后学生数据：{}", rollCallList);
+                    rollCallList = rollCallRepository.save(rollCallList);
+                    rollCallLogService.saveSignInLog(rollCallList);
                 } else {
                     log.warn("无学生的签到信息, 排课id为:" + schedule.getId());
                 }
