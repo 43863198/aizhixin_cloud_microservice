@@ -779,8 +779,8 @@ public class ScheduleService {
                         }
                     }
                     log.info("处理的后学生数据：{}", rollCallList);
-                    rollCallList = rollCallRepository.save(rollCallList);
-                    rollCallLogService.saveSignInLog(rollCallList);
+                    rollCallRepository.save(rollCallList);
+                    rollCallLogService.saveSignInLog(schedule.getId(), scheduleRollCall.getId(), rollCallList);
                 } else {
                     log.warn("无学生的签到信息, 排课id为:" + schedule.getId());
                 }
