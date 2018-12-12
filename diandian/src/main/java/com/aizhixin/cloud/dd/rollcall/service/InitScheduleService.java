@@ -483,7 +483,7 @@ public class InitScheduleService {
             log.info("学生列表 {} {}", studentList.size(), studentList);
         }
 //        List<Long> studentLeaves = studentLeaveScheduleService.findStudentIdByScheduleId(schedule, startDate, endDate);
-       List<RollCall> rollCalls = new ArrayList<>();
+        List<RollCall> rollCalls = new ArrayList<>();
         Map<Long, RollCall> rollCallMap = new HashMap();
         for (StudentDTO dto : studentList) {
             RollCall rollCall = new RollCall();
@@ -527,7 +527,7 @@ public class InitScheduleService {
         schedule.setIsInitRollcall(Boolean.TRUE);
         scheduleRepository.save(schedule);
         log.info("初始化学生签到信息完毕。" + schedule.getId());
-        rollCallLogService.saveInitLog(rollCalls);
+        rollCallLogService.saveInitLog(schedule.getId(), scheduleRollCall.getId(), rollCalls);
         return true;
     }
 

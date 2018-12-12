@@ -7,6 +7,7 @@ import com.aizhixin.cloud.dd.counsellorollcall.thread.StudentSignThread;
 import com.aizhixin.cloud.dd.counsellorollcall.thread.UpdateRollcallMessageThread;
 import com.aizhixin.cloud.dd.counsellorollcall.v1.service.TempGroupService;
 import com.aizhixin.cloud.dd.counsellorollcall.v2.service.CounselorRollcallTeacherService;
+import com.aizhixin.cloud.dd.rollcall.service.RollCallLogService;
 import com.aizhixin.cloud.dd.rollcall.service.RollCallStatsService;
 import com.aizhixin.cloud.dd.rollcall.service.ScheduleService;
 import org.slf4j.Logger;
@@ -78,6 +79,9 @@ public class MyScheduleService {
 
     @Autowired
     private ClassPerfService classPerfService;
+
+    @Autowired
+    private RollCallLogService rollCallLogService;
 
     @Value("${schedule.execute}")
     private Boolean execute = true;
@@ -269,6 +273,18 @@ public class MyScheduleService {
         } else {
             log.info("初始化教师平时打分，获取锁失败");
         }
+    }
+
+    @Scheduled(cron = "1 0 21 * * ?")
+    public void checkRollCall() {
+        if (distributeLock.getCheckRollCallLogLock()) {
+            log.info("处理检查签到记录任务");
+            rollCallLogService.checkRollCall();
+            distributeLock.delCheckRollCallLogLock();
+        } else {
+            log.info("处理检查签到记录任务，获取锁失败");
+        }
+
     }
 
     @PostConstruct

@@ -362,6 +362,35 @@ public class DistributeLock {
         }
     }
 
+    public boolean getCheckRollCallLogLock() {
+        StringBuilder lockPath = new StringBuilder(zkLockPath);
+        StringBuilder taskPath = new StringBuilder(zkTaskPath);
+        Date current = new Date();
+        String curDayString = DateUtil.format(current);
+        String HHmm = DateUtil.format(current, "HHmm");
+        lockPath.append("/").append(curDayString).append("/checkRollCallLog/").append(HHmm);
+        taskPath.append("/").append(curDayString).append("/checkRollCallLog/").append(HHmm);
+        return getLock(lockPath.toString(), taskPath.toString());
+    }
+
+    public void delCheckRollCallLogLock() {
+        StringBuilder lockPath = new StringBuilder(zkLockPath);
+        StringBuilder taskPath = new StringBuilder(zkTaskPath);
+        Date current = new Date();
+        String curDayString = DateUtil.format(current);
+        lockPath.append("/").append(curDayString).append("/checkRollCallLog");
+        taskPath.append("/").append(curDayString).append("/checkRollCallLog");
+        CuratorFramework client = CuratorFrameworkFactory.newClient(zkConnectString, new RetryNTimes(ZOOKEEPER_RETRY_TIMES, ZOOKEEPER_RETRY_SLEEP_TIMES));
+        try {
+            client.start();
+            client.delete().deletingChildrenIfNeeded().forPath(lockPath.toString());
+            client.delete().deletingChildrenIfNeeded().forPath(taskPath.toString());
+            client.close();
+        } catch (Exception e) {
+            LOG.warn("删除锁路径({})和任务路径({})失败:{}", lockPath.toString(), taskPath.toString(), e);
+        }
+    }
+
     /**
      * 导员点名
      *

@@ -91,6 +91,9 @@ public class PhoneController {
     @Autowired
     private ContrastToolService contrastToolService;
 
+    @Autowired
+    private RollCallLogService rollCallLogService;
+
     /**
      * 手机端获取用户信息 单角色
      *
@@ -337,6 +340,13 @@ public class PhoneController {
         tempString = psw.substring(12, 14);
         contrastToolService.contrastTask();
         return new ResponseEntity(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getCheckRollCallResult", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "查询检查考勤结果", response = Void.class, notes = "查询检查考勤结果<br>@author hsh")
+    public ResponseEntity<?> getCheckRollCallResult() {
+        Map map = rollCallLogService.getCheckRollCallResult();
+        return new ResponseEntity(map, HttpStatus.OK);
     }
 
     /**
