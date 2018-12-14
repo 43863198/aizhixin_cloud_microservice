@@ -1,9 +1,12 @@
 package com.aizhixin.cloud.dd.credit.controller;
 
 import com.aizhixin.cloud.dd.common.core.ApiReturn;
+import com.aizhixin.cloud.dd.common.core.PageUtil;
+import com.aizhixin.cloud.dd.common.domain.PageData;
 import com.aizhixin.cloud.dd.common.utils.TokenUtil;
 import com.aizhixin.cloud.dd.credit.dto.CreditDTO;
 import com.aizhixin.cloud.dd.credit.dto.RatingCreditDTO;
+import com.aizhixin.cloud.dd.credit.entity.CreditCommitLog;
 import com.aizhixin.cloud.dd.credit.service.CreditService;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
 import com.aizhixin.cloud.dd.rollcall.service.DDUserService;
@@ -11,6 +14,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -174,6 +179,55 @@ public class CreditPhoneController {
         }
         creditService.commitCredit(creditId, classId);
         return new ResponseEntity(ApiReturn.message(Boolean.TRUE, null, null), HttpStatus.OK);
+    }
+
+    /**
+     * 教师查询提交记录
+     */
+    @RequestMapping(value = "/teacher/getCreditCommitLog", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "教师查询提交记录", response = Void.class, notes = "教师查询提交记录<br>@author hsh")
+    public ResponseEntity<?> getCreditCommitLog(@RequestHeader("Authorization") String accessToken,
+                                                @ApiParam(value = "creditId", required = true) @RequestParam(value = "creditId", required = true) Long creditId,
+                                                @ApiParam(value = "pageNumber 起始页") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                @ApiParam(value = "pageSize 每页的限制数目") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        Pageable pageable = PageUtil.createNoErrorPageRequestAndSortType(pageNumber, pageSize, "DESC", "id");
+        PageData<CreditCommitLog> result = creditService.getCreditCommitLog(pageable, creditId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
+    /**
+     * 教师查询提交学生记录
+     */
+    @RequestMapping(value = "/teacher/getCreditCommitStudentLog", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "教师查询提交学生记录", response = Void.class, notes = "教师查询提交学生记录<br>@author hsh")
+    public ResponseEntity<?> getCreditCommitStudentLog(@RequestHeader("Authorization") String accessToken,
+                                                       @ApiParam(value = "creditId", required = true) @RequestParam(value = "creditId", required = true) Long creditId,
+                                                       @ApiParam(value = "logId", required = true) @RequestParam(value = "logId", required = true) Long logId) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        List result = creditService.getCreditCommitStudentLog(creditId, logId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
+    /**
+     * 教师查询提交学生打分记录
+     */
+    @RequestMapping(value = "/teacher/getCreditCommitStudentRecordLog", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(httpMethod = "GET", value = "教师查询提交学生打分记录", response = Void.class, notes = "教师查询提交学生打分记录<br>@author hsh")
+    public ResponseEntity<?> getCreditCommitStudentRecordLog(@RequestHeader("Authorization") String accessToken,
+                                                             @ApiParam(value = "commitStuLogId", required = true) @RequestParam(value = "commitStuLogId", required = true) Long commitStuLogId) {
+        AccountDTO account = ddUserService.getUserInfoWithLogin(accessToken);
+        if (account == null) {
+            return new ResponseEntity<Object>(TokenUtil.tokenValid(), HttpStatus.UNAUTHORIZED);
+        }
+        List result = creditService.getCreditCommitStudentRecordLog(commitStuLogId);
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
     /*************学生*******************/

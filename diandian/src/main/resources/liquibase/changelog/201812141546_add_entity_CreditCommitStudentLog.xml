@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <property name="now" value="now()" dbms="mysql,h2"/>
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <changeSet id="201812141546" author="hsh">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="dd_credit_commit_student_log"/>
+            </not>
+        </preConditions>
+        <createTable tableName="dd_credit_commit_student_log" remarks="学分提交记录学生表">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="commit_log_id" type="BIGINT" remarks="学分提交记录 id"/>
+            <column name="credit_id" type="BIGINT" remarks="学分 id"/>
+            <column name="stu_id" type="BIGINT" remarks="学生 id"/>
+            <column name="stu_name" type="varchar(200)" remarks="姓名"/>
+            <column name="job_num" type="varchar(200)" remarks="学号"/>
+            <column name="avatar" type="varchar(400)" remarks="头像"/>
+            <column name="class_id" type="BIGINT" remarks="班级 id"/>
+            <column name="rating_count" type="INT(4)" remarks="被评价次数"/>
+            <column name="avg_score" type="FLOAT(10,1)" remarks="平均分"/>
+            <column name="avg_score_pct" type="FLOAT(10,1)" remarks="百分比平均分"/>
+
+            <column name="CREATED_DATE" type="DATETIME" defaultValueDate="${now}" remarks="创建时间"/>
+            <column name="DELETE_FLAG" type="INT(4)" defaultValueNumeric="0" remarks="删除标记(0正常,1删除)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

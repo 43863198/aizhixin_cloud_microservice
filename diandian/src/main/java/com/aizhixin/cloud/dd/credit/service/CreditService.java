@@ -1,6 +1,8 @@
 package com.aizhixin.cloud.dd.credit.service;
 
 import com.aizhixin.cloud.dd.common.core.DataValidity;
+import com.aizhixin.cloud.dd.common.domain.PageData;
+import com.aizhixin.cloud.dd.common.domain.PageDomain;
 import com.aizhixin.cloud.dd.credit.domain.CreditClassDomain;
 import com.aizhixin.cloud.dd.credit.domain.CreditDomain;
 import com.aizhixin.cloud.dd.credit.domain.CreditRatingPersonDomain;
@@ -18,18 +20,15 @@ import com.aizhixin.cloud.dd.orgStructure.repository.ClassesRepository;
 import com.aizhixin.cloud.dd.orgStructure.repository.UserInfoRepository;
 import com.aizhixin.cloud.dd.orgStructure.utils.UserType;
 import com.aizhixin.cloud.dd.rollcall.dto.AccountDTO;
-import org.apache.catalina.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.crypto.Data;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -59,6 +58,12 @@ public class CreditService {
     private ClassesRepository classesRepository;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private CreditCommitLogRepository commitLogRepository;
+    @Autowired
+    private CreditCommitStudentLogRepository studentLogRepository;
+    @Autowired
+    private CreditCommitStudentRecordLogRepository studentRecordLogRepository;
 
     @Transactional
     public void saveCredit(AccountDTO account, CreditDTO dto) {
@@ -518,6 +523,17 @@ public class CreditService {
         if (list != null && list.size() > 0) {
             CreditStudent cs = list.get(0);
             cs.setAvgScore(score);
+            //百分比分数
+            BigDecimal avgScore = new BigDecimal(score);
+            Credit credit = creditRepository.findOne(creditId);
+            CreditTemplet templet = templetRepository.findOne(credit.getTempletId());
+            if (templet.getTotalScore() > 0) {
+                BigDecimal templetTotal = new BigDecimal(templet.getTotalScore());
+                BigDecimal avgScorePct = avgScore.divide(templetTotal, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                cs.setAvgScorePct(avgScorePct.floatValue());
+            } else {
+                cs.setAvgScorePct(0f);
+            }
             studentRepository.save(cs);
         }
     }
@@ -547,6 +563,16 @@ public class CreditService {
             if (list != null && list.size() > 0) {
                 CreditStudent cs = list.get(0);
                 cs.setAvgScore(totalScore.floatValue());
+                //百分比分数
+                Credit credit = creditRepository.findOne(creditId);
+                CreditTemplet templet = templetRepository.findOne(credit.getTempletId());
+                if (templet.getTotalScore() > 0) {
+                    BigDecimal templetTotal = new BigDecimal(templet.getTotalScore());
+                    BigDecimal avgScorePct = totalScore.divide(templetTotal, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                    cs.setAvgScorePct(avgScorePct.floatValue());
+                } else {
+                    cs.setAvgScorePct(0f);
+                }
                 studentRepository.save(cs);
             }
         }
@@ -577,12 +603,14 @@ public class CreditService {
                     report.setCommitCount(0);
                     report = reportRepository.save(report);
                 }
+                Map<Long, List<CreditStudentRecord>> studentRecordMap = new HashMap<>();
                 BigDecimal count = new BigDecimal(report.getCommitCount());
                 BigDecimal newCount = new BigDecimal(report.getCommitCount() + 1);
                 BigDecimal stuCount = new BigDecimal(studentList.size());
                 BigDecimal totalScore = new BigDecimal(0);
                 for (CreditStudent item : studentList) {
                     List<CreditStudentRecord> studentRecords = studentRecordRepository.findByCreditIdAndStuIdAndDeleteFlag(creditId, item.getStuId(), DataValidity.VALID.getState());
+                    studentRecordMap.put(item.getStuId(), studentRecords);
                     List<CreditReportRecord> records = reportRecordRepository.findByReportIdAndStuId(report.getId(), item.getStuId());
                     Map<Long, CreditReportRecord> recordMap = new HashMap();
                     if (records != null && records.size() > 0) {
@@ -621,7 +649,7 @@ public class CreditService {
                 totalScore = totalScore.divide(stuCount, 1, BigDecimal.ROUND_HALF_UP);
                 report.setAvgScore(totalScore.floatValue());
                 //平均分
-                reportRepository.save(report);
+                report = reportRepository.save(report);
                 List<CreditClass> creditClasses = classRepository.findByCreditAndClassIdAndDeleteFlag(credit, classId, DataValidity.VALID.getState());
                 if (creditClasses != null && creditClasses.size() > 0) {
                     CreditClass creditClass = creditClasses.get(0);
@@ -631,6 +659,38 @@ public class CreditService {
                     creditClass.setLastSubmittedTime(new Date());
                     classRepository.save(creditClass);
                 }
+
+                //保存提交log
+                saveReportLog(report, studentList, studentRecordMap);
+            }
+        }
+    }
+
+    private void saveReportLog(CreditReport report, List<CreditStudent> studentList, Map<Long, List<CreditStudentRecord>> studentRecordMap) {
+        CreditCommitLog commitLog = new CreditCommitLog();
+        BeanUtils.copyProperties(report, commitLog);
+        commitLog.setId(null);
+        commitLog.setReportId(report.getId());
+        commitLog = commitLogRepository.save(commitLog);
+
+        for (CreditStudent creditStudent : studentList) {
+            CreditCommitStudentLog studentLog = new CreditCommitStudentLog();
+            BeanUtils.copyProperties(creditStudent, studentLog);
+            studentLog.setId(null);
+            studentLog.setCommitLogId(commitLog.getId());
+            studentLog = studentLogRepository.save(studentLog);
+
+            List<CreditStudentRecord> studentRecords = studentRecordMap.get(studentLog.getStuId());
+            if (studentRecords != null && studentRecords.size() > 0) {
+                List<CreditCommitStudentRecordLog> recordLogs = new ArrayList<>();
+                for (CreditStudentRecord studentRecord : studentRecords) {
+                    CreditCommitStudentRecordLog recordLog = new CreditCommitStudentRecordLog();
+                    BeanUtils.copyProperties(studentRecord, recordLog);
+                    recordLog.setId(null);
+                    recordLog.setCommitStuLogId(studentLog.getId());
+                    recordLogs.add(recordLog);
+                }
+                studentRecordLogRepository.save(recordLogs);
             }
         }
     }
@@ -700,9 +760,13 @@ public class CreditService {
                 student.setAvgScore(avgScore.floatValue());
                 //百分比分数
                 CreditTemplet templet = templetRepository.findOne(credit.getTempletId());
-                BigDecimal templetTotal = new BigDecimal(templet.getTotalScore());
-                BigDecimal avgScorePct = avgScore.divide(templetTotal, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
-                student.setAvgScorePct(avgScorePct.floatValue());
+                if (templet.getTotalScore() > 0) {
+                    BigDecimal templetTotal = new BigDecimal(templet.getTotalScore());
+                    BigDecimal avgScorePct = avgScore.divide(templetTotal, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                    student.setAvgScorePct(avgScorePct.floatValue());
+                } else {
+                    student.setAvgScorePct(0f);
+                }
                 student.setRatingCount(count.intValue());
                 studentRepository.save(student);
             }
@@ -721,5 +785,26 @@ public class CreditService {
 
         }
 
+    }
+
+    public PageData<CreditCommitLog> getCreditCommitLog(Pageable pageable, Long creditId) {
+        Page<CreditCommitLog> page = commitLogRepository.findByCreditId(pageable, creditId);
+        PageDomain pageDomain = new PageDomain();
+        pageDomain.setPageSize(page.getSize());
+        pageDomain.setPageNumber(page.getNumber());
+        pageDomain.setTotalElements(page.getTotalElements());
+        pageDomain.setTotalPages(page.getTotalPages());
+        PageData<CreditCommitLog> pageData = new PageData<>();
+        pageData.setData(page.getContent());
+        pageData.setPage(pageDomain);
+        return pageData;
+    }
+
+    public List getCreditCommitStudentLog(Long creditId, Long logId) {
+        return studentLogRepository.findByCommitLogIdAndCreditId(logId, creditId);
+    }
+
+    public List getCreditCommitStudentRecordLog(Long commitStuLogId) {
+        return studentRecordLogRepository.findByCommitStuLogId(commitStuLogId);
     }
 }
