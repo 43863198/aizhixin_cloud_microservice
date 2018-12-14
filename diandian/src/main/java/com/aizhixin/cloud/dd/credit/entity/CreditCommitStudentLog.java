@@ -11,9 +11,15 @@ import javax.persistence.Entity;
 /**
  * @author hsh
  */
-@Entity(name = "dd_credit_student")
+@Entity(name = "dd_credit_commit_student_log")
 @ToString
-public class CreditStudent extends AbstractOnlyIdAndCreatedDateEntity {
+public class CreditCommitStudentLog extends AbstractOnlyIdAndCreatedDateEntity {
+
+    @Column(name = "commit_log_id")
+    @Getter
+    @Setter
+    private Long commitLogId;
+
     @Column(name = "credit_id")
     @Getter
     @Setter
