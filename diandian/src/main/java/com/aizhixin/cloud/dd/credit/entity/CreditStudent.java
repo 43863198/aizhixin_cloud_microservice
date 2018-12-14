@@ -49,6 +49,11 @@ public class CreditStudent extends AbstractOnlyIdAndCreatedDateEntity {
     @Setter
     private Float avgScore;
 
+    @Column(name = "avg_score_pct")
+    @Getter
+    @Setter
+    private Float avgScorePct;
+
     @Column(name = "rating_count")
     @Getter
     @Setter

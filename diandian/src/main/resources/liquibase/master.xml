@@ -168,4 +168,5 @@
 	<include file="classpath:liquibase/changelog/201810181646_update_entity_TempGroup.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201811020933_update_entity_RollCall.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/changelog/201811281547_update_entity_CreditClass.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/changelog/201812141038_update_entity_CreditStudent.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

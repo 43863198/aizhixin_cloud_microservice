@@ -1,6 +1,7 @@
 package com.aizhixin.cloud.dd.credit.service;
 
 import com.aizhixin.cloud.dd.common.core.DataValidity;
+import com.aizhixin.cloud.dd.credit.domain.CreditClassDomain;
 import com.aizhixin.cloud.dd.credit.domain.CreditDomain;
 import com.aizhixin.cloud.dd.credit.domain.CreditRatingPersonDomain;
 import com.aizhixin.cloud.dd.credit.domain.CreditStudentDetailsDomain;
@@ -392,9 +393,9 @@ public class CreditService {
         return new ArrayList();
     }
 
-    public List getCreditListByStuId(Long stuId) {
+    public List<CreditClassDomain> getCreditListByStuId(Long stuId) {
         UserInfo userInfo = userInfoRepository.findByUserId(stuId);
-        List<CreditClass> result = new ArrayList<>();
+        List<CreditClassDomain> result = new ArrayList<>();
         if (userInfo != null && userInfo.getClassesId() != null) {
             List<CreditClass> list = classRepository.findByClassIdAndDeleteFlagOrderByIdDesc(userInfo.getClassesId(), DataValidity.VALID.getState());
             if (list != null && list.size() > 0) {
@@ -410,19 +411,32 @@ public class CreditService {
                         personMap.put(creditClass.getId(), personList);
                     }
                 }
+                Map<Long, CreditStudent> creditStudentMap = new HashMap<>();
+                List<CreditStudent> students = studentRepository.findByStuIdAndDeleteFlag(stuId, DataValidity.VALID.getState());
+                if (students != null && students.size() > 0) {
+                    for (CreditStudent item : students) {
+                        creditStudentMap.put(item.getCreditId(), item);
+                    }
+                }
                 for (CreditClass creditClass : list) {
                     List<CreditRatingPerson> personList = personMap.get(creditClass.getId());
                     Credit credit = creditClass.getCredit();
                     Credit credit1 = new Credit();
                     BeanUtils.copyProperties(credit, credit1);
                     credit1.setRatingPersonList(personList);
-                    CreditClass cc = new CreditClass();
+                    CreditClassDomain cc = new CreditClassDomain();
                     cc.setId(creditClass.getId());
                     cc.setCommitCount(creditClass.getCommitCount());
                     cc.setClassName(creditClass.getClassName());
                     cc.setClassId(creditClass.getClassId());
                     cc.setCreatedDate(creditClass.getCreatedDate());
                     cc.setCredit(credit1);
+                    CreditStudent student = creditStudentMap.get(credit1.getId());
+                    if (student != null) {
+                        cc.setAvgScore(student.getAvgScore());
+                        cc.setAvgScorePct(student.getAvgScorePct());
+                        cc.setRatingCount(student.getRatingCount());
+                    }
                     result.add(cc);
                 }
             }
@@ -684,6 +698,11 @@ public class CreditService {
                 count = count.add(new BigDecimal(1));
                 avgScore = avgScore.divide(count, 1, BigDecimal.ROUND_HALF_UP);
                 student.setAvgScore(avgScore.floatValue());
+                //百分比分数
+                CreditTemplet templet = templetRepository.findOne(credit.getTempletId());
+                BigDecimal templetTotal = new BigDecimal(templet.getTotalScore());
+                BigDecimal avgScorePct = avgScore.divide(templetTotal, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                student.setAvgScorePct(avgScorePct.floatValue());
                 student.setRatingCount(count.intValue());
                 studentRepository.save(student);
             }
