@@ -670,6 +670,7 @@ public class CreditService {
         CreditCommitLog commitLog = new CreditCommitLog();
         BeanUtils.copyProperties(report, commitLog);
         commitLog.setId(null);
+        commitLog.setCreatedDate(new Date());
         commitLog.setReportId(report.getId());
         commitLog = commitLogRepository.save(commitLog);
 
