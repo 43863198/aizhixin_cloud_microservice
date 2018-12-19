@@ -448,6 +448,36 @@ public class ScheduleService {
     }
 
     /**
+     * 检查下课
+     */
+    public void checkClassOut() {
+        try {
+            long startTime = System.currentTimeMillis() - (5 * 60 * 1000);
+            long endTime = System.currentTimeMillis() - (15 * 60 * 1000);
+            String start = DateFormatUtil.format(new Date(startTime), DateFormatUtil.FORMAT_LONG);
+            String end = DateFormatUtil.format(new Date(endTime), DateFormatUtil.FORMAT_LONG);
+            String teachDay = DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT);
+            List<Map<String, Object>> list = scheduleQuery.queryUnOuntSchedule(start, end, teachDay);
+            if (list != null && list.size() > 0) {
+                log.info("检查下课 {} {}: {}", start, end, list);
+                for (Map<String, Object> map : list) {
+                    if (map.get("schedulerollcallid") != null && map.get("scheduleid") != null) {
+                        Long scheduleRollCallId = Long.parseLong(map.get("schedulerollcallid").toString());
+                        Long scheduleId = Long.parseLong(map.get("scheduleid").toString());
+                        log.info("重新下课：scheduleId {} scheduleRollCallId {}", scheduleId, scheduleRollCallId);
+                        Schedule schedule = scheduleRepository.findOne(scheduleId);
+                        if (schedule != null) {
+                            outClassDoAnything(schedule, Boolean.FALSE);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Exception", e);
+        }
+    }
+
+    /**
      * 获取即将上课或者下课的排课
      *
      * @param time
@@ -798,7 +828,6 @@ public class ScheduleService {
             rollCallStatsService.statsStuTeachingClassByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
             rollCallStatsService.statsStuAllByScheduleRollCallId(scheduleRollCall.getId());
         } catch (Exception e) {
-            log.warn("Exception", e);
             log.warn("课后处理数据异常", e);
             message = e.getMessage();
             scheduleFlag = false;
@@ -854,7 +883,6 @@ public class ScheduleService {
                 return true;
             }
         } catch (Exception e) {
-            log.warn("Exception", e);
             log.warn("计算学生是否迟到异常，默认学生为未迟到!", e);
         }
         return true;

@@ -140,6 +140,22 @@ public class MyScheduleService {
     }
 
     /**
+     * 检查下课
+     */
+    @Scheduled(cron = "1 5,15,25,35,45,55 * * * ?")
+    public void checkClassOut() {
+        if (distributeLock.getCheckClassOutLock()) {
+            if (execute) {
+                log.info("开启检查下课处理任务");
+                scheduleService.checkClassOut();
+            }
+            distributeLock.delCheckClassOutLock();
+        } else {
+            log.info("启动检查下课处理任务，获取锁失败");
+        }
+    }
+
+    /**
      * 关闭辅导员点名 无用
      */
     @Scheduled(cron = "0 0 2 * * ?")
