@@ -452,28 +452,32 @@ public class ScheduleService {
      */
     public void checkClassOut() {
         try {
-            long startTime = System.currentTimeMillis() - (5 * 60 * 1000);
-            long endTime = System.currentTimeMillis() - (15 * 60 * 1000);
+            long startTime = System.currentTimeMillis() - (15 * 60 * 1000);
+            long endTime = System.currentTimeMillis() - (5 * 60 * 1000);
             String start = DateFormatUtil.format(new Date(startTime), DateFormatUtil.FORMAT_LONG);
             String end = DateFormatUtil.format(new Date(endTime), DateFormatUtil.FORMAT_LONG);
             String teachDay = DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT);
             List<Map<String, Object>> list = scheduleQuery.queryUnOuntSchedule(start, end, teachDay);
             if (list != null && list.size() > 0) {
-                log.info("检查下课 {} {}: {}", start, end, list);
+                log.info("检查下课: {} {}: {}", start, end, list);
                 for (Map<String, Object> map : list) {
                     if (map.get("schedulerollcallid") != null && map.get("scheduleid") != null) {
                         Long scheduleRollCallId = Long.parseLong(map.get("schedulerollcallid").toString());
                         Long scheduleId = Long.parseLong(map.get("scheduleid").toString());
-                        log.info("重新下课：scheduleId {} scheduleRollCallId {}", scheduleId, scheduleRollCallId);
+                        log.info("重新下课: scheduleId {} scheduleRollCallId {}", scheduleId, scheduleRollCallId);
                         Schedule schedule = scheduleRepository.findOne(scheduleId);
                         if (schedule != null) {
                             outClassDoAnything(schedule, Boolean.FALSE);
                         }
+                    } else {
+                        log.info("检查下课: 数据错误 {} ", map);
                     }
                 }
+            } else {
+                log.info("检查下课: 无未下课数据");
             }
         } catch (Exception e) {
-            log.warn("Exception", e);
+            log.warn("checkClassOutException", e);
         }
     }
 
