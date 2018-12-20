@@ -161,6 +161,7 @@ public class ScheduleQuery {
 
     public List<Map<String, Object>> queryUnOuntSchedule(String start, String end, String teachDay) {
         String sql = "SELECT dsr.ID schedulerollcallid,ds.ID scheduleid FROM dd_schedule_rollcall dsr LEFT JOIN dd_schedule ds ON ds.ID=dsr.SCHEDULE_ID WHERE dsr.DELETE_FLAG=0 AND ds.DELETE_FLAG=0 AND dsr.IS_IN_CLASSROOM=1 AND dsr.IS_OPEN_ROLL_CALL=1 AND ds.TEACH_DATE='" + teachDay + "' AND CONCAT(ds.TEACH_DATE,' ',ds.END_TIME)>='" + start + "' AND CONCAT(ds.TEACH_DATE,' ',ds.END_TIME)<='" + end + "'";
+        log.info("检查下课sql:" + sql);
         List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
         return result;
     }

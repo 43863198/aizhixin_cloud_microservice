@@ -14,6 +14,7 @@ import com.aizhixin.cloud.dd.remote.OrgManagerRemoteClient;
 import com.aizhixin.cloud.dd.rollcall.dto.StudentDTO;
 import com.aizhixin.cloud.dd.rollcall.entity.Schedule;
 import com.aizhixin.cloud.dd.rollcall.repository.ScheduleRepository;
+import com.aizhixin.cloud.dd.rollcall.service.ScheduleService;
 import com.aizhixin.cloud.dd.rollcall.service.StudentLeaveScheduleService;
 import com.aizhixin.cloud.dd.rollcall.service.StudentService;
 import org.apache.http.HttpResponse;
@@ -69,6 +70,13 @@ public class xgTest {
     private ScheduleRepository scheduleRepository;
     @Autowired
     private StudentLeaveScheduleService studentLeaveScheduleService;
+    @Autowired
+    private ScheduleService scheduleService;
+
+    @Test
+    public void classOut(){
+        scheduleService.checkClassOut();
+    }
 
     @Test
     public void ttttt() {
