@@ -7,9 +7,7 @@ import com.aizhixin.cloud.dd.counsellorollcall.thread.StudentSignThread;
 import com.aizhixin.cloud.dd.counsellorollcall.thread.UpdateRollcallMessageThread;
 import com.aizhixin.cloud.dd.counsellorollcall.v1.service.TempGroupService;
 import com.aizhixin.cloud.dd.counsellorollcall.v2.service.CounselorRollcallTeacherService;
-import com.aizhixin.cloud.dd.rollcall.service.RollCallLogService;
-import com.aizhixin.cloud.dd.rollcall.service.RollCallStatsService;
-import com.aizhixin.cloud.dd.rollcall.service.ScheduleService;
+import com.aizhixin.cloud.dd.rollcall.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import com.aizhixin.cloud.dd.common.services.DistributeLock;
 import com.aizhixin.cloud.dd.communication.service.RollCallEverService;
 import com.aizhixin.cloud.dd.counsellorollcall.v1.service.AlarmClockService;
 import com.aizhixin.cloud.dd.orgStructure.client.SynchronizedDataService;
-import com.aizhixin.cloud.dd.rollcall.service.InitScheduleService;
 import com.aizhixin.cloud.dd.rollcall.serviceV2.StuTeachClassService;
 import com.aizhixin.cloud.dd.rollcall.thread.TaskThread;
 
@@ -82,6 +79,8 @@ public class MyScheduleService {
 
     @Autowired
     private RollCallLogService rollCallLogService;
+    @Autowired
+    private ClassScheduleService classScheduleService;
 
     @Value("${schedule.execute}")
     private Boolean execute = true;
@@ -145,10 +144,8 @@ public class MyScheduleService {
     @Scheduled(cron = "1 5,15,25,35,45,55 * * * ?")
     public void checkClassOut() {
         if (distributeLock.getCheckClassOutLock()) {
-            if (execute) {
-                log.info("开启检查下课处理任务");
-                scheduleService.checkClassOut();
-            }
+            log.info("开启检查下课处理任务");
+            classScheduleService.checkClassOut();
             distributeLock.delCheckClassOutLock();
         } else {
             log.info("启动检查下课处理任务，获取锁失败");
