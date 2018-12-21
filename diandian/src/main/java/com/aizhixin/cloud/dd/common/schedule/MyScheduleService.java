@@ -82,19 +82,14 @@ public class MyScheduleService {
     @Autowired
     private ClassScheduleService classScheduleService;
 
-    @Value("${schedule.execute}")
-    private Boolean execute = true;
-
     /**
      * 凌晨获取排课信息
      */
     @Scheduled(cron = "0 20 0 * * ?")
     public void dayDataTask() {
         if (distributeLock.getDayInitLock()) {
-            if (execute) {
-                log.info("开始启动天粒度数据预处理任务");
-                initScheduleService.initSchedule();
-            }
+            log.info("开始启动天粒度数据预处理任务");
+            initScheduleService.initSchedule();
             distributeLock.delDayInitLock();
         } else {
             log.info("启动天粒度数据预处理任务，获取锁失败");
@@ -107,14 +102,12 @@ public class MyScheduleService {
     @Scheduled(cron = "0 20 5 * * ?")
     public void checkDayDataTask() {
         if (distributeLock.getDayInitLock()) {
-            if (execute) {
-                log.info("开始验证天粒度数据预处理任务");
-                if (!initScheduleService.checkDayDataTask()) {
-                    log.info("开始启动天粒度数据预处理任务");
-                    initScheduleService.initSchedule();
-                } else {
-                    log.info("验证天粒度数据预处理任务完成");
-                }
+            log.info("开始验证天粒度数据预处理任务");
+            if (!initScheduleService.checkDayDataTask()) {
+                log.info("开始启动天粒度数据预处理任务");
+                initScheduleService.initSchedule();
+            } else {
+                log.info("验证天粒度数据预处理任务完成");
             }
             distributeLock.delDayInitLock();
         } else {
@@ -128,10 +121,8 @@ public class MyScheduleService {
     @Scheduled(cron = "1 0,10,20,30,40,50 * * * ?")
     public void classOutAndIn() {
         if (distributeLock.getClassOutAndInLock()) {
-            if (execute) {
-                log.info("开启课前课后预处理任务");
-                scheduleService.executePerTenMinutes(null);
-            }
+            log.info("开启课前课后预处理任务");
+            scheduleService.executePerTenMinutes(null);
             distributeLock.delClassOutAndInLock();
         } else {
             log.info("启动课前课后预处理任务，获取锁失败");
@@ -139,9 +130,10 @@ public class MyScheduleService {
     }
 
     /**
-     * 检查下课
+     * 检查下课 5分钟执行一次
      */
-    @Scheduled(cron = "1 5,15,25,35,45,55 * * * ?")
+//    @Scheduled(cron = "1 5,15,25,35,45,55 * * * ?")
+    @Scheduled(cron = "1 0/5 * * * ?")
     public void checkClassOut() {
         if (distributeLock.getCheckClassOutLock()) {
             log.info("开启检查下课处理任务");
@@ -172,10 +164,8 @@ public class MyScheduleService {
     @Scheduled(cron = "30 * * * * ?")
     public void countMedian() {
         if (distributeLock.getCountMedianLock()) {
-            if (execute) {
-                log.info("开启计算中值预处理任务");
-                initScheduleService.checkRollCallTypeSchedule();
-            }
+            log.info("开启计算中值预处理任务");
+            initScheduleService.checkRollCallTypeSchedule();
             distributeLock.delCountMedianLock();
         } else {
             log.info("启动计算中值预处理任务，获取锁失败");
@@ -315,8 +305,4 @@ public class MyScheduleService {
         updateRollcallMessageThread.start();
     }
 
-
-    public Boolean getExecute() {
-        return execute;
-    }
 }
