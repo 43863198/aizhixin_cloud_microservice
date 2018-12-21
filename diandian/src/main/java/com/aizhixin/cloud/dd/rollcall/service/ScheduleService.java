@@ -534,40 +534,40 @@ public class ScheduleService {
             });
 
             // 扫描下课时间
-            log.info("扫描下课!!!任务:" + begin + " , " + end);
-            list = scheduleQuery.queryScheduleByStartAndEndTime(begin, end, time, Boolean.FALSE);
-
-            Map<Long, List> endMap = new HashMap();
-            sb = new StringBuffer();
-            for (CourseScheduleDTO dto : list) {
-                String classEndTime = dto.getTeachEndTime();
-                Date classEndDate = DateFormatUtil.parse(classEndTime, "yyyy-MM-dd HH:mm");
-                Long key = (classEndDate.getTime() - now);
-
-                if (key <= 0) {
-                    // 当前时间超过课程结束时间,5S后执行
-                    key = 5000l;
-                    System.out.println(now + "课程结束时间(endTime):" + classEndTime + "," + dto.toString());
-                }
-
-                if (!endMap.containsKey(key)) {
-                    List countList = new ArrayList();
-                    endMap.put(key, countList);
-                }
-                endMap.get(key).add(dto);
-                sb.append(dto.getScheduleId());
-                sb.append(",");
-            }
-            log.info("下课需要初始化的课程信息:" + sb.toString());
-            sb = null;
-            endMap.forEach((sleepTime, listDto) -> {
-                Thread t = new Thread(() -> {
-                    executeAfterClassPerTask(sleepTime, listDto);
-                });
-                t.setName("course_end_" + sleepTime);
-                t.start();
-            });
-            endMap = null;
+//            log.info("扫描下课!!!任务:" + begin + " , " + end);
+//            list = scheduleQuery.queryScheduleByStartAndEndTime(begin, end, time, Boolean.FALSE);
+//
+//            Map<Long, List> endMap = new HashMap();
+//            sb = new StringBuffer();
+//            for (CourseScheduleDTO dto : list) {
+//                String classEndTime = dto.getTeachEndTime();
+//                Date classEndDate = DateFormatUtil.parse(classEndTime, "yyyy-MM-dd HH:mm");
+//                Long key = (classEndDate.getTime() - now);
+//
+//                if (key <= 0) {
+//                    // 当前时间超过课程结束时间,5S后执行
+//                    key = 5000l;
+//                    System.out.println(now + "课程结束时间(endTime):" + classEndTime + "," + dto.toString());
+//                }
+//
+//                if (!endMap.containsKey(key)) {
+//                    List countList = new ArrayList();
+//                    endMap.put(key, countList);
+//                }
+//                endMap.get(key).add(dto);
+//                sb.append(dto.getScheduleId());
+//                sb.append(",");
+//            }
+//            log.info("下课需要初始化的课程信息:" + sb.toString());
+//            sb = null;
+//            endMap.forEach((sleepTime, listDto) -> {
+//                Thread t = new Thread(() -> {
+//                    executeAfterClassPerTask(sleepTime, listDto);
+//                });
+//                t.setName("course_end_" + sleepTime);
+//                t.start();
+//            });
+//            endMap = null;
         } catch (Exception e) {
             log.warn("Exception", e);
         }
