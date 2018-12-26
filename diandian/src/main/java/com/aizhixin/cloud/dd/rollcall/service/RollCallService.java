@@ -818,10 +818,15 @@ public class RollCallService {
         } else {
             // 课堂外修改
             rollCall = rollCallRepository.findOne(rollcallDTO.getId());
-            rollCall.setType(rollcallDTO.getType());
-            rollCall.setCanRollCall(Boolean.FALSE);
-            rollCallRepository.save(rollCall);
-
+            if(rollCall==null){
+                Object obj = redisTemplate.opsForHash().get(RedisUtil.getScheduleRollCallKey(scheduleRollCall.getId()), rollcallDTO.getUserId());
+                rollCall = (RollCall) obj;
+            }
+            if(rollCall!=null){
+                rollCall.setType(rollcallDTO.getType());
+                rollCall.setCanRollCall(Boolean.FALSE);
+                rollCallRepository.save(rollCall);
+            }
             //更新统计
             rollCallStatsService.statsStuAllByStuId(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getStudentId());
             rollCallStatsService.statsStuTeachingClassByTeachingClass(rollCall.getOrgId(), rollCall.getSemesterId(), rollCall.getTeachingClassId());
