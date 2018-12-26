@@ -10,6 +10,7 @@ import com.aizhixin.cloud.dd.rollcall.entity.RollCall;
 import com.aizhixin.cloud.dd.rollcall.entity.Schedule;
 import com.aizhixin.cloud.dd.rollcall.entity.ScheduleRollCall;
 import com.aizhixin.cloud.dd.rollcall.repository.RollCallRepository;
+import com.aizhixin.cloud.dd.rollcall.repository.ScheduleRepository;
 import com.aizhixin.cloud.dd.rollcall.utils.CourseUtils;
 import com.aizhixin.cloud.dd.rollcall.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -39,11 +40,17 @@ public class ClassOutService {
     private RedisTemplate redisTemplate;
     @Autowired
     private RollCallRepository rollCallRepository;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
-
-    @Async
+//    @Async
     @Transactional
-    public Map<String, Object> outClassDoAnything(Schedule schedule) {
+    public Map<String, Object> outClassDoAnything(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findOne(scheduleId);
+        if (schedule == null) {
+            log.warn("无排课信息:{}", scheduleId);
+            return ApiReturn.message(false, "无排课信息", null);
+        }
         Long schedueUseTime = System.currentTimeMillis();
         Boolean scheduleFlag = true;
         String message = "";
@@ -61,7 +68,6 @@ public class ClassOutService {
                 } else {
                     log.warn("打卡机没有开启, 排课id为:" + schedule.getId());
                 }
-//                List<Long> slss = studentLeaveScheduleService.findStudentIdByScheduleId(schedule.getId());
                 Date startDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleStartTime(), DateFormatUtil.FORMAT_MINUTE);
                 Date endDate = DateFormatUtil.parse2(schedule.getTeachDate() + " " + schedule.getScheduleEndTime(), DateFormatUtil.FORMAT_MINUTE);
                 List<StudentDTO> studentList = studentService.listStudents2(schedule.getTeachingclassId(), startDate, endDate);
@@ -176,10 +182,22 @@ public class ClassOutService {
             log.info("下课!!!修改学生的状态成功..." + schedule.getId());
             // ===============redisRollCall===================
             deleteRedisRollCallIng(schedule.getOrganId(), scheduleRollCall.getId());
-            //统计学生累计考勤
-            log.info("统计学生累计考勤...", schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
-            rollCallStatsService.statsStuTeachingClassByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
-            rollCallStatsService.statsStuAllByScheduleRollCallId(scheduleRollCall.getId());
+            try {
+                //统计学生累计考勤
+                if (schedule.getOrganId() != null && schedule.getSemesterId() != null && schedule.getTeachingclassId() != null) {
+                    log.info("统计学生累计考勤... orgId:{} semesterId:{} teachingClassId{}", schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
+                    if (rollCallStatsService != null) {
+                        rollCallStatsService.statsStuTeachingClassByTeachingClass(schedule.getOrganId(), schedule.getSemesterId(), schedule.getTeachingclassId());
+                    } else {
+                        log.warn("rollCallStatsService is null");
+                    }
+                } else {
+                    log.warn("schedule is null: {}", schedule);
+                }
+                rollCallStatsService.statsStuAllByScheduleRollCallId(scheduleRollCall.getId());
+            } catch (Exception e) {
+                log.warn("课后处理统计数据异常", e);
+            }
         } catch (Exception e) {
             log.warn("课后处理数据异常", e);
             message = e.getMessage();
