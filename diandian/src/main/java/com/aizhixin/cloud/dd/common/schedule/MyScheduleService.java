@@ -132,7 +132,6 @@ public class MyScheduleService {
     /**
      * 检查下课 5分钟执行一次
      */
-//    @Scheduled(cron = "1 5,15,25,35,45,55 * * * ?")
     @Scheduled(cron = "1 0/5 * * * ?")
     public void checkClassOut() {
         if (distributeLock.getCheckClassOutLock()) {

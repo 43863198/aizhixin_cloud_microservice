@@ -195,11 +195,11 @@ public class AttendanceStatisticsExeclQuery {
     public PageData<ClassesAttendanceByClassDto> classAttendanceGroupByClasses(Integer offset, Integer limit, Long orgId, String teachingYear, Long collegeId, Long proId,
         Long classId, String beginDate, String endDate) {
 
-        String sql = "SELECT   dr.teaching_year,  dr.college_name,  dr.professional_name,dr.class_id,  dr.`class_name`, "
-            + "   COUNT(*) AS total,  SUM(IF(dr.`TYPE` = 1, 1, 0)) AS normal,  SUM(IF(dr.`TYPE` = 3, 1, 0)) AS later,                              "
-            + "   SUM(IF(dr.`TYPE` = 4, 1, 0)) AS askForLeave,  SUM(IF(dr.`TYPE` = 5, 1, 0)) AS leaveEarly,  SUM(IF(dr.`TYPE` = 2, 1, 0)) AS truant  " + " FROM   dd_rollcall dr "
-            + " WHERE DATE_FORMAT(dr.`CREATED_DATE`, '%Y-%m-%d') >=  '" + beginDate + "'   AND DATE_FORMAT(dr.`CREATED_DATE`, '%Y-%m-%d') <=  '" + endDate
-            + "'    AND dr.org_id =  " + orgId + "  #teachingYear# #collegeId# #proId#  #classId# " + " GROUP BY  dr.`CLASS_ID`";
+        String sql = "SELECT   dr.teaching_year,  dr.college_name,  dr.professional_name,dr.class_id, dr.`class_name`, "
+            + " COUNT(*) AS total,  SUM(IF(dr.`TYPE` = 1, 1, 0)) AS normal,  SUM(IF(dr.`TYPE` = 3, 1, 0)) AS later,                              "
+            + " SUM(IF(dr.`TYPE` = 4, 1, 0)) AS askForLeave,  SUM(IF(dr.`TYPE` = 5, 1, 0)) AS leaveEarly, SUM(IF(dr.`TYPE` = 2, 1, 0)) AS truant  " + " FROM dd_rollcall dr "
+            + " WHERE DATE_FORMAT(dr.`CREATED_DATE`, '%Y-%m-%d') >= '" + beginDate + "'   AND DATE_FORMAT(dr.`CREATED_DATE`, '%Y-%m-%d') <=  '" + endDate
+            + "' AND dr.TYPE < 9 AND dr.org_id = " + orgId + "  #teachingYear# #collegeId# #proId#  #classId# " + " GROUP BY  dr.`CLASS_ID`";
 
         if (StringUtils.isNotBlank(teachingYear)) {
             sql = sql.replace("#teachingYear#", "AND dr.teaching_year like  '%" + teachingYear + "%'");
