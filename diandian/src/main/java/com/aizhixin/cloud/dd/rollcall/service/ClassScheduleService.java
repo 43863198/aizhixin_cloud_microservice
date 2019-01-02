@@ -27,12 +27,18 @@ public class ClassScheduleService {
      */
     public void checkClassOut() {
         try {
+            long startTime = System.currentTimeMillis() - (5 * 60 * 1000);
             long endTime = System.currentTimeMillis();
+            String start = DateFormatUtil.format(new Date(startTime), DateFormatUtil.FORMAT_LONG);
             String end = DateFormatUtil.format(new Date(endTime), DateFormatUtil.FORMAT_LONG);
             String teachDay = DateFormatUtil.format(new Date(), DateFormatUtil.FORMAT_SHORT);
-            List<Map<String, Object>> list = scheduleQuery.queryUnOuntSchedule(end, teachDay);
+            List<Map<String, Object>> list = scheduleQuery.querySchedule(start, end, teachDay);
+            List<Map<String, Object>> list2 = scheduleQuery.queryUnOutSchedule(start, teachDay);
             if (list != null && list.size() > 0) {
-                log.info("{} 检查下课: {}: {}", end, end, list);
+                if (list2 != null && list.size() > 0) {
+                    list.addAll(list2);
+                }
+                log.info("检查下课: {} {}: {}", start, end, list);
                 for (Map<String, Object> map : list) {
                     if (map.get("schedulerollcallid") != null && map.get("scheduleid") != null) {
                         Long scheduleRollCallId = Long.parseLong(map.get("schedulerollcallid").toString());
