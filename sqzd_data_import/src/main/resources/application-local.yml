@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:59776;DatabaseName=kingo_jwgldb;
+    username: sa
+    password: admin
+    hikari:
+      auto-commit: false

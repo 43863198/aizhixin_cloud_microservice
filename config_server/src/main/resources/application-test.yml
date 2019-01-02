@@ -4,7 +4,7 @@ eureka:
     instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
   client:
     service-url:
-      defaultZone: http://172.16.23.122:1111/eureka/,http://172.16.23.123:1111/eureka/
+      defaultZone: http://172.16.40.21:1111/eureka/,http://172.16.40.23:1111/eureka/
 spring:
   cloud:
     inetutils:
@@ -12,10 +12,10 @@ spring:
     config:
       server:
         git:
-          uri: http://172.16.23.241/edu/zx-global-config.git
+          uri: git@172.16.40.97:edu/zx-global-config.git
           search-paths: config-repo
-          username: ZxRobot
-          password: dinglicom.com
+          username: root
+          password: aizhixin
       discovery:
         enabled: true
         service-id: config-server
@@ -23,8 +23,8 @@ spring:
     stream:
       kafka:
         binder:
-          zk-nodes: 172.16.23.131:2181,172.16.23.132:2181,172.16.23.133:2181
-          brokers: 172.16.23.131:9092,172.16.23.132:9092,172.16.23.133:9092
+          zk-nodes: 172.16.40.21:2181,172.16.40.23:2181,172.16.40.30:2181
+          brokers: 172.16.40.21:9092,172.16.40.23:9092,172.16.40.30:9092
 server:
   tomcat:
     accesslog:

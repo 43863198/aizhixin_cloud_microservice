@@ -10,6 +10,7 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,13 +27,16 @@ import com.aizhixin.cloud.studentpractice.common.PageData;
 import com.aizhixin.cloud.studentpractice.common.PageDomain;
 import com.aizhixin.cloud.studentpractice.common.domain.AccountDTO;
 import com.aizhixin.cloud.studentpractice.common.domain.IdNameDomain;
+import com.aizhixin.cloud.studentpractice.common.domain.MessageDTOV2;
 import com.aizhixin.cloud.studentpractice.common.domain.PushMessageDTO;
 import com.aizhixin.cloud.studentpractice.common.domain.QueryCommentTotalDomain;
 import com.aizhixin.cloud.studentpractice.common.domain.TrainingRelationInfoDTO;
 import com.aizhixin.cloud.studentpractice.common.domain.UserInfoDomain;
+import com.aizhixin.cloud.studentpractice.common.rest.RestUtil;
 import com.aizhixin.cloud.studentpractice.task.domain.StuInforDomain;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class AuthUtilService {
@@ -75,7 +79,6 @@ public class AuthUtilService {
 	@Value("${dl.org.back.queryclassteacher}")
 	private String queryclassteacher;
 	
-	
 	@Value("${dl.em.back.querycommenttotal}")
 	private String queryCommentTotal;
 	
@@ -84,6 +87,9 @@ public class AuthUtilService {
 	
 	@Value("${dl.dd.back.dbname}")
 	private String ddBackDbName;
+	
+	@Autowired
+	private RestUtil restUtil;
 
 	public String getOrgDbName() {
 		return orgBackDbName;
@@ -403,6 +409,17 @@ public class AuthUtilService {
 		}
 	}
 	
+	
+    public void pushMsg(MessageDTOV2 dto) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String inJson = mapper.writeValueAsString(dto);
+            String outJson = restUtil.postBody(ddHost + "/api/v1/message/pushMessage", inJson, "pushMsg");
+//            System.out.println(outJson);
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+    }
 	
 	/**
 	 * 根据实践小组id集合查询实践小组企业导师和学生对应关系

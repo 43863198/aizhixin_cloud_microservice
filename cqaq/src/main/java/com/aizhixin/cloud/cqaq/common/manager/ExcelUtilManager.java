@@ -349,7 +349,14 @@ public class ExcelUtilManager {
 			row.createCell(0).setCellValue(d.getSkbj());
 			row.createCell(1).setCellValue("");
 			if (!StringUtils.isEmpty(d.getWeek())) {
+
+				String[] weeks = d.getWeek().split("\\,");
 				p = d.getWeek().indexOf("-");
+				if(weeks.length == 2){
+					start = weeks[0];
+					end = weeks[1];
+				}
+
 				if (p > 0) {
 					start = d.getWeek().substring(0, p);
 					end = d.getWeek().substring(p + 1);

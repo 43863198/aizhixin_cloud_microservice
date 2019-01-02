@@ -203,11 +203,11 @@ public class SummaryService {
 			PushMessageDTO msg = new PushMessageDTO();
 			msg.setSummaryId(summary.getId());
          	msg.setTaskName(domain.getSummaryTitle());
-         	msg.setCommitUserName(dto.getName());
-         	msg.setContent(MessageCode.MESSAGE_HEAD.concat(MessageCode.MESSAGE_STUDENT_ADD_TASK).replace("{1}", dto.getName()));
-			msg.setFunction(PushMessageConstants.MODULE_SUMMARY);
+         	msg.setContent(MessageCode.MESSAGE_HEAD.concat(MessageCode.MESSAGE_SUMMARY_SAVE).replace("{1}", dto.getName()));
+			msg.setFunction(PushMessageConstants.MODULE_TASK);
 			msg.setModule(PushMessageConstants.MODULE_TASK);
 			msg.setTitle(MessageCode.MESSAGE_TITLE_SUMMARY);
+			msg.setGroupId(summary.getGroupId());
 			ArrayList<Long> ids = new ArrayList<Long>();
 			ids.add(summary.getCounselorId());
 			msg.setUserIds(ids);
@@ -299,7 +299,7 @@ public class SummaryService {
 
 			QueryCommentTotalDomain queryCountDTO = new QueryCommentTotalDomain();
 			queryCountDTO.setSourceIds(idList);
-			queryCountDTO.setModule(PushMessageConstants.MODULE_SUMMARY);
+			queryCountDTO.setModule(PushMessageConstants.MODULE_TASK);
 
 			HashMap<String, Integer> commentTotalMap = authUtilService
 					.getCommentTotalCount(queryCountDTO, token);

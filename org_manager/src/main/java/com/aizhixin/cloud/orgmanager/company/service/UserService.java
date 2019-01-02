@@ -5,18 +5,13 @@ package com.aizhixin.cloud.orgmanager.company.service;
 
 import com.aizhixin.cloud.orgmanager.classschedule.domain.TeachStudentDomain;
 import com.aizhixin.cloud.orgmanager.classschedule.entity.TeachingClassClasses;
-import com.aizhixin.cloud.orgmanager.classschedule.entity.TeachingClassStudents;
 import com.aizhixin.cloud.orgmanager.classschedule.repository.TeachingClassClassesRepository;
 import com.aizhixin.cloud.orgmanager.classschedule.service.TeachingClassStudentsService;
 import com.aizhixin.cloud.orgmanager.common.PageData;
 import com.aizhixin.cloud.orgmanager.common.PageDomain;
 import com.aizhixin.cloud.orgmanager.common.async.AsyncTaskBase;
 import com.aizhixin.cloud.orgmanager.common.core.*;
-import com.aizhixin.cloud.orgmanager.common.domain.CounRollcallGroupDTOV2;
-import com.aizhixin.cloud.orgmanager.common.domain.CounRollcallGroupPracticeDTO;
-import com.aizhixin.cloud.orgmanager.common.domain.CountDomain;
-import com.aizhixin.cloud.orgmanager.common.domain.IdNameDomain;
-import com.aizhixin.cloud.orgmanager.common.domain.MessageDTOV2;
+import com.aizhixin.cloud.orgmanager.common.domain.*;
 import com.aizhixin.cloud.orgmanager.common.exception.CommonException;
 import com.aizhixin.cloud.orgmanager.common.provider.store.redis.RedisTokenStore;
 import com.aizhixin.cloud.orgmanager.common.rest.RestUtil;
@@ -34,7 +29,6 @@ import com.aizhixin.cloud.orgmanager.remote.PayCallbackService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -59,7 +53,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -1593,13 +1586,13 @@ public class UserService {
             for (UpdateStudentTeachingClassDTO dto : list) {
                 //delete old
                 if (dto.getOldClass() != null) {
-                    List<TeachingClassClasses> oldClassList = teachingClassClassesRepository.findByClasses(dto.getOldClass());
+                    List<Long> oldClassList = teachingClassClassesRepository.findIdsByClasses(dto.getOldClass());
                     if (oldClassList != null && oldClassList.size() > 0) {
-                        for (TeachingClassClasses item : oldClassList) {
-                            if (orgId == 0) {
-                                orgId = item.getOrgId();
-                            }
-                            teachingClassStudentsService.delete(item.getTeachingClass().getId(), dto.getStuId());
+                        for (Long id : oldClassList) {
+//                            if (orgId == 0) {
+//                                orgId = item.getOrgId();
+//                            }
+                            teachingClassStudentsService.delete(id, dto.getStuId());
                         }
                     }
                 }
@@ -1607,13 +1600,13 @@ public class UserService {
                 Set<Long> studentIds = new HashSet<>();
                 studentIds.add(dto.getStuId());
                 ids.add(dto.getStuId());
-                List<TeachingClassClasses> newClassList = teachingClassClassesRepository.findByClasses(dto.getNewClass());
+                List<Long> newClassList = teachingClassClassesRepository.findIdsByClasses(dto.getNewClass());
                 if (newClassList != null && newClassList.size() > 0) {
-                    for (TeachingClassClasses item : newClassList) {
-                        if (orgId == 0) {
-                            orgId = item.getOrgId();
-                        }
-                        teachingClassStudentsService.save(item.getTeachingClass(), studentIds);
+                    for (Long id : newClassList) {
+//                        if (orgId == 0) {
+//                            orgId = item.getOrgId();
+//                        }
+                        teachingClassStudentsService.save(id, studentIds);
                     }
                 }
             }
@@ -3257,5 +3250,25 @@ public class UserService {
             result.put(ApiReturnConstants.RESULT, false);
         }
         return result;
+    }
+
+    public PageData<TeacherSimpleDomainV2> findByOrgIdTeacherInfo(Pageable page,Long orgId,String name){
+        Page<TeacherSimpleDomainV2> teacherSimpleDomainV2Page;
+        if (StringUtils.isEmpty(name)){
+            teacherSimpleDomainV2Page = userRepository.findByTeacherOrgId(page, orgId, 60);
+        } else {
+            teacherSimpleDomainV2Page = userRepository.findByTeacherOrgIdAndNameLikeOrJobNumber(page,orgId,60,"%"+name+"%","%"+name+"%");
+        }
+        PageData<TeacherSimpleDomainV2> pageData = new PageData<>();
+        PageDomain pageDomain = new PageDomain();
+        if (teacherSimpleDomainV2Page!=null){
+            pageData.setData(teacherSimpleDomainV2Page.getContent());
+            pageDomain.setTotalElements(teacherSimpleDomainV2Page.getTotalElements());
+            pageDomain.setTotalPages(teacherSimpleDomainV2Page.getTotalPages());
+        }
+        pageDomain.setPageNumber(page.getPageNumber());
+        pageDomain.setPageSize(page.getPageSize());
+        pageData.setPage(pageDomain);
+        return pageData;
     }
 }

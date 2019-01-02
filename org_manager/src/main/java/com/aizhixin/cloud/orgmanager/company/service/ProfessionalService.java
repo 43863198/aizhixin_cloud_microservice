@@ -771,7 +771,7 @@ public class ProfessionalService {
                 }
                 codeSet.add(d.getCode());
             }
-            if (!StringUtils.isEmpty(d.getName())) {
+            if (codeSet.isEmpty() && !StringUtils.isEmpty(d.getName())) {
                 if (nameSet.contains(d.getName())) {
                     msg = "专业名称在此Excel中已经存在";
                     d.setMsg(null == d.getMsg() ? msg : d.getMsg() + "," + msg);
@@ -812,7 +812,7 @@ public class ProfessionalService {
             }
         }
         List<String> names = null;
-        if (nameSet.size() > 0) {
+        if (codeSet.isEmpty() && nameSet.size() > 0) {
             names = findNamesByOrgIdAndCodes(orgId, nameSet);
         }
         //错误判断及空行数据提示
@@ -877,8 +877,14 @@ public class ProfessionalService {
                 hasError = true;
             }
             Professional p = new Professional();
-            if (!StringUtils.isEmpty(d.getName())) {
-                cache.put(d.getName(), d);
+            if (!codeSet.isEmpty()) {
+                if (!StringUtils.isEmpty(d.getCode())) {
+                    cache.put(d.getCode(), d);
+                }
+            } else {
+                if (!StringUtils.isEmpty(d.getName())) {
+                    cache.put(d.getName(), d);
+                }
             }
             p.setCode(d.getCode());
             p.setName(d.getName());
@@ -908,6 +914,11 @@ public class ProfessionalService {
             ProfessionalExcelDomain d = cache.get(c.getName());
             if (null != d) {
                 d.setId(c.getId());
+            } else {
+                d = cache.get(c.getCode());
+                if (null != d) {
+                    d.setId(c.getId());
+                }
             }
         }
         return excelDatas;

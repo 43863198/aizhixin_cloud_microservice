@@ -6,17 +6,17 @@ package com.aizhixin.cloud.studentpractice.common.core;
 public interface PushMessageConstants {
 
 	/**
-	 * 任务实践模块
+	 * 实践消息模块
 	 */
 	String MODULE_TASK = "practiceTask";
 	
-	/**
-	 * 日志周志模块
-	 */
-	String MODULE_SUMMARY = "summary";
-
-	/**
-	 * 实践报告模块
-	 */
-	String MODULE_REPORT = "report";
+//	/**
+//	 * 日志周志模块
+//	 */
+//	String MODULE_SUMMARY = "summary";
+//
+//	/**
+//	 * 实践报告模块
+//	 */
+//	String MODULE_REPORT = "report";
 }

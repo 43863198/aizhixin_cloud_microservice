@@ -1,18 +1,5 @@
 package com.aizhixin.cloud.cqaq.syn.manager;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
 import com.aizhixin.cloud.cqaq.common.manager.FileOperator;
 import com.aizhixin.cloud.cqaq.common.manager.JsonUtil;
 import com.aizhixin.cloud.cqaq.syn.dto.BaseDTO;
@@ -22,8 +9,14 @@ import com.aizhixin.cloud.cqaq.syn.dto.excel.TeachingclassClassesDTO;
 import com.aizhixin.cloud.cqaq.syn.dto.excel.TeachingclassDTO;
 import com.aizhixin.cloud.cqaq.syn.repository.ChongqingJdbcRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
 
 @Slf4j
 @Component
@@ -279,6 +272,7 @@ public class TeachingClassAndScheduleManager {
 				if (!StringUtils.isEmpty(d.getXn())) {
 					teachingclassDTO.setXn(d.getXn() + "-" + String.valueOf(Integer.parseInt(d.getXn()) + 1));
 				}
+
 				if ("0".equals(d.getXq().toString()) && !StringUtils.isEmpty(d.getXq())) {
 					teachingclassDTO.setXq("1");
 				} else {
@@ -315,22 +309,49 @@ public class TeachingClassAndScheduleManager {
 					teachingclassClassesDTO.addBj(d.getClassesCode());
 				}
 			}
-
 			CourseScheduleDTO courseScheduleDTO = new CourseScheduleDTO();
-			courseScheduleDTO.setSkbj(d.getKey());
-			courseScheduleDTO.setClassroom(d.getClassroom());
-			courseScheduleDTO.setDayOfWeek(d.getDayOfWeek());
-			courseScheduleDTO.setPeriod(d.getPeriod());
-			courseScheduleDTO.setRs(d.getRs());
-			courseScheduleDTO.setWeek(d.getWeek());
-			Set<String> ss = teachingclassScheduleMap.get(d.getKey());
-			if (null == ss) {
-				ss = new HashSet<>();
-				teachingclassScheduleMap.put(d.getKey(), ss);
-			}
-			if (!ss.contains(courseScheduleDTO.key())) {
-				ss.add(courseScheduleDTO.key());
-				courseScheduleDTOList.add(courseScheduleDTO);
+			String weekLength = d.getWeek();
+			String[] weeks = weekLength.split("\\,");
+			int len = weeks.length;
+			if(len == 2){
+				for(int i = 0; i < len; i++) {
+					CourseScheduleDTO[] courseSchedule ;
+					courseSchedule = new CourseScheduleDTO[len];
+					courseSchedule[i] = new CourseScheduleDTO();
+					courseSchedule[i].setSkbj(d.getKey());
+					courseSchedule[i].setClassroom(d.getClassroom());
+					courseSchedule[i].setDayOfWeek(d.getDayOfWeek());
+					courseSchedule[i].setPeriod(d.getPeriod());
+					courseSchedule[i].setRs(d.getRs());
+					courseSchedule[i].setWeek(weeks[i]);
+
+					Set<String> ss = teachingclassScheduleMap.get(d.getKey());
+					if (null == ss) {
+						ss = new HashSet<>();
+						teachingclassScheduleMap.put(d.getKey(), ss);
+					}
+					if (!ss.contains(courseSchedule[i].key())) {
+						ss.add(courseSchedule[i].key());
+						courseScheduleDTOList.add(courseSchedule[i]);
+					}
+				}
+			}else{
+				courseScheduleDTO.setSkbj(d.getKey());
+				courseScheduleDTO.setClassroom(d.getClassroom());
+				courseScheduleDTO.setDayOfWeek(d.getDayOfWeek());
+				courseScheduleDTO.setPeriod(d.getPeriod());
+				courseScheduleDTO.setRs(d.getRs());
+				courseScheduleDTO.setWeek(d.getWeek());
+
+				Set<String> ss = teachingclassScheduleMap.get(d.getKey());
+				if (null == ss) {
+					ss = new HashSet<>();
+					teachingclassScheduleMap.put(d.getKey(), ss);
+				}
+				if (!ss.contains(courseScheduleDTO.key())) {
+					ss.add(courseScheduleDTO.key());
+					courseScheduleDTOList.add(courseScheduleDTO);
+				}
 			}
 		}
 	}
